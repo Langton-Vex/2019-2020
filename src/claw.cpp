@@ -3,6 +3,10 @@
 #define OPEN_POS 200
 #define CLOSE_POS -200
 
+Claw::Claw(){
+  peripherals.claw_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+}
+
 void Claw:: user_control(){
       int open = peripherals.master_controller.get_digital(DIGITAL_L1);
       int close = peripherals.master_controller.get_digital(DIGITAL_L2);

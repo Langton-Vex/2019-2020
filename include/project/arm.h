@@ -9,6 +9,7 @@ class Arm{
     Arm();
     void user_control();
     void set(int power);
+    void set_pos(float position);
   protected:
     //Peripherals_t peripherals;
 };

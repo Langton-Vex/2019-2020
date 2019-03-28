@@ -5,7 +5,8 @@ struct Peripherals_t;
 #include "main.h"
 
 class Claw{
-  public:
+public:
+    Claw();
     void user_control();
     void set(int power);
   protected:
