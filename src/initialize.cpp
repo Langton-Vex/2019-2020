@@ -17,7 +17,10 @@ Claw claw;
 void initialize() {
 
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+	pros::lcd::set_text(1, "Initialise");
+
+	
+
  // btw statics are cool
   /*
 	FILE* config_file = fopen("/usd/config.txt", "r"); // file on SD card

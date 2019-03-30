@@ -13,10 +13,15 @@
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
 void opcontrol() {
+	std::string telemetry_file("/usd/telemetry.csv");
+	FILE* telem_file = telemetry_init(telemetry_file);
 
 	while (true) {
 		macros_update(peripherals.master_controller);
+		telemetry_update(telem_file);
+
 
     chassis.user_control();
 	  arm.user_control();

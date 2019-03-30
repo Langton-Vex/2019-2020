@@ -1,3 +1,6 @@
+#ifndef _MACROS_H_
+#define _MACROS_H_
+
 #include "api.h"
 
 typedef void (*MacroFunc) (void);
@@ -12,3 +15,4 @@ struct Macro{
   bool empty = true;
   void run();
 };
+#endif
