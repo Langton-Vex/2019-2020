@@ -19,8 +19,8 @@ void opcontrol() {
 		macros_update(peripherals.master_controller);
 
     chassis.user_control();
-	  arm.user_control();
-		claw.user_control();
+	  //arm.user_control();
+		//claw.user_control();
 		pros::delay(20);
 	}
 }
