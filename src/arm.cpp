@@ -1,7 +1,7 @@
 #include "main.h"
 
 Arm::Arm(){
-  peripherals.arm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  peripherals.arm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
 void Arm:: user_control(){
@@ -14,6 +14,7 @@ void Arm:: user_control(){
 }
 
 void Arm::set(int power){
+  if (abs(power) < 10) power = 5;
   peripherals.arm_mtr.move(power);
 
 }
