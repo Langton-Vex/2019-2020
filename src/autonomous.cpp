@@ -11,4 +11,10 @@
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+
+  //for (int i=0;i<4;i++){
+    chassis.move_forward(0.5, 100);
+    chassis.point_turn(90, 100);
+  //}
+}
