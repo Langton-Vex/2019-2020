@@ -5,13 +5,13 @@
 #define PI 3.14159
 #define IN_TO_CM 2.54 // MULTIPLY BY THIS TO CONVERT INCHES TO CM
 
-#define TURN_RADIUS 1 // ALL UNITS IN METRES
-#define WHEEL_CIRCUMFERENCE 4 * IN_TO_CM * PI
+#define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
+#define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
 
 Chassis::Chassis(){
 
-	int turn_radius = TURN_RADIUS; // made a macro for convenience,
-	int wheel_circumference = WHEEL_CIRCUMFERENCE;// But OO is good practice
+	turn_radius = TURN_RADIUS; // made a macro for convenience,
+	wheel_circumference = WHEEL_CIRCUMFERENCE;// But OO is good practice
 
 	pros::motor_gearset_e_t motor_gearset = peripherals.left_mtr.get_gearing();
 	if (motor_gearset == MOTOR_GEARSET_06) motor_speed = 600;
@@ -45,8 +45,8 @@ void Chassis::set(int power, int turn){
 /*distance: a float, in metres
 velocity: an integer, in RPM*/
 void Chassis::move_forward(float distance,int velocity=100){
-	int rel_target = distance / wheel_circumference;
-	int abs_target = peripherals.left_mtr.get_position() + rel_target;
+	double rel_target = distance / wheel_circumference;
+	double abs_target = peripherals.left_mtr.get_position() + rel_target;
 	peripherals.left_mtr.move_relative(distance / wheel_circumference,velocity);
 	peripherals.right_mtr.move_relative(distance / wheel_circumference,velocity);
 
@@ -61,8 +61,8 @@ void Chassis::move_forward(float distance,int velocity=100){
 /*angle: an int, in degrees
 velocity: an integer, in RPM*/
 void Chassis::point_turn(int angle,int velocity=100){
-	int rel_target = (2*turn_radius*PI * (angle/360)) / wheel_circumference;
-	int abs_target = peripherals.left_mtr.get_position() + rel_target;
+	double rel_target = (2*turn_radius*PI * (angle/360)) / wheel_circumference;
+	double abs_target = peripherals.left_mtr.get_position() + rel_target;
 	peripherals.left_mtr.move_relative(rel_target,velocity);
 	peripherals.right_mtr.move_relative(-rel_target,velocity);
 
