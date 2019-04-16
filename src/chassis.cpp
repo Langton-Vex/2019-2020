@@ -47,13 +47,16 @@ velocity: an integer, in RPM*/
 void Chassis::move_forward(double distance,int velocity=100){
 	double rel_target = distance / wheel_circumference;
 	double abs_target = peripherals.left_mtr.get_position() + rel_target;
-	peripherals.left_mtr.move_relative(distance / wheel_circumference,velocity);
-	peripherals.right_mtr.move_relative(distance / wheel_circumference,velocity);
+  pros::lcd::print(0,"%f",rel_target);
+  peripherals.left_mtr.move_relative(100,100);
+  peripherals.right_mtr.move_relative(100,100);
+	//peripherals.left_mtr.move_relative(rel_target,velocity);
+	//peripherals.right_mtr.move_relative(rel_target,velocity);
 
 	while (!((peripherals.left_mtr.get_position() < abs_target + 5.0) &&
 				   (peripherals.left_mtr.get_position() > abs_target - 5.0))) {
 	  // Continue running this loop as long as the motor is not within +-5 units of its goal
-	  pros::delay(2);
+	  pros::delay(20);
   }
 
 };

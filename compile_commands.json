@@ -28,11 +28,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/claw.cpp.o",
             "src\\claw.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\claw.cpp"
+=======
+            "bin/peripherals.cpp.o",
+            "src\\peripherals.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\peripherals.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -63,11 +71,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/peripherals.cpp.o",
             "src\\peripherals.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\peripherals.cpp"
+=======
+            "bin/claw.cpp.o",
+            "src\\claw.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\claw.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -98,11 +114,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/chassis.cpp.o",
             "src\\chassis.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\chassis.cpp"
+=======
+            "bin/macros.cpp.o",
+            "src\\macros.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\macros.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -133,11 +157,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/autonomous.cpp.o",
             "src\\autonomous.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\autonomous.cpp"
+=======
+            "bin/initialize.cpp.o",
+            "src\\initialize.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\initialize.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -168,11 +200,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/arm.cpp.o",
             "src\\arm.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\arm.cpp"
+=======
+            "bin/opcontrol.cpp.o",
+            "src\\opcontrol.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\opcontrol.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -203,11 +243,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/initialize.cpp.o",
             "src\\initialize.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\initialize.cpp"
+=======
+            "bin/arm.cpp.o",
+            "src\\arm.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\arm.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -238,11 +286,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/macros.cpp.o",
             "src\\macros.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\macros.cpp"
+=======
+            "bin/helpers.cpp.o",
+            "src\\helpers.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\helpers.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -273,11 +329,19 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/helpers.cpp.o",
             "src\\helpers.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\helpers.cpp"
+=======
+            "bin/chassis.cpp.o",
+            "src\\chassis.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\chassis.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     },
     {
         "arguments": [
@@ -308,10 +372,18 @@
             "-fdiagnostics-color",
             "--std=gnu++17",
             "-o",
+<<<<<<< HEAD
             "C:/Users/Joshua/AppData/Local/Temp/tmpr8svbp4c/opcontrol.cpp.o",
             "src\\opcontrol.cpp"
         ],
         "directory": "C:\\Users\\Joshua\\Desktop\\Vex\\PROS test",
         "file": "src\\opcontrol.cpp"
+=======
+            "bin/autonomous.cpp.o",
+            "src\\autonomous.cpp"
+        ],
+        "directory": "C:\\Users\\admin\\Desktop\\Vex yr10\\2019-2020",
+        "file": "src\\autonomous.cpp"
+>>>>>>> fbcd06d607c77a26f1553effea0ac012053a9ee3
     }
 ]
