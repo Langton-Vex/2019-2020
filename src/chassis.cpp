@@ -44,14 +44,14 @@ void Chassis::set(int power, int turn){
 
 /*distance: a float, in metres
 velocity: an integer, in RPM*/
-void Chassis::move_forward(float distance,int velocity=100){
+void Chassis::move_forward(double distance,int velocity=100){
 	double rel_target = distance / wheel_circumference;
 	double abs_target = peripherals.left_mtr.get_position() + rel_target;
 	peripherals.left_mtr.move_relative(distance / wheel_circumference,velocity);
 	peripherals.right_mtr.move_relative(distance / wheel_circumference,velocity);
 
-	while (!((peripherals.left_mtr.get_position() < abs_target + 5) &&
-				   (peripherals.left_mtr.get_position() > abs_target - 5))) {
+	while (!((peripherals.left_mtr.get_position() < abs_target + 5.0) &&
+				   (peripherals.left_mtr.get_position() > abs_target - 5.0))) {
 	  // Continue running this loop as long as the motor is not within +-5 units of its goal
 	  pros::delay(2);
   }
@@ -60,14 +60,14 @@ void Chassis::move_forward(float distance,int velocity=100){
 
 /*angle: an int, in degrees
 velocity: an integer, in RPM*/
-void Chassis::point_turn(int angle,int velocity=100){
+void Chassis::point_turn(double angle,int velocity=100){
 	double rel_target = (2*turn_radius*PI * (angle/360)) / wheel_circumference;
 	double abs_target = peripherals.left_mtr.get_position() + rel_target;
 	peripherals.left_mtr.move_relative(rel_target,velocity);
 	peripherals.right_mtr.move_relative(-rel_target,velocity);
 
-	while (!((peripherals.left_mtr.get_position() < abs_target + 5) &&
-				   (peripherals.left_mtr.get_position() > abs_target - 5))) {
+	while (!((peripherals.left_mtr.get_position() < abs_target + 5.0) &&
+				   (peripherals.left_mtr.get_position() > abs_target - 5.0))) {
 	  // Continue running this loop as long as the motor is not within +-5 units of its goal
 	  pros::delay(2);
   }
