@@ -1,3 +1,4 @@
+/*
 #include "main.h"
 
 #define OPEN_POS 200
@@ -20,3 +21,4 @@ void Claw::set(int power){
   peripherals.claw_mtr.move_velocity(power);
   //peripherals.claw_mtr.move_absolute(position,127);
 }
+*/

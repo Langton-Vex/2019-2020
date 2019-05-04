@@ -9,10 +9,12 @@
  */
 
 // left, right, arm, claw
-Peripherals_t peripherals(1,2,3,4);
-Chassis chassis;
-Arm arm;
-Claw claw;
+
+#define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
+#define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
+
+Peripherals_t peripherals(1,2,3);
+Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
 
 void initialize() {
 

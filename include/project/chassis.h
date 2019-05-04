@@ -6,9 +6,9 @@ struct Peripherals_t;
 
 class Chassis{
   public:
-    Chassis();
+    Chassis(double turn_r, double w_circumference);
     void user_control();
-    void set(int power,int turn);
+    void set(int forward,int right,int turn);
     void move_forward(double distance,int velocity);
     void point_turn(double angle,int velocity);
 
@@ -16,7 +16,8 @@ class Chassis{
     double wheel_circumference;
   protected:
     //Peripherals_t peripherals;
-    int motor_speed;
+    int tank_motor_speed;
+    int strafe_motor_speed;
 };
 
 #endif

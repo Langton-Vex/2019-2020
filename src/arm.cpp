@@ -1,3 +1,4 @@
+/*
 #include "main.h"
 
 Arm::Arm(){
@@ -21,3 +22,4 @@ void Arm::set(int power){
 void Arm::set_pos(float position){
   peripherals.arm_mtr.move_absolute(position,127);
 }
+*/

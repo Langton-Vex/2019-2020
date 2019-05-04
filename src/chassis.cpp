@@ -2,48 +2,57 @@
 #include "math.h"
 #include "stdexcept"
 
-#define PI 3.14159
+//#define PI 3.14159
 #define IN_TO_CM 2.54 // MULTIPLY BY THIS TO CONVERT INCHES TO CM
 
-#define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
-#define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
+Chassis::Chassis(double t_r, double w_c){
+	// H-Drive
 
-Chassis::Chassis(){
+	turn_radius = t_r;
+	wheel_circumference = w_c;
 
-	turn_radius = TURN_RADIUS; // made a macro for convenience,
-	wheel_circumference = WHEEL_CIRCUMFERENCE;// But OO is good practice
+	pros::motor_gearset_e_t tank_motor_gearset = peripherals.left_mtr.get_gearing();
+	if (tank_motor_gearset == MOTOR_GEARSET_06) tank_motor_speed = 600;
+	else if (tank_motor_gearset == MOTOR_GEARSET_18) tank_motor_speed = 200;
+	else if (tank_motor_gearset == MOTOR_GEARSET_36) tank_motor_speed = 100;
+	else throw std::invalid_argument("Cannot get gearset of left mtr");
 
-	pros::motor_gearset_e_t motor_gearset = peripherals.left_mtr.get_gearing();
-	if (motor_gearset == MOTOR_GEARSET_06) motor_speed = 600;
-	else if (motor_gearset == MOTOR_GEARSET_18) motor_speed = 200;
-	else if (motor_gearset == MOTOR_GEARSET_36) motor_speed = 100;
+	pros::motor_gearset_e_t strafe_motor_gearset = peripherals.strafe_mtr.get_gearing();
+	if (strafe_motor_gearset == MOTOR_GEARSET_06) tank_motor_speed = 600;
+	else if (strafe_motor_gearset == MOTOR_GEARSET_18) tank_motor_speed = 200;
+	else if (strafe_motor_gearset == MOTOR_GEARSET_36) tank_motor_speed = 100;
 	else throw std::invalid_argument("Cannot get gearset of left mtr");
 }
 
 void Chassis:: user_control(){
-	int power = peripherals.master_controller.get_analog(ANALOG_RIGHT_Y);
-	int turn = peripherals.master_controller.get_analog(ANALOG_RIGHT_X);
+	int forward = peripherals.master_controller.get_analog(ANALOG_RIGHT_Y);
+	int right = peripherals.master_controller.get_analog(ANALOG_RIGHT_X);
+  int turn = peripherals.master_controller.get_analog(ANALOG_LEFT_X);
 
-			this->set(power,turn);
+	this->set(forward,right,turn);
 }
 
 
-void Chassis::set(int power, int turn){
+void Chassis::set(int forward, int right, int turn){
 
 	//float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
 	//float turne = 1/(sgn(turn) * 127) * pow((float)turn,2);
+	float powere = (sgn(forward) / tank_motor_speed) * pow(((float)forward*tank_motor_speed / 127),2); // exponential speed function
+	float righte = (sgn(right) / strafe_motor_speed) * pow(((float)right*strafe_motor_speed / 127),2);
+	float turne = (sgn(turn) / tank_motor_speed) * pow((float) (turn*tank_motor_speed / 127),2);
 
-	float powere = (sgn(power) / motor_speed) * pow(((float)power*motor_speed / 127),2); // exponential speed function
-	float turne = (sgn(turn) / motor_speed) * pow((float) (turn*motor_speed / 127),2);
-	int left = (int) powere + (int) turne;
-	int right = (int) powere - (int) turne;
-	pros::lcd::print(0, "Left: %d\nRight: %d\n", left,right);
-	peripherals.left_mtr.move_velocity(left);
-	peripherals.right_mtr.move_velocity (right);
+	int left_speed = (int) round(powere) + (int) round(turne);
+	int right_speed = (int) round(powere) - (int) round(turne);
+	int strafe_speed = (int) round(righte);
+
+	peripherals.left_mtr.move_velocity(left_speed);
+	peripherals.right_mtr.move_velocity (right_speed);
+	peripherals.strafe_mtr.move_velocity (strafe_speed);
 }
 
-/*distance: a float, in metres
-velocity: an integer, in RPM*/
+/*
+distance: a float, in metres
+velocity: an integer, in RPM
 void Chassis::move_forward(double distance,int velocity=100){
 	double rel_target = distance / wheel_circumference;
 	double abs_target = peripherals.left_mtr.get_position() + rel_target;
@@ -61,8 +70,8 @@ void Chassis::move_forward(double distance,int velocity=100){
 
 };
 
-/*angle: an int, in degrees
-velocity: an integer, in RPM*/
+angle: an int, in degrees
+velocity: an integer, in RPM
 void Chassis::point_turn(double angle,int velocity=100){
 	double rel_target = (2*turn_radius*PI * (angle/360)) / wheel_circumference;
 	double abs_target = peripherals.left_mtr.get_position() + rel_target;
@@ -76,3 +85,4 @@ void Chassis::point_turn(double angle,int velocity=100){
   }
 
 };
+*/
