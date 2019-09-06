@@ -13,16 +13,14 @@ float sgn(int x);
 extern Peripherals_t peripherals;
 
 class Chassis;
-class Arm;
-class Claw;
+//class Arm;
+//class Claw;
 #include "project/chassis.h"
 #include "project/arm.h"
 #include "project/claw.h"
 
 // can use smart pointers later, but meh
 
-extern Chassis chassis;
-extern Arm arm;
-extern Claw claw;
+//extern Chassis chassis;
 
 #endif  // _USERDEFS_H_

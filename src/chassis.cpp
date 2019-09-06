@@ -2,6 +2,7 @@
 #include "math.h"
 #include "stdexcept"
 
+extern Chassis chassis;
 
 Chassis::Chassis(){
   pros::motor_gearset_e_t motor_gearset = peripherals.left_mtr.get_gearing();

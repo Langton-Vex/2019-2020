@@ -13,8 +13,9 @@
 #define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
 #define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
 
-Peripherals_t peripherals(1,2,3);
-Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
+Peripherals_t peripherals(20,17,19,18,3,4,1,2);
+//Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
+Chassis chassis();
 
 void initialize() {
 

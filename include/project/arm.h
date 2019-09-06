@@ -1,4 +1,4 @@
-/*
+
 #ifndef _ARM_H_
 #define _ARM_H_
 
@@ -13,8 +13,9 @@ class Arm{
     void set_pos(float position);
   protected:
     //Peripherals_t peripherals;
+    int current_power;
+  
 };
 
 
 #endif
-*/
