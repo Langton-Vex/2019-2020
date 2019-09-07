@@ -15,7 +15,9 @@
 
 Peripherals_t peripherals(20,17,19,18,3,4,1,2);
 //Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
-Chassis chassis();
+Chassis chassis = Chassis();
+Arm arm = Arm();
+Claw claw = Claw();
 
 void initialize() {
 

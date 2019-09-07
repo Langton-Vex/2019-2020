@@ -7,6 +7,7 @@ struct Peripherals_t{
   Peripherals_t(int left, int right, int lefttwo,int rightwo, int leftintake, int rightintake, int leftarm, int rightarm);
   pros::Motor left_mtr, right_mtr,lefttwo_mtr,righttwo_mtr,leftintake_mtr,rightintake_mtr,leftarm_mtr,rightarm_mtr;
   pros::Controller master_controller;
+  int8_t left_port, lefttwo_port, right_port, righttwo_port;
 };
 
 #endif

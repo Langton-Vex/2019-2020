@@ -7,11 +7,13 @@
 Claw::Claw(){}
 
 void Claw:: user_control(){
-      int open = peripherals.master_controller.get_digital(DIGITAL_L1);
-      int close = peripherals.master_controller.get_digital(DIGITAL_L2);
-      int power = (open) ? OPEN_POS : (close)? CLOSE_POS:0; // If up, power = open_pos,
-                                                  //elif down, power = close_pos
-                                                  //  else, power = 0
+      int intake = peripherals.master_controller.get_digital_new_press(DIGITAL_UP);
+      int eject = peripherals.master_controller.get_digital_new_press(DIGITAL_DOWN);
+
+      power = (intake && (power < 1)) ? 127:0; // If we press the button, and
+      power = (eject && (power > -1)) ? -127:0; // it is unpowered, power it
+                                               // and vice versa
+
       this->set(power);
 }
 

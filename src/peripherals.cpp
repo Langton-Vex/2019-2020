@@ -1,7 +1,8 @@
 #include "main.h"
 
 
-Peripherals_t::Peripherals_t(int left, int right, int lefttwo,int righttwo, int leftintake, int rightintake, int leftarm, int rightarm) :
+Peripherals_t::Peripherals_t(int left, int right, int lefttwo,int righttwo,
+    int leftintake, int rightintake, int leftarm, int rightarm) :
   left_mtr( left, MOTOR_GEARSET_18,false,MOTOR_ENCODER_ROTATIONS),
   right_mtr(right, MOTOR_GEARSET_18,true, MOTOR_ENCODER_ROTATIONS),
   lefttwo_mtr( lefttwo, MOTOR_GEARSET_18,false,MOTOR_ENCODER_ROTATIONS),
@@ -14,4 +15,10 @@ Peripherals_t::Peripherals_t(int left, int right, int lefttwo,int righttwo, int 
   rightarm_mtr(rightarm, MOTOR_GEARSET_18,true, MOTOR_ENCODER_ROTATIONS),
 
 
-  master_controller(pros::E_CONTROLLER_MASTER){};
+  master_controller(pros::E_CONTROLLER_MASTER){
+
+    left_port = left;
+    right_port = right;
+    lefttwo_port = lefttwo;
+    righttwo_port = righttwo;
+  };

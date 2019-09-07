@@ -2,22 +2,28 @@
 
 extern Chassis chassis;
 
-/**
- * Runs the user autonomous code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the autonomous
- * mode. Alternatively, this function may be called in initialize or opcontrol
- * for non-competition testing purposes.
- *
+// The autonomous framework that is a godsend
+using namespace okapi;
+
+/*
  * If the robot is disabled or communications is lost, the autonomous task
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
+
+const auto WHEEL_DIAMETER = 4_in;  // Fix this
+const auto CHASSIS_WIDTH = 13.5_in;
+
+
+
 void autonomous() {
 
-  //for (int i=0;i<4;i++){
+  auto okapi_chassis = ChassisControllerFactory::create(
+                  {peripherals.left_port,peripherals.lefttwo_port},
+                  {peripherals.right_port,peripherals.righttwo_port},
+                  AbstractMotor::gearset::red,
+                  {WHEEL_DIAMETER, CHASSIS_WIDTH});
 
-    //chassis.move_forward(0.5, 100);
-    //chassis.point_turn(90.0, 100);
-  //}
+  okapi_chassis.moveDistance(1_m);
+  okapi_chassis.turnAngle(90_deg);
 }

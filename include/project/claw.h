@@ -10,6 +10,8 @@ public:
     Claw();
     void user_control();
     void set(int power);
+
+    int power = 0;
   protected:
     //Peripherals_t peripherals;
 };

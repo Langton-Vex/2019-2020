@@ -14,15 +14,13 @@ Macro::Macro(MacroFunc f){
 
 Macro::Macro(){}
 
-Macro arm_up = Macro([]() {pros::lcd::print(1,"Macro Activated");});
-
 
 pros::controller_digital_e_t button_list[12] = {DIGITAL_L1, DIGITAL_L2,DIGITAL_R1,DIGITAL_R2,
                                                 DIGITAL_UP, DIGITAL_DOWN, DIGITAL_LEFT, DIGITAL_RIGHT,
                                                 DIGITAL_X,DIGITAL_Y,DIGITAL_A,DIGITAL_B};
 
                        //L1     ,L2     ,R1     ,R2
-Macro macros[12] = {     Macro(),Macro(),arm_up,Macro(),
+Macro macros[12] = {     Macro(),Macro(),Macro(),Macro(),
                        //UP     ,DOWN   ,LEFT   ,RIGHT
                          Macro(),Macro(),Macro(),Macro(),
                        //X      ,Y      ,A      ,B

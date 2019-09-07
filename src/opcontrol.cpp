@@ -1,3 +1,5 @@
+
+
 #include "main.h"
 
 /**
@@ -14,13 +16,18 @@
  * task, not resume it from where it left off.
  */
 extern Chassis chassis;
+extern Arm arm;
+extern Claw claw;
 
 void opcontrol() {
 
 	while (true) {
 		macros_update(peripherals.master_controller);
 
+    arm.user_control();
     chassis.user_control();
+		claw.user_control();
+		
 		pros::delay(20);
 	}
 }

@@ -1,4 +1,3 @@
-
 #ifndef _USERDEFS_H_
 #define _USERDEFS_H_
 #include "api.h"
@@ -23,4 +22,4 @@ class Chassis;
 
 //extern Chassis chassis;
 
-#endif  // _USERDEFS_H_
+#endif
