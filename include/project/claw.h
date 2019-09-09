@@ -14,5 +14,7 @@ public:
     int power = 0;
   protected:
     //Peripherals_t peripherals;
+    int intake_last = 0;
+    int eject_last = 0;
 };
 #endif
