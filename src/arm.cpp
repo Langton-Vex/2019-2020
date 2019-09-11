@@ -1,7 +1,7 @@
 #include "main.h"
 #include <sstream>
 
-const double max_height = 3.0;
+const double max_height = -1.8;
 
 Arm::Arm(){
   peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -46,10 +46,21 @@ void Arm:: user_control(){
       //double final_height = user_pos_modifier;
       //if (final_height < max_height)
 
+      height_per = abs(peripherals.leftarm_mtr.get_position()) / abs(max_height);
 
       // Quick and dirty place to put this
-      std::string arm_pos = std::to_string(final_height);
+      std::string arm_pos = std::to_string(peripherals.leftarm_mtr.get_position());
+      std::string temp = std::to_string(peripherals.leftarm_mtr.get_temperature());
+      temp.append(" celcius");
       pros::lcd::set_text(1,arm_pos);
+
+      pros::lcd::set_text(2,temp);
+
+
+      double power_mult = (peripherals.leftarm_mtr.get_actual_velocity() > 1 &&
+       height_per < 0.2) ? 0.01:1;
+      power = power * power_mult;
+
       if (power > 5 || power < 5)
         this->set(power);
 
@@ -57,9 +68,9 @@ void Arm:: user_control(){
 }
 
 void Arm::set(int power){
-  //if (abs(power) < 10) power = 5;
-  peripherals.leftarm_mtr.move(power);
-  peripherals.rightarm_mtr.move(power);
+  if (abs(power) < 10) power = -5;
+  peripherals.leftarm_mtr.move_velocity(power);
+  peripherals.rightarm_mtr.move_velocity(power);
 
 }
 void Arm::set_pos(double position){

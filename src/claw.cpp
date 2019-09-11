@@ -20,15 +20,20 @@ void Claw:: user_control(){
       intake_last = current_intake;
       eject_last = current_eject;
 
-      power = (intake && (power < 1)) ? 127:0; // If we press the button, and
-      power = (eject && (power > -1)) ? -127:0; // it is unpowered, power it
-                                               // and vice versa
+      if (intake && (power < 1))
+        power = 127;
+      else if (intake && (power > 1))
+        power = 0;
+      else if (eject && (power > -1))
+        power = -127;
+     else if (eject && (power < -1))
+        power = 0;
 
       this->set(power);
 }
 
 void Claw::set(int power){
-  peripherals.leftintake_mtr.move_velocity(power);
-    peripherals.rightintake_mtr.move_velocity(power);
+  peripherals.leftintake_mtr.move(power);
+    peripherals.rightintake_mtr.move(power);
   //peripherals.claw_mtr.move_absolute(position,127);
 }

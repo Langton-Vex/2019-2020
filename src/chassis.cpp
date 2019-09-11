@@ -2,6 +2,8 @@
 #include "math.h"
 #include "stdexcept"
 
+extern Arm arm;
+
 Chassis::Chassis(){
   pros::motor_gearset_e_t motor_gearset = peripherals.left_mtr.get_gearing();
   if (motor_gearset == MOTOR_GEARSET_06) motor_speed = 600;
@@ -14,6 +16,10 @@ void Chassis::user_control(){
       int power = peripherals.master_controller.get_analog(ANALOG_RIGHT_Y);
       int turn = peripherals.master_controller.get_analog(ANALOG_RIGHT_X);
 
+      double power_mult  = (arm.height_per < 0.9)? (1-arm.height_per):0.1;
+
+      power = power * power_mult;
+      turn  = turn * power_mult;
       this->set(power,turn);
 }
 

@@ -20,6 +20,7 @@ class Arm{
 
     double user_pos_modifier;
     double sensitivity;
+    double height_per;
   protected:
     //Peripherals_t peripherals;
     int current_power;
