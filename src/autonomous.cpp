@@ -11,19 +11,22 @@ using namespace okapi;
  * from where it left off.
  */
 
-const auto WHEEL_DIAMETER = 4_in;  // Fix this
-const auto CHASSIS_WIDTH = 13.5_in;
+const auto WHEEL_DIAMETER = 4.125_in;  // Fix this
+const auto CHASSIS_WIDTH = 385_mm;
 
 
 
 void autonomous() {
 
-  auto okapi_chassis = ChassisControllerFactory::create(
+  auto ccont = ChassisControllerFactory::create(
                   {peripherals.left_port,peripherals.lefttwo_port},
                   {peripherals.right_port,peripherals.righttwo_port},
                   AbstractMotor::gearset::red,
                   {WHEEL_DIAMETER, CHASSIS_WIDTH});
 
-  okapi_chassis.moveDistance(1_m);
-  okapi_chassis.turnAngle(90_deg);
+  ccont.moveDistance(1_m);
+  ccont.waitUntilSettled();
+  ccont.turnAngle(180_deg);
+  ccont.waitUntilSettled();
+  ccont.moveDistance(1_m);
 }

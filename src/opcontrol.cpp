@@ -22,12 +22,12 @@ extern Claw claw;
 void opcontrol() {
 
 	while (true) {
-		macros_update(peripherals.master_controller);
+		//macros_update(peripherals.master_controller);
 
     arm.user_control();
     chassis.user_control();
 		claw.user_control();
-		
+
 		pros::delay(20);
 	}
 }

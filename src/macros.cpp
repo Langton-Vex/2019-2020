@@ -27,9 +27,11 @@ Macro macros[12] = {     Macro(),Macro(),Macro(),Macro(),
                          Macro(),Macro(),Macro(),Macro()};
 
 void macros_update(pros::Controller controller){
-    for (int i=0;i<12;i++){
+    /*
+      for (int i=0;i<12;i++){
       if(controller.get_digital_new_press(button_list[i]) && !macros[i].empty){
         macros[i].run();
       };
     }
+    */
 }
