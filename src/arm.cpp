@@ -8,8 +8,13 @@ using namespace okapi;
 double major_positions[4] = {0.0,0.5,1,1.5};
 double minor_positions[4] = {0.0,0.1,0.2,0.2};
 
-auto liftControl = AsyncControllerFactory::posIntegrated(
-  {peripherals.leftarm_port,peripherals.rightarm_port});
+const double liftkP = 100.0;
+const double liftkI = 1;
+const double liftkD = 1;
+
+auto liftControl = AsyncControllerFactory::posPID(
+  {peripherals.leftarm_port,peripherals.rightarm_port},
+  liftkP,liftkI,liftkD);
 
 Arm::Arm(){
   peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -49,10 +54,7 @@ void Arm:: user_control(){
       //user_pos_modifier += (double)power * sensitivity;
       double final_height = major_positions[current_major_position] +
                     minor_positions[current_minor_position];
-      if (final_height != current_goal_height){
-        liftControl.setTarget(final_height);
-        current_goal_height = final_height;
-      }
+
       //double final_height = user_pos_modifier;
       //if (final_height < max_height)
 
@@ -65,16 +67,24 @@ void Arm:: user_control(){
       pros::lcd::set_text(1,arm_pos);
 
       pros::lcd::set_text(2,temp);
+      peripherals.master_controller.set_text(1,1,temp.c_str());
 
-      //double power_mult = (peripherals.leftarm_mtr.get_actual_velocity() < -1 &&
-      // height_per < 0.2) ? 0.01:1;
-      double power_mult = 1;
+      double power_mult = (peripherals.leftarm_mtr.get_actual_velocity() > 1 &&
+      height_per < 0.2) ? 0.01:1;
+      //double power_mult = 1;
       power = power * power_mult;
       if (power > 5 || power < 5)
         this->set(power);
+      if (final_height != current_goal_height && abs(power) < 5){
+        pros::lcd::set_text(3,"Setting target");
+        liftControl.setTarget(final_height);
+        current_goal_height = final_height;
+
+
+      }
 
       else if(abs(peripherals.leftarm_mtr.get_position()) < -0.1)
-        this->set(10); // dodgy holding but it works
+        this->set(15); // dodgy holding but it works
 
       //this->set_pos(final_height);
 }
