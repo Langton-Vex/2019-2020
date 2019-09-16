@@ -19,7 +19,21 @@ extern Chassis chassis;
 extern Arm arm;
 extern Claw claw;
 
+void set_temperature(void* param){
+	std::uint32_t now = pros::millis();
+  while (true) {
+		std::string temp = std::to_string(peripherals.leftarm_mtr.get_temperature());
+		temp.append(" celcius");
+		peripherals.master_controller.set_text(1,1,temp.c_str());
+
+    pros::Task::delay_until(&now, 500);
+
+	}
+}
+
 void opcontrol() {
+
+	pros::Task my_task (set_temperature);
 
 	while (true) {
 		//macros_update(peripherals.master_controller);
