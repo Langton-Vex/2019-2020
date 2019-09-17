@@ -15,8 +15,8 @@ const auto WHEEL_DIAMETER = 4.125_in;  // Fix this
 const auto CHASSIS_WIDTH = 385_mm;
 
 auto ccont = ChassisControllerFactory::create(
-                {-20,17},
-                {-19,18},
+                {20,19}, // peripherals.left_port,peripherals.lefttwo_port
+                {17,18},// peripherals.right_port,peripherals.righttwo_port
                 AbstractMotor::gearset::green,
                 {WHEEL_DIAMETER, CHASSIS_WIDTH});
 
