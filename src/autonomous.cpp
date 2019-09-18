@@ -20,7 +20,7 @@ auto ccont = ChassisControllerFactory::create(
                 AbstractMotor::gearset::green,
                 {WHEEL_DIAMETER, CHASSIS_WIDTH});
 
-const double liftkP = 10.0;
+const double liftkP = 100.0;
 const double liftkI = 1;
 const double liftkD = 1;
 
@@ -34,22 +34,22 @@ void autonomous() {
   pros::lcd::set_text(1,"running autonomous");
   //ccont.moveDistance(128_m);
   ccont.turnAngle(90_deg);
-  //ccont.moveDistanceAsync(6_in);
-  //lift.setTarget(0.5);
-  //ccont.waitUntilSettled();
+  ccont.moveDistanceAsync(6_in);
+  lift.setTarget(0.5);
+  ccont.waitUntilSettled();
 
-  //ccont.turnAngle(-90_deg);
-  //ccont.moveDistance(3_in);
-  //lift.setTarget(0.1);
-  //lift.waitUntilSettled();
+  ccont.turnAngle(-90_deg);
+  ccont.moveDistance(3_in);
+  lift.setTarget(0.1);
+  lift.waitUntilSettled();
 
   intake.moveVelocity(127);
   pros::delay(500); // This defo needs changing
   intake.moveVelocity(0);
 
   ccont.moveDistance(-3_in);
-  //ccont.turnAngle(-90_deg);
-  //ccont.moveDistance(18_in);
+  ccont.turnAngle(-90_deg);
+  ccont.moveDistance(18_in);
 
   intake.moveVelocity(-127);
   pros::delay(500); // This defo needs changing

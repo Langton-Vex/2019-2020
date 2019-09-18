@@ -89,7 +89,7 @@ void Arm:: user_control(){
       }
       */
 
-      /*else*/ if(abs(peripherals.leftarm_mtr.get_position()) < -0.1)
+      else if(abs(peripherals.leftarm_mtr.get_position()) < -0.1)
         this->set(15); // dodgy holding but it works
 
       //this->set_pos(final_height);

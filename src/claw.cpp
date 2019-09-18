@@ -10,8 +10,8 @@ void Claw:: user_control(){
       int intake = 0;
       int eject = 0;
 
-      int current_intake = peripherals.master_controller.get_digital(DIGITAL_UP);
-      int current_eject  = peripherals.master_controller.get_digital(DIGITAL_DOWN);
+      int current_intake = peripherals.master_controller.get_digital(DIGITAL_L1);
+      int current_eject  = peripherals.master_controller.get_digital(DIGITAL_L2);
       if (current_intake && !intake_last)
         intake = 1;
 
@@ -21,11 +21,11 @@ void Claw:: user_control(){
       eject_last = current_eject;
 
       if (intake && (power < 1))
-        power = 127;
+        power = 63;
       else if (intake && (power > 1))
         power = 0;
       else if (eject && (power > -1))
-        power = -127;
+        power = -63;
      else if (eject && (power < -1))
         power = 0;
 
