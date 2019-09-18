@@ -33,7 +33,7 @@ MotorGroup intake({peripherals.leftintake_port,peripherals.rightintake_port});
 void autonomous() {
   pros::lcd::set_text(1,"running autonomous");
   //ccont.moveDistance(128_m);
-  ccont.turnAngle(100);
+  ccont.turnAngle(90_deg);
   //ccont.moveDistanceAsync(6_in);
   //lift.setTarget(0.5);
   //ccont.waitUntilSettled();
@@ -49,7 +49,7 @@ void autonomous() {
 
   ccont.moveDistance(-3_in);
   //ccont.turnAngle(-90_deg);
-  ccont.moveDistance(18_in);
+  //ccont.moveDistance(18_in);
 
   intake.moveVelocity(-127);
   pros::delay(500); // This defo needs changing
