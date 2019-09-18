@@ -16,13 +16,4 @@ Peripherals_t::Peripherals_t(int left, int right, int lefttwo,int righttwo,
 
 
   master_controller(pros::E_CONTROLLER_MASTER){
-
-    left_port = left;
-    right_port = right;
-    lefttwo_port = lefttwo;
-    righttwo_port = righttwo;
-    leftarm_port = leftarm;
-    rightarm_port = rightarm;
-    leftintake_port = leftintake;
-    rightintake_port = rightintake;
   };

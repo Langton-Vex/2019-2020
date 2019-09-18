@@ -33,7 +33,7 @@ void set_temperature(void* param){
 
 void opcontrol() {
 
-	pros::Task my_task (set_temperature);
+	pros::Task temp_task (set_temperature);
 
 	while (true) {
 		//macros_update(peripherals.master_controller);

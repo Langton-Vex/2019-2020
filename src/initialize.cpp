@@ -13,7 +13,20 @@
 #define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
 #define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
 
-Peripherals_t peripherals(20,17,19,18,3,4,1,2);
+const int left_port = 20;
+const int right_port = 17;
+const int lefttwo_port = 19;
+const int righttwo_port = 18;
+const int leftintake_port = 3;
+const int rightintake_port = 4;
+const int leftarm_port = 1;
+const int rightarm_port = 2;
+
+
+
+Peripherals_t peripherals(left_port, right_port, lefttwo_port, righttwo_port,
+	            leftintake_port, rightintake_port, leftarm_port,rightarm_port);
+
 //Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
 Chassis chassis = Chassis();
 Arm arm = Arm();

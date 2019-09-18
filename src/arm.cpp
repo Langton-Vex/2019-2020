@@ -5,15 +5,18 @@ const double max_height = -0.9;
 
 using namespace okapi;
 
-double major_positions[4] = {0.0,0.25,0.5,0.75};
-double minor_positions[4] = {0.0,0.05,0.1,0.1};
+extern int left_port, right_port, lefttwo_port, righttwo_port,
+             leftarm_port, rightarm_port, leftintake_port,rightintake_port;
+
+double major_positions[4] = {0,250,500,750};
+//double minor_positions[4] = {0.0,0.05,0.1,0.1};
 
 const double liftkP = 100.0;
 const double liftkI = 1;
 const double liftkD = 1;
 
 auto liftControl = AsyncControllerFactory::posPID(
-  {peripherals.leftarm_port,peripherals.rightarm_port},
+  {leftarm_port,rightarm_port},
   liftkP,liftkI,liftkD);
 
 Arm::Arm(){
@@ -32,10 +35,10 @@ void Arm:: user_control(){
       //float pos_rotations = (float)pos_joy / (127 * 4); // figure out the bounds of the arm,
                                                          //  and set appropriate values
 
-      bool arm_up = peripherals.master_controller.get_digital_new_press(DIGITAL_L1);
-      bool arm_down = peripherals.master_controller.get_digital_new_press(DIGITAL_L2);
-      int block_up = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
-      int block_down = peripherals.master_controller.get_digital_new_press(DIGITAL_R2);
+      bool arm_up = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
+      bool arm_down = peripherals.master_controller.get_digital_new_press(DIGITAL_R2);
+      //int block_up = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
+      //int block_down = peripherals.master_controller.get_digital_new_press(DIGITAL_R2);
 
 
       if (arm_up && (current_major_position <= 3)){
@@ -44,16 +47,17 @@ void Arm:: user_control(){
       else if (arm_down&&(current_major_position > 0)){
         current_major_position--;
       }
+      /*
       if (block_up && (current_minor_position <= 3)){
         current_minor_position++;
       }
       else if (block_down&&(current_minor_position > 0)){
         current_minor_position--;
       }
-
+      */
       //user_pos_modifier += (double)power * sensitivity;
-      double final_height = major_positions[current_major_position] +
-                    minor_positions[current_minor_position];
+      double final_height = major_positions[current_major_position]/* +
+                    minor_positions[current_minor_position]*/;
 
       //double final_height = user_pos_modifier;
       //if (final_height < max_height)
@@ -67,30 +71,25 @@ void Arm:: user_control(){
       pros::lcd::set_text(1,arm_pos);
 
       pros::lcd::set_text(2,temp);
-      peripherals.master_controller.set_text(1,1,temp.c_str());
+      //peripherals.master_controller.set_text(1,1,temp.c_str());
 
       //double power_mult = (peripherals.leftarm_mtr.get_actual_velocity() > 1 &&
       //height_per < 0.2) ? 0.01:1;
 
-
-
-      double power_mult = 1;
-      power = power * power_mult;
+      //double power_mult = 1;
+      power = power /* * power_mult*/;
       if (power > 5 || power < 5)
         this->set(power);
 
-      /*
-      if (final_height != current_goal_height && abs(power) < 5){
+      else if (final_height != current_goal_height && abs(power) < 5){
         pros::lcd::set_text(3,"Setting target");
         liftControl.setTarget(final_height);
         current_goal_height = final_height;
-
-
       }
-      */
 
-      else if(abs(peripherals.leftarm_mtr.get_position()) < -0.1)
-        this->set(15); // dodgy holding but it works
+
+      //else if(abs(peripherals.leftarm_mtr.get_position()) < -0.1)
+      //  this->set(15); // dodgy holding but it works
 
       //this->set_pos(final_height);
 }
