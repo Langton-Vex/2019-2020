@@ -1,12 +1,12 @@
 #include "main.h"
 #include <sstream>
 
-const double max_height = -1.8;
+const double max_height = -0.9;
 
 using namespace okapi;
 
-double major_positions[4] = {0.0,0.5,1,1.5};
-double minor_positions[4] = {0.0,0.1,0.2,0.2};
+double major_positions[4] = {0.0,0.25,0.5,0.75};
+double minor_positions[4] = {0.0,0.05,0.1,0.1};
 
 const double liftkP = 100.0;
 const double liftkI = 1;
