@@ -1,7 +1,7 @@
 #include "main.h"
 #include <sstream>
 
-const double max_height = -0.9;
+const double max_height = -2;
 
 using namespace okapi;
 

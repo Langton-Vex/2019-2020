@@ -42,11 +42,13 @@ void autonomous() {
 
   ccont.turnAngle(-90_deg);
   ccont.moveDistance(5_in);
-  lift.setTarget(0);
-  lift.waitUntilSettled();
+
+
 
   intake.moveVelocity(-127);
-  pros::delay(1000); // This defo needs changing
+  lift.setTarget(0);
+  lift.waitUntilSettled();
+  pros::delay(500); // This defo needs changing
   intake.moveVelocity(0);
 
   ccont.moveDistance(-5_in);
