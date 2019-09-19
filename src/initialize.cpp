@@ -13,14 +13,14 @@
 #define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
 #define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
 
-const int left_port = 20;
-const int right_port = 17;
-const int lefttwo_port = 19;
-const int righttwo_port = 18;
-const int leftintake_port = 3;
-const int rightintake_port = 4;
-const int leftarm_port = 1;
-const int rightarm_port = 2;
+extern const int left_port = 20;
+extern const int right_port = 17;
+extern const int lefttwo_port = 19;
+extern const int righttwo_port = 18;
+extern const int leftintake_port = 3;
+extern const int rightintake_port = 4;
+extern const int leftarm_port = 1;
+extern const int rightarm_port = 2;
 
 
 

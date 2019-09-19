@@ -40,4 +40,9 @@ void Chassis::set(int power, int turn){
   peripherals.right_mtr.move_velocity (right);
   peripherals.lefttwo_mtr.move_velocity(left);
   peripherals.righttwo_mtr.move_velocity ( right);
+
+  std::string left_v = std::to_string(peripherals.left_mtr.get_actual_velocity());
+  std::string right_v = std::to_string(peripherals.right_mtr.get_actual_velocity());
+  pros::lcd::set_text(3,left_v);
+  pros::lcd::set_text(4,right_v);
 }

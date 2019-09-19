@@ -15,9 +15,9 @@ const double liftkP = 100.0;
 const double liftkI = 1;
 const double liftkD = 1;
 
-auto liftControl = AsyncControllerFactory::posPID(
-  {leftarm_port,rightarm_port},
-  liftkP,liftkI,liftkD);
+// auto liftControl = AsyncControllerFactory::posPID(
+//  {leftarm_port,rightarm_port},
+//  liftkP,liftkI,liftkD);
 
 Arm::Arm(){
   peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -80,13 +80,13 @@ void Arm:: user_control(){
       power = power /* * power_mult*/;
       if (power > 5 || power < 5)
         this->set(power);
-
+      /*
       else if (final_height != current_goal_height && abs(power) < 5){
         pros::lcd::set_text(3,"Setting target");
         liftControl.setTarget(final_height);
         current_goal_height = final_height;
       }
-
+      */
 
       //else if(abs(peripherals.leftarm_mtr.get_position()) < -0.1)
       //  this->set(15); // dodgy holding but it works
