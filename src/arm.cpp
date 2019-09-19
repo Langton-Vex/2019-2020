@@ -31,9 +31,6 @@ Arm::Arm(){
 
 void Arm:: user_control(){
       int power = peripherals.master_controller.get_analog(ANALOG_LEFT_Y);
-      //int pos_joy = peripherals.master_controller.get_analog(ANALOG_LEFT_Y);
-      //float pos_rotations = (float)pos_joy / (127 * 4); // figure out the bounds of the arm,
-                                                         //  and set appropriate values
 
       bool arm_up = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
       bool arm_down = peripherals.master_controller.get_digital_new_press(DIGITAL_R2);
