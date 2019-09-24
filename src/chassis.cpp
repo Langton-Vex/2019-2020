@@ -16,8 +16,11 @@ void Chassis::user_control(){
       int power = peripherals.master_controller.get_analog(ANALOG_RIGHT_Y);
       int turn = peripherals.master_controller.get_analog(ANALOG_RIGHT_X);
 
-      double power_mult  = (arm.height_per < 0.5)? (1-arm.height_per):0.5;
+      int slowmode_button =  peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
+      if (slowmode_button == 1) slowmode = !slowmode;
 
+      double power_mult  = (arm.height_per < 0.5)? (0.80-arm.height_per):0.5;
+      //power_mult = (slowmode) ? 0.5: power_mult;
       power = power * power_mult;
       turn  = turn * power_mult;
       this->set(power,turn);

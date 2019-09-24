@@ -17,6 +17,7 @@ class Chassis{
   protected:
     //Peripherals_t peripherals;
     int motor_speed;
+    bool slowmode = false;
 };
 
 #endif

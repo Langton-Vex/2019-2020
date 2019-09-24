@@ -27,39 +27,75 @@ auto ccont = ChassisControllerFactory::create(
 
 MotorGroup intake({leftintake_port,rightintake_port});
 
-
-
-void autonomous() {
+void near_small(){
   auto lift = AsyncControllerFactory::posIntegrated(
     {leftarm_port,-rightarm_port});
 
-  pros::lcd::set_text(1,"running autonomous");
-  ccont.turnAngle(90_deg);
-  ccont.moveDistanceAsync(6_in);
-
-  lift.setTarget(-500);
-  ccont.waitUntilSettled();
-
-  ccont.turnAngle(-90_deg);
-  ccont.moveDistance(5_in);
-
-
-
-  intake.moveVelocity(-127);
-  lift.setTarget(0);
-  lift.waitUntilSettled();
-  pros::delay(500); // This defo needs changing
-  intake.moveVelocity(0);
-
-  ccont.moveDistance(-5_in);
-  ccont.turnAngle(-90_deg);
+  ccont.turnAngle(-100_deg);
   ccont.moveDistance(18_in);
-
-  lift.setTarget(-500);
   intake.moveVelocity(127);
+  lift.setTarget(-400);
   lift.waitUntilSettled();
   intake.moveVelocity(0);
+  ccont.moveDistance(-16_in);
+  lift.setTarget(0);
+
+}
+
+void colour_tile(){
+
+    auto lift = AsyncControllerFactory::posIntegrated(
+      {leftarm_port,-rightarm_port});
+
+    lift.setMaxVelocity(100);
+
+    pros::lcd::set_text(1,"running autonomous");
+    //ccont.moveDistance(1_in);
+    //ccont.turnAngle(90_deg);
+    lift.setTarget(-400);
+    lift.waitUntilSettled();
+    ccont.moveDistanceAsync(8_in);
+
+    ccont.waitUntilSettled();
+
+    //ccont.turnAngle(-110_deg);
+    //ccont.moveDistance(5_in);
 
 
 
+    intake.moveVelocity(-127);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    pros::delay(500); // This defo needs changing
+    //intake.moveVelocity(0);
+    lift.setTarget(-200);
+    lift.waitUntilSettled();
+
+    ccont.moveDistance(-5_in);
+    ccont.turnAngle(-110_deg); //invert
+    ccont.moveDistance(34_in);
+    intake.moveVelocity(0);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    intake.moveVelocity(127);
+    pros::delay(250);
+    lift.setMaxVelocity(50);
+    lift.setTarget(-500);
+    lift.waitUntilSettled();
+    pros::delay(250);
+    lift.setMaxVelocity(200);
+    lift.setTarget(-1000);
+    lift.waitUntilSettled();
+    lift.setTarget(-400);
+    lift.waitUntilSettled();
+    pros::delay(500);
+    intake.moveVelocity(0);
+    ccont.setMaxVelocity(100);
+    ccont.moveDistance(-16_in);
+    lift.setTarget(0);
+
+}
+
+void autonomous() {
+    colour_tile();
 }

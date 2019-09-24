@@ -32,7 +32,6 @@ void set_temperature(void* param){
 }
 
 void opcontrol() {
-
 	pros::Task temp_task (set_temperature);
 
 	while (true) {
