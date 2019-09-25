@@ -22,11 +22,28 @@ extern Claw claw;
 void set_temperature(void* param){
 	std::uint32_t now = pros::millis();
   while (true) {
-		std::string temp = std::to_string(peripherals.leftarm_mtr.get_temperature());
-		temp.append(" celcius");
-		peripherals.master_controller.set_text(1,1,temp.c_str());
+		int arm_temp = round((peripherals.leftarm_mtr.get_temperature() +
+		                      peripherals.rightarm_mtr.get_temperature())/2);
 
-    pros::Task::delay_until(&now, 500);
+		int drive_temp = round((peripherals.left_mtr.get_temperature() +
+										      peripherals.right_mtr.get_temperature()+
+													peripherals.lefttwo_mtr.get_temperature()+
+													peripherals.righttwo_mtr.get_temperature()
+											)/4);
+
+		std::string arm_temp_str = std::to_string(arm_temp);
+		std::string drive_temp_str = std::to_string(drive_temp);
+		arm_temp_str.append(" arm");
+
+		drive_temp_str.append(" drive");
+		std::string line = arm_temp_str;
+		line.append(" ");
+		line.append(drive_temp_str);
+		peripherals.master_controller.print(0,0,line.c_str());
+
+    pros::Task::delay(1000);
+		peripherals.master_controller.clear();
+		pros::Task::delay(50);
 
 	}
 }
