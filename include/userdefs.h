@@ -14,6 +14,9 @@ extern Peripherals_t peripherals;
 class Chassis;
 //class Arm;
 //class Claw;
+class GUI;
+
+#include "project/gui.h"
 #include "project/chassis.h"
 #include "project/arm.h"
 #include "project/claw.h"

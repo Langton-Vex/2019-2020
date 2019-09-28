@@ -32,10 +32,12 @@ Chassis chassis = Chassis();
 Arm arm = Arm();
 Claw claw = Claw();
 
-void initialize() {
+GUI gui = GUI();
 
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+void initialize() {
+  gui.init_draw();
+	//pros::lcd::initialize();
+  //pros::lcd::set_text(1, "This means things are working?");
  // btw statics are cool
   /*
 	FILE* config_file = fopen("/usd/config.txt", "r"); // file on SD card

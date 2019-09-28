@@ -9,7 +9,7 @@ Chassis::Chassis(){
   if (motor_gearset == MOTOR_GEARSET_06) motor_speed = 600;
   else if (motor_gearset == MOTOR_GEARSET_18) motor_speed = 200;
   else if (motor_gearset == MOTOR_GEARSET_36) motor_speed = 100;
-  else throw std::invalid_argument("Cannot get gearset of left mtr");
+  //else throw std::invalid_argument("Cannot get gearset of left mtr");
 }
 
 void Chassis::user_control(){
@@ -18,7 +18,7 @@ void Chassis::user_control(){
 
       int slowmode_button =  peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
       if (slowmode_button == 1) slowmode = !slowmode;
-      pros::lcd::print(5,"height per %f",arm.height_per);
+      //pros::lcd::print(5,"height per %f",arm.height_per);
       double power_mult  = (arm.height_per < 0.5)? (1.0-arm.height_per):0.5;
       power_mult = (slowmode) ? 0.5: power_mult;
       power = power * power_mult;
@@ -37,7 +37,7 @@ void Chassis::set(int power, int turn){
 
   int left = (int) powere + (int) turne;
   int right = (int) powere - (int) turne;
-  pros::lcd::print(0, "Left: %d\nRight: %d\n", left,right);
+  //pros::lcd::print(0, "Left: %d\nRight: %d\n", left,right);
 
   peripherals.left_mtr.move_velocity(left);
   peripherals.right_mtr.move_velocity (right);
@@ -46,6 +46,6 @@ void Chassis::set(int power, int turn){
 
   std::string left_v = std::to_string(peripherals.left_mtr.get_actual_velocity());
   std::string right_v = std::to_string(peripherals.right_mtr.get_actual_velocity());
-  pros::lcd::set_text(3,left_v);
-  pros::lcd::set_text(4,right_v);
+  //pros::lcd::set_text(3,left_v);
+  //pros::lcd::set_text(4,right_v);
 }

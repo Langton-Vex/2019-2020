@@ -20,8 +20,8 @@ const double liftkD = 1;
 //  liftkP,liftkI,liftkD);
 
 Arm::Arm(){
-  peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  peripherals.rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  //peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  //peripherals.rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
   current_major_position = 0;
   current_minor_position = 0;
