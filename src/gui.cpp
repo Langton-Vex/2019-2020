@@ -31,7 +31,7 @@ void GUI::build_main(lv_obj_t * parent)
     lv_style_copy(&h_style, &lv_style_transp);
     h_style.body.padding.inner = LV_DPI / 20;
     h_style.body.padding.hor = LV_DPI / 20;
-    h_style.body.padding.ver = LV_DPI / 10;
+    h_style.body.padding.ver = LV_DPI / 20;
 
     lv_obj_t * h = lv_cont_create(parent, NULL);
     lv_obj_set_style(h, &h_style);
@@ -42,7 +42,9 @@ void GUI::build_main(lv_obj_t * parent)
     // Begin main element building
 
     lv_obj_t * auton_select = lv_roller_create(h, NULL);
-    lv_obj_set_size(auton_select, HOR_RES/4, VER_RES / 2);
+    lv_roller_set_action(auton_select, cb_auton_select);
+
+    lv_obj_set_size(auton_select, HOR_RES/4, VER_RES / 4);
     //lv_obj_set_protect(auton_select, LV_PROTECT_POS);
     lv_obj_align(auton_select, NULL, LV_ALIGN_OUT_RIGHT_MID,HOR_RES/2,0);
     lv_roller_set_options(auton_select,
@@ -59,7 +61,7 @@ void GUI::build_main(lv_obj_t * parent)
     static lv_style_t side_sw_on_style;
     static lv_style_t side_sw_off_style;
     static lv_style_t side_sw_bg_style;
-    static lv_style_t side_sw_indic_style;
+    //static lv_style_t side_sw_indic_style;
 
     lv_style_copy(&side_sw_on_style, &lv_style_pretty_color);
     side_sw_on_style.body.radius = LV_RADIUS_CIRCLE;
@@ -67,7 +69,7 @@ void GUI::build_main(lv_obj_t * parent)
     lv_style_copy(&side_sw_off_style, &lv_style_pretty);
     side_sw_off_style.body.radius = LV_RADIUS_CIRCLE;
 
-    lv_style_copy(&side_sw_indic_style, &lv_style_pretty_color);
+    //lv_style_copy(&side_sw_indic_style, &lv_style_pretty_color);
     lv_style_copy(&side_sw_bg_style, &lv_style_pretty);
 
     side_sw_on_style.body.main_color = LV_COLOR_HEX(0xff0000);
@@ -78,30 +80,38 @@ void GUI::build_main(lv_obj_t * parent)
 
     //side_sw_bg_style.body.main_color= LV_COLOR_HEX(0x424247);
 
-    side_sw_indic_style.body.radius = LV_RADIUS_CIRCLE;
+    //side_sw_indic_style.body.radius = LV_RADIUS_CIRCLE;
     side_sw_bg_style.body.radius = LV_RADIUS_CIRCLE;
 
     //side_sw_indic_style.body.main_color = LV_COLOR_HEX(0xff0000);
     //side_sw_bg_style.body.main_color = LV_COLOR_HEX(0xff0000);
     //side_sw_indic_style.body.grad_color = LV_COLOR_HEX(0xff0000);
-    side_sw_indic_style.body.main_color = LV_COLOR_HEX(0x9fc8ef);
-    side_sw_indic_style.body.grad_color = LV_COLOR_HEX(0x9fc8ef);
+    /*
+    side_sw_indic_style.body.main_color = LV_COLOR_HEX(0xffffff);
+    side_sw_indic_style.body.grad_color = LV_COLOR_HEX(0xffffff);
     side_sw_indic_style.body.padding.hor = LV_DPI/5;
     side_sw_indic_style.body.padding.ver = 0;
-
+    */
     lv_obj_t *side = lv_sw_create(h, NULL);
     lv_obj_align(side, auton_select, LV_ALIGN_OUT_LEFT_MID, -50, 0);
 
     lv_sw_set_style(side, LV_SW_STYLE_KNOB_ON, &side_sw_on_style);
     lv_sw_set_style(side, LV_SW_STYLE_KNOB_OFF, &side_sw_off_style);
     lv_sw_set_style(side, LV_SW_STYLE_BG, &side_sw_bg_style);
-    lv_sw_set_style(side, LV_SW_STYLE_INDIC, &side_sw_indic_style);
+    lv_sw_set_style(side, LV_SW_STYLE_INDIC, &lv_style_transp);
 
     lv_obj_t * side_label = lv_label_create(h, NULL);
     lv_label_set_long_mode(side_label, LV_LABEL_LONG_EXPAND);
     lv_label_set_text(side_label, "Team\ncolour");
     lv_obj_align(side_label, side, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
 
+}
 
+lv_res_t GUI::cb_auton_select(lv_obj_t * auton_select){
 
+  char sel_str[64];
+  lv_roller_get_selected_str(auton_select, sel_str);
+  printf("Auton: %s \n",sel_str);
+
+  return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
 }

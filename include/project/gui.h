@@ -10,6 +10,8 @@ public:
 protected:
   int state;
   lv_theme_t * th = lv_theme_alien_init(210, &lv_font_dejavu_20);
+
+  static lv_res_t cb_auton_select(lv_obj_t * auton_select);
 };
 
 #endif
