@@ -5,11 +5,11 @@
 
 class GUI{
 public:
-  void init_draw();
-  static void create_tab1(lv_obj_t * parent);
+  void gui_build();
+  static void build_main(lv_obj_t * parent);
 protected:
   int state;
-  lv_theme_t * th = lv_theme_night_init(210, NULL);
+  lv_theme_t * th = lv_theme_alien_init(210, &lv_font_dejavu_20);
 };
 
 #endif

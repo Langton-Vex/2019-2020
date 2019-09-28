@@ -8,10 +8,6 @@
  * to keep execution time for this mode under a few seconds.
  */
 
-// left, right, arm, claw
-
-#define TURN_RADIUS 0.1472184 // ALL UNITS IN METRES
-#define WHEEL_CIRCUMFERENCE 0.32916037028 // CLAW BOT NUMBERS
 
 extern const int left_port = 20;
 extern const int right_port = 17;
@@ -35,7 +31,7 @@ Claw claw = Claw();
 GUI gui = GUI();
 
 void initialize() {
-  gui.init_draw();
+  gui.gui_build();
 	//pros::lcd::initialize();
   //pros::lcd::set_text(1, "This means things are working?");
  // btw statics are cool

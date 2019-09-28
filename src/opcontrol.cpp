@@ -26,15 +26,15 @@ void set_temperature(void* param){
 		temp.append(" celcius");
 		peripherals.master_controller.set_text(1,1,temp.c_str());
 
-    pros::Task::delay_until(&now, 500);
+    pros::delay(500);
 
 	}
 }
 
 void opcontrol() {
-
+  
 	pros::Task temp_task (set_temperature,nullptr,"temp_task");
-	
+
 	while (true) {
 		//macros_update(peripherals.master_controller);
 
