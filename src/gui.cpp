@@ -1,5 +1,7 @@
 #include "main.h"
 
+extern ConfigManager configManager;
+
 const auto HOR_RES = 480;
 const auto VER_RES = 240;
 
@@ -19,6 +21,7 @@ void GUI::gui_build(){
 
 
     build_main(main);
+    build_console(console);
 };
 
 void GUI::build_main(lv_obj_t * parent)
@@ -47,9 +50,17 @@ void GUI::build_main(lv_obj_t * parent)
     lv_obj_set_size(auton_select, HOR_RES/4, VER_RES / 4);
     //lv_obj_set_protect(auton_select, LV_PROTECT_POS);
     lv_obj_align(auton_select, NULL, LV_ALIGN_OUT_RIGHT_MID,HOR_RES/2,0);
-    lv_roller_set_options(auton_select,
-      "Example Auton\n Example 2\n Example 3");
-    lv_roller_set_selected(auton_select, 1, false);
+
+    std::string routines_str;
+    for(int i = 0; i < configManager.autonomous_names.size();i++) {
+        if(i>0)
+          routines_str.append("\n"+configManager.autonomous_names[i]);
+        else
+          routines_str.append(configManager.autonomous_names[i]);
+    }
+    lv_roller_set_options(auton_select,routines_str.c_str());
+
+    lv_roller_set_selected(auton_select, configManager.selected_auton, false);
     lv_roller_set_visible_row_count(auton_select, 3);
 
     lv_obj_t * auton_select_label = lv_label_create(h, NULL);
@@ -93,6 +104,10 @@ void GUI::build_main(lv_obj_t * parent)
     side_sw_indic_style.body.padding.ver = 0;
     */
     lv_obj_t *side = lv_sw_create(h, NULL);
+    lv_sw_set_action(side, cb_side);
+
+    if(configManager.selected_team == 1) lv_sw_off(side);
+    else lv_sw_on(side);
     lv_obj_align(side, auton_select, LV_ALIGN_OUT_LEFT_MID, -50, 0);
 
     lv_sw_set_style(side, LV_SW_STYLE_KNOB_ON, &side_sw_on_style);
@@ -107,11 +122,53 @@ void GUI::build_main(lv_obj_t * parent)
 
 }
 
-lv_res_t GUI::cb_auton_select(lv_obj_t * auton_select){
+void GUI::build_console(lv_obj_t * parent){
+  lv_page_set_scrl_layout(parent, LV_LAYOUT_PRETTY);
 
-  char sel_str[64];
-  lv_roller_get_selected_str(auton_select, sel_str);
-  printf("Auton: %s \n",sel_str);
+  lv_theme_t * th = lv_theme_get_current();
+
+  static lv_style_t h_style;
+  lv_style_copy(&h_style, &lv_style_transp);
+  h_style.body.padding.inner = LV_DPI / 20;
+  h_style.body.padding.hor = LV_DPI / 20;
+  h_style.body.padding.ver = LV_DPI / 20;
+
+  lv_obj_t * h = lv_cont_create(parent, NULL);
+  lv_obj_set_style(h, &h_style);
+  lv_obj_set_click(h, false);
+  lv_cont_set_fit(h, true,true);
+
+  static lv_style_t style_console;
+  lv_style_copy(&style_console, &lv_style_plain);
+  /*
+  style_console.body.main_color = LV_COLOR_BLACK;
+  style_console.body.grad_color = LV_COLOR_BLACK;
+  style_console.body.border.color = LV_COLOR_WHITE;
+  style_console.body.border.width = 1;
+  style_console.body.border.opa = LV_OPA_70;
+  style_console.body.radius = LV_RADIUS_CIRCLE;
+  style_console.body.opa = LV_OPA_60;
+  */
+  lv_obj_t * console_box = lv_ta_create(h, NULL);
+  lv_obj_set_size(console_box, 400,125);
+  lv_obj_align(console_box, NULL, LV_ALIGN_CENTER, 0, - LV_DPI / 2);
+  lv_ta_set_style(console_box,LV_TA_STYLE_SB, &style_console);                     /*Apply the scroll bar style*/
+  lv_ta_set_cursor_type(console_box, LV_CURSOR_NONE);
+
+}
+
+lv_res_t GUI::cb_auton_select(lv_obj_t * auton_select){
+  configManager.select_auton(lv_roller_get_selected(auton_select));
+
+  return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
+}
+
+lv_res_t GUI::cb_side(lv_obj_t * side){
+  bool switch_state = lv_sw_get_state(side); // false is blue, true is red
+  if (switch_state)
+    configManager.select_team(-1);
+  else
+    configManager.select_team(1);
 
   return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
 }

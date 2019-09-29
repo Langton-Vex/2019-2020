@@ -24,14 +24,21 @@ Peripherals_t peripherals(left_port, right_port, lefttwo_port, righttwo_port,
 	            leftintake_port, rightintake_port, leftarm_port,rightarm_port);
 
 //Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
-Chassis chassis = Chassis();
-Arm arm = Arm();
-Claw claw = Claw();
+Chassis chassis;
+Arm arm;
+Claw claw;
 
-GUI gui = GUI();
+GUI gui;
+ConfigManager configManager;
+
+void init_autonomous(); // uh oh global space
 
 void initialize() {
+	init_autonomous();
+	
+	pros::delay(100);
   gui.gui_build();
+
 	//pros::lcd::initialize();
   //pros::lcd::set_text(1, "This means things are working?");
  // btw statics are cool
