@@ -109,7 +109,6 @@ void init_autonomous(){
 }
 
 void autonomous() {
-    pros::delay(5000);
     auton_routine routine = configManager.auton_routines[configManager.selected_auton];
     printf("attempting to run routine");
     routine(); // nullptr could happen :o
