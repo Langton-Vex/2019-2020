@@ -9,7 +9,9 @@ public:
   static void build_main(lv_obj_t * parent);
   static void build_diagnostics(lv_obj_t * parent);
   static void build_control(lv_obj_t * parent);
-  static void build_console(lv_obj_t * parent);
+  void build_console(lv_obj_t * parent);
+
+  lv_obj_t * console_box;
 protected:
   int state;
   lv_theme_t * th = lv_theme_alien_init(210, &lv_font_dejavu_20);

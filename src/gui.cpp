@@ -22,6 +22,7 @@ void GUI::gui_build(){
 
     build_main(main);
     build_console(console);
+    build_diagnostics(diagnostics);
 };
 
 void GUI::build_main(lv_obj_t * parent)
@@ -149,11 +150,38 @@ void GUI::build_console(lv_obj_t * parent){
   style_console.body.radius = LV_RADIUS_CIRCLE;
   style_console.body.opa = LV_OPA_60;
   */
-  lv_obj_t * console_box = lv_ta_create(h, NULL);
+  console_box = lv_ta_create(h, NULL);
   lv_obj_set_size(console_box, 400,125);
   lv_obj_align(console_box, NULL, LV_ALIGN_CENTER, 0, - LV_DPI / 2);
   lv_ta_set_style(console_box,LV_TA_STYLE_SB, &style_console);                     /*Apply the scroll bar style*/
   lv_ta_set_cursor_type(console_box, LV_CURSOR_NONE);
+  lv_ta_set_text(console_box, "Initializing hackerman console:\n");
+
+}
+
+void GUI::build_diagnostics(lv_obj_t * parent){
+  lv_page_set_scrl_layout(parent, LV_LAYOUT_PRETTY);
+
+  lv_theme_t * th = lv_theme_get_current();
+
+  static lv_style_t h_style;
+  lv_style_copy(&h_style, &lv_style_transp);
+  h_style.body.padding.inner = LV_DPI / 20;
+  h_style.body.padding.hor = LV_DPI / 20;
+  h_style.body.padding.ver = LV_DPI / 20;
+
+  lv_obj_t * h = lv_cont_create(parent, NULL);
+  lv_obj_set_style(h, &h_style);
+  lv_obj_set_click(h, false);
+  lv_cont_set_fit(h, true,true);
+
+  static lv_style_t style_table;
+  lv_style_copy(&style_table, &lv_style_plain);
+
+  lv_obj_t * arm_height = lv_gauge_create(h,NULL);
+  //lv_obj_set_size(arm_height, 400,125);
+  lv_obj_align(arm_height, NULL, LV_ALIGN_CENTER, 0, - LV_DPI / 2);
+  lv_gauge_set_style(arm_height, &style_table);
 
 }
 

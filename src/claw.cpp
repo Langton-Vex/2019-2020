@@ -4,7 +4,11 @@
 #define OPEN_POS 200
 #define CLOSE_POS -200
 
-Claw::Claw(){}
+Claw::Claw(){
+  peripherals.leftintake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);
+  peripherals.rightintake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);
+
+}
 
 void Claw:: user_control(){
       int intake = 0;
