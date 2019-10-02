@@ -19,6 +19,8 @@ extern Chassis chassis;
 extern Arm arm;
 extern Claw claw;
 
+extern GUI gui;
+
 void set_temperature(void* param){
 	std::uint32_t now = pros::millis();
   while (true) {
@@ -26,13 +28,19 @@ void set_temperature(void* param){
 		temp.append(" celcius");
 		peripherals.master_controller.set_text(1,1,temp.c_str());
 
-    pros::delay(500);
+    std::string arm_pos_string = "Arm: ";
+		arm_pos_string.append(std::to_string(peripherals.leftarm_mtr.get_position()));
+
+		lv_ta_set_text(gui.console_box, arm_pos_string.c_str());
+
+    pros::delay(123);
+
 
 	}
 }
 
 void opcontrol() {
-  
+
 	pros::Task temp_task (set_temperature,nullptr,"temp_task");
 
 	while (true) {
