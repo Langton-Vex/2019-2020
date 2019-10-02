@@ -178,10 +178,41 @@ void GUI::build_diagnostics(lv_obj_t * parent){
   static lv_style_t style_table;
   lv_style_copy(&style_table, &lv_style_plain);
 
-  lv_obj_t * arm_height = lv_gauge_create(h,NULL);
-  //lv_obj_set_size(arm_height, 400,125);
-  lv_obj_align(arm_height, NULL, LV_ALIGN_CENTER, 0, - LV_DPI / 2);
-  lv_gauge_set_style(arm_height, &style_table);
+  static lv_style_t guage_style;
+  lv_style_copy(&guage_style, &lv_style_pretty_color);
+  guage_style.body.main_color = LV_COLOR_HEX3(0xFFF);     /*Line color at the beginning*/
+  guage_style.body.grad_color =  LV_COLOR_HEX3(0xFFF);    /*Line color at the end*/
+  guage_style.body.padding.hor = 10;                      /*Scale line length*/
+  guage_style.body.padding.inner = 8 ;                    /*Scale label padding*/
+  guage_style.body.border.color = LV_COLOR_HEX3(0x333);   /*Needle middle circle color*/
+  guage_style.line.width = 3;
+  guage_style.text.color = LV_COLOR_HEX3(0xFFF);
+  guage_style.line.color = LV_COLOR_RED;                  /*Line color after the critical value*/
+  guage_style.text.font = &lv_font_dejavu_10;
+
+  arm_temp_guage = lv_gauge_create(h,NULL);
+  lv_obj_set_size(arm_temp_guage, 125,125);
+  lv_obj_align(arm_temp_guage, NULL, LV_ALIGN_OUT_LEFT_MID, 0,0);
+  lv_gauge_set_style(arm_temp_guage, &style_table);
+  lv_gauge_set_range(arm_temp_guage, 0, 70);
+  lv_gauge_set_critical_value(arm_temp_guage, 50);
+  lv_gauge_set_style(arm_temp_guage, &guage_style);
+
+  chassis_temp_guage = lv_gauge_create(h,NULL);
+  lv_obj_set_size(chassis_temp_guage, 125,125);
+  lv_obj_align(chassis_temp_guage, arm_temp_guage, LV_ALIGN_OUT_RIGHT_MID, 20,0);
+  lv_gauge_set_style(chassis_temp_guage, &style_table);
+  lv_gauge_set_range(chassis_temp_guage, 0, 70);
+  lv_gauge_set_critical_value(chassis_temp_guage, 50);
+  lv_gauge_set_style(chassis_temp_guage, &guage_style);
+
+  claw_temp_guage = lv_gauge_create(h,NULL);
+  lv_obj_set_size(claw_temp_guage, 125,125);
+  lv_obj_align(claw_temp_guage, chassis_temp_guage, LV_ALIGN_OUT_RIGHT_MID, 20,0);
+  lv_gauge_set_style(claw_temp_guage, &style_table);
+  lv_gauge_set_range(claw_temp_guage, 0, 70);
+  lv_gauge_set_critical_value(claw_temp_guage, 50);
+  lv_gauge_set_style(claw_temp_guage, &guage_style);
 
 }
 

@@ -33,6 +33,21 @@ void set_temperature(void* param){
 
 		lv_ta_set_text(gui.console_box, arm_pos_string.c_str());
 
+		double chassis_temp =(peripherals.left_mtr.get_temperature() +
+											 peripherals.right_mtr.get_temperature() +
+											 peripherals.lefttwo_mtr.get_temperature() +
+											 peripherals.righttwo_mtr.get_temperature())/4;
+
+		double arm_temp =(peripherals.leftarm_mtr.get_temperature() +
+											peripherals.rightarm_mtr.get_temperature())/2;
+
+		double claw_temp =(peripherals.leftintake_mtr.get_temperature() +
+												peripherals.rightintake_mtr.get_temperature())/2;
+
+    lv_gauge_set_value(gui.chassis_temp_guage, 0, chassis_temp);
+		lv_gauge_set_value(gui.arm_temp_guage, 0, arm_temp);
+		lv_gauge_set_value(gui.claw_temp_guage, 0, claw_temp);
+
     pros::delay(123);
 
 
