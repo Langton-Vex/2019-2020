@@ -29,11 +29,12 @@ auto ccont = ChassisControllerFactory::create(
 
 MotorGroup intake({leftintake_port,rightintake_port});
 
+auto lift = AsyncControllerFactory::posIntegrated(
+  {leftarm_port,-rightarm_port});
+
 void near_small(){
     printf("near small running");
     pros::delay(20);
-    auto lift = AsyncControllerFactory::posIntegrated(
-      {leftarm_port,-rightarm_port});
 
     ccont.turnAngle(-100_deg);
     ccont.moveDistance(18_in);
@@ -47,13 +48,8 @@ void near_small(){
 }
 
 void colour_tile(){
-    printf("colour tile running");
-    pros::delay(20);
-    auto lift = AsyncControllerFactory::posIntegrated(
-      {leftarm_port,-rightarm_port});
-
+    ccont.setMaxVelocity(150);
     int side = configManager.selected_team;
-    printf("%d",side);
 
     lift.setMaxVelocity(100);
 
@@ -104,13 +100,17 @@ void colour_tile(){
 }
 
 void init_autonomous(){
+
+  lift.flipDisable(true);
+
   configManager.register_auton("near small", near_small);
   configManager.register_auton("colour tile", colour_tile);
 }
 
 void autonomous() {
     auton_routine routine = configManager.auton_routines[configManager.selected_auton];
-    printf("attempting to run routine");
+    lift.flipDisable(false);
     routine(); // nullptr could happen :o
+    lift.flipDisable(true);
 
 }
