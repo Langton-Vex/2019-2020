@@ -98,6 +98,17 @@ void colour_tile(){
 
 }
 
+void fourstack_tower(){
+  ccont.setMaxVelocity(150);
+  int side = configManager.selected_team;
+
+  lift.setMaxVelocity(100);
+  lift.setTarget(0);
+  ccont.moveDistance(6_in);
+  ccont.turnAngle(-90_deg);
+  
+};
+
 void do_nothing(){};
 
 void init_autonomous(){
