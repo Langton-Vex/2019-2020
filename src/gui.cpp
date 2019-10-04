@@ -197,7 +197,7 @@ void GUI::build_diagnostics(lv_obj_t * parent){
   lv_gauge_set_range(arm_temp_guage, 0, 70);
   lv_gauge_set_critical_value(arm_temp_guage, 50);
   lv_gauge_set_style(arm_temp_guage, &guage_style);
-  lv_gauge_set_scale(arm_temp_guage, 220, 14, 7);
+  lv_gauge_set_scale(arm_temp_guage, 220, 13, 8);
 
   chassis_temp_guage = lv_gauge_create(h,NULL);
   lv_obj_set_size(chassis_temp_guage, 125,125);
@@ -206,7 +206,7 @@ void GUI::build_diagnostics(lv_obj_t * parent){
   lv_gauge_set_range(chassis_temp_guage, 0, 70);
   lv_gauge_set_critical_value(chassis_temp_guage, 50);
   lv_gauge_set_style(chassis_temp_guage, &guage_style);
-  lv_gauge_set_scale(chassis_temp_guage, 220, 14, 7);
+  lv_gauge_set_scale(chassis_temp_guage, 220, 13, 8);
 
   claw_temp_guage = lv_gauge_create(h,NULL);
   lv_obj_set_size(claw_temp_guage, 125,125);
@@ -215,7 +215,7 @@ void GUI::build_diagnostics(lv_obj_t * parent){
   lv_gauge_set_range(claw_temp_guage, 0, 70);
   lv_gauge_set_critical_value(claw_temp_guage, 50);
   lv_gauge_set_style(claw_temp_guage, &guage_style);
-  lv_gauge_set_scale(claw_temp_guage, 220, 14, 7);
+  lv_gauge_set_scale(claw_temp_guage, 220, 13, 8);
 
 }
 
