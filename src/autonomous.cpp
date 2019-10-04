@@ -99,12 +99,15 @@ void colour_tile(){
 
 }
 
+void do_nothing(){};
+
 void init_autonomous(){
 
   lift.flipDisable(true);
 
   configManager.register_auton("near small", near_small);
   configManager.register_auton("colour tile", colour_tile);
+  configManager.register_auton("do nothing",do_nothing);
 }
 
 void autonomous() {
