@@ -29,8 +29,7 @@ auto ccont = ChassisControllerFactory::create(
 
 MotorGroup intake({leftintake_port,rightintake_port});
 
-auto lift = AsyncControllerFactory::posIntegrated(
-  {leftarm_port,-rightarm_port});
+extern AsyncPosIntegratedController lift;
 
 void near_small(){
     printf("near small running");

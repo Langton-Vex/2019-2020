@@ -18,6 +18,8 @@ extern const int rightintake_port = 4;
 extern const int leftarm_port = 1;
 extern const int rightarm_port = 2;
 
+auto lift = okapi::AsyncControllerFactory::posIntegrated(
+  {leftarm_port,-rightarm_port});
 
 
 Peripherals_t peripherals(left_port, right_port, lefttwo_port, righttwo_port,
@@ -34,8 +36,9 @@ ConfigManager configManager;
 void init_autonomous(); // uh oh global space
 
 void initialize() {
+	lift.flipDisable(true);
 	init_autonomous();
-	
+
 	pros::delay(100);
   gui.gui_build();
 
