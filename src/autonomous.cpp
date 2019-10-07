@@ -98,18 +98,11 @@ void colour_tile(){
 
 }
 
-void fourstack_tower(){
-  ccont.setMaxVelocity(150);
-  int side = configManager.selected_team;
-
-  lift.setMaxVelocity(100);
-  lift.setTarget(0);
-  ccont.moveDistance(6_in);
-  ccont.turnAngle(-90_deg);
-  
-};
-
 void do_nothing(){};
+
+void move_15(){
+  ccont.moveDistance(15_in);
+}
 
 void init_autonomous(){
 
@@ -118,6 +111,8 @@ void init_autonomous(){
   configManager.register_auton("near small", near_small);
   configManager.register_auton("colour tile", colour_tile);
   configManager.register_auton("do nothing",do_nothing);
+
+  configManager.register_auton("Move 15",move_15);
 }
 
 void autonomous() {
