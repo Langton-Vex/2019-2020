@@ -11,8 +11,8 @@ using namespace okapi;
  * from where it left off.
  */
 
- extern int left_port, right_port, lefttwo_port, righttwo_port,
- 	            leftarm_port, rightarm_port, leftintake_port,rightintake_port;
+extern int left_port, right_port, lefttwo_port, righttwo_port,
+    leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
 extern ConfigManager configManager;
 
@@ -22,16 +22,17 @@ const auto CHASSIS_WIDTH = 370_mm;
 // intake is roughly 5
 
 auto ccont = ChassisControllerFactory::create(
-                {left_port,lefttwo_port}, // peripherals.left_port,peripherals.lefttwo_port
-                {right_port,righttwo_port},// peripherals.right_port,peripherals.righttwo_port
-                AbstractMotor::gearset::green,
-                {WHEEL_DIAMETER, CHASSIS_WIDTH});
+    { left_port, lefttwo_port }, // peripherals.left_port,peripherals.lefttwo_port
+    { right_port, righttwo_port }, // peripherals.right_port,peripherals.righttwo_port
+    AbstractMotor::gearset::green,
+    { WHEEL_DIAMETER, CHASSIS_WIDTH });
 
-MotorGroup intake({leftintake_port,rightintake_port});
+MotorGroup intake({ leftintake_port, rightintake_port });
 
 extern AsyncPosIntegratedController lift;
 
-void near_small(){
+void near_small()
+{
     printf("near small running");
     pros::delay(20);
 
@@ -43,16 +44,16 @@ void near_small(){
     intake.moveVelocity(0);
     ccont.moveDistance(-16_in);
     lift.setTarget(0);
-
 }
 
-void colour_tile(){
+void colour_tile()
+{
     ccont.setMaxVelocity(150);
     int side = configManager.selected_team;
 
     lift.setMaxVelocity(100);
 
-    pros::lcd::set_text(1,"running autonomous");
+    pros::lcd::set_text(1, "running autonomous");
     //ccont.moveDistance(1_in);
     //ccont.turnAngle(90_deg);
     lift.setTarget(-400);
@@ -94,36 +95,35 @@ void colour_tile(){
     ccont.setMaxVelocity(100);
     ccont.moveDistance(-16_in);
     lift.setTarget(0);
-
-
 }
 
-void do_nothing(){};
+void do_nothing() {};
 
-void move_15(){
-  ccont.moveDistance(15_in);
+void move_15()
+{
+    ccont.moveDistance(15_in);
 }
 
-void init_autonomous(){
+void init_autonomous()
+{
 
-  lift.flipDisable(true);
+    lift.flipDisable(true);
 
-  configManager.register_auton("near small", near_small);
-  configManager.register_auton("colour tile", colour_tile);
-  configManager.register_auton("do nothing",do_nothing);
+    configManager.register_auton("near small", near_small);
+    configManager.register_auton("colour tile", colour_tile);
+    configManager.register_auton("do nothing", do_nothing);
 
-  configManager.register_auton("Move 15",move_15);
+    configManager.register_auton("Move 15", move_15);
 }
 
-void autonomous() {
-    if (configManager.auton_routines.size() < configManager.selected_auton){
-      auton_routine routine = configManager.auton_routines[configManager.selected_auton];
-      lift.flipDisable(false);
-      routine(); // nullptr could happen :o
-      lift.flipDisable(true);
+void autonomous()
+{
+    if (configManager.auton_routines.size() < configManager.selected_auton) {
+        auton_routine routine = configManager.auton_routines[configManager.selected_auton];
+        lift.flipDisable(false);
+        routine(); // nullptr could happen :o
+        lift.flipDisable(true);
+    } else {
+        printf("Selected auton is greater than amount of autons");
     }
-    else{
-      printf("Selected auton is greater than amount of autons");
-    }
-
 }
