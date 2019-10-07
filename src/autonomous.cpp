@@ -16,8 +16,8 @@ using namespace okapi;
 
 extern ConfigManager configManager;
 
-const auto WHEEL_DIAMETER = 4.07_in;
-const auto CHASSIS_WIDTH = 384_mm;
+const auto WHEEL_DIAMETER = 4.3_in;
+const auto CHASSIS_WIDTH = 370_mm;
 
 // intake is roughly 5
 

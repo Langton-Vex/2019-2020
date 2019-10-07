@@ -30,11 +30,11 @@ void ConfigManager::load_config(){
     char temp_string[256];
 
     input_file.getline(temp_string,256);
-    select_auton(std::stoi(temp_string));
+    selected_auton = std::stoi(temp_string);;
 
 
     input_file.getline(temp_string,256);
-    select_team(std::stoi(temp_string));
+    selected_team= std::stoi(temp_string);;
     input_file.close();
   }
 }
@@ -46,22 +46,22 @@ void ConfigManager::register_auton(std::string name, auton_routine routine){
 };
 
 void ConfigManager::select_auton(int id){
-    if (id > auton_routines.size()){
-      if (auton_routines.size() == 0)
-        throw std::range_error("An auton must exist! This is a nullptr catch");
-      selected_auton = 0;
-    }
-    else
+    //if (id > auton_routines.size()){
+      //if (auton_routines.size() == 0)
+      //  throw std::range_error("An auton must exist! This is a nullptr catch");
+      //selected_auton = 0;
+    //}
+    //else
       selected_auton = id;
     this->save_config();
 }
 void ConfigManager::select_team(int team){
-    if (team > auton_routines.size()){
-      if (auton_routines.size() == 0)
-        throw std::range_error("An auton must exist! This is a nullptr catch");
-      selected_team = 0;
-    }
-    else
+    //if (team > auton_routines.size()){
+      //if (auton_routines.size() == 0)
+      //  throw std::range_error("An auton must exist! This is a nullptr catch");
+      //selected_team = 0;
+    //}
+    //else
       selected_team = team;
 
     this->save_config();
