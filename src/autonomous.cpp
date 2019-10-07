@@ -116,9 +116,14 @@ void init_autonomous(){
 }
 
 void autonomous() {
-    auton_routine routine = configManager.auton_routines[configManager.selected_auton];
-    lift.flipDisable(false);
-    routine(); // nullptr could happen :o
-    lift.flipDisable(true);
+    if (configManager.auton_routines.size() < configManager.selected_auton){
+      auton_routine routine = configManager.auton_routines[configManager.selected_auton];
+      lift.flipDisable(false);
+      routine(); // nullptr could happen :o
+      lift.flipDisable(true);
+    }
+    else{
+      printf("Selected auton is greater than amount of autons");
+    }
 
 }
