@@ -109,8 +109,6 @@ void auton_safety(void* param) {
     }
 }
 
-
-
 void init_autonomous() {
     lift.flipDisable(true);
 

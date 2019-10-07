@@ -25,15 +25,15 @@ void Chassis::user_control() {
     //pros::lcd::print(5,"height per %f",arm.height_per);
     double power_mult = power_mult_calc();
     power_mult = (slowmode) ? 0.5 : power_mult;
-    
+
     power = power * power_mult;
     turn = turn * power_mult;
     this->set(power, turn);
 }
 
-double Chassis::power_mult_calc(){
-  double power_mult = (arm.height_per < 0.5) ? (1.0 - arm.height_per) : 0.5;
-  return power_mult;
+double Chassis::power_mult_calc() {
+    double power_mult = (arm.height_per < 0.5) ? (1.0 - arm.height_per) : 0.5;
+    return power_mult;
 }
 
 void Chassis::set(int power, int turn) {
