@@ -3,13 +3,11 @@
 #include <iostream>
 #include <iterator>
 
-ConfigManager::ConfigManager()
-{
+ConfigManager::ConfigManager() {
     load_config();
 };
 
-void ConfigManager::save_config()
-{
+void ConfigManager::save_config() {
     printf("Saving config");
     std::ofstream save_file(save_filepath, std::ofstream::out | std::ofstream::trunc);
     save_file.clear();
@@ -18,8 +16,7 @@ void ConfigManager::save_config()
     save_file.close();
 }
 
-void ConfigManager::load_config()
-{
+void ConfigManager::load_config() {
     bool file_exists;
     if (FILE* file = fopen(save_filepath.c_str(), "r")) {
         fclose(file);
@@ -43,14 +40,12 @@ void ConfigManager::load_config()
     }
 }
 
-void ConfigManager::register_auton(std::string name, auton_routine routine)
-{
+void ConfigManager::register_auton(std::string name, auton_routine routine) {
     autonomous_names.push_back(name);
     auton_routines.push_back(routine);
 };
 
-void ConfigManager::select_auton(int id)
-{
+void ConfigManager::select_auton(int id) {
     //if (id > auton_routines.size()){
     //if (auton_routines.size() == 0)
     //  throw std::range_error("An auton must exist! This is a nullptr catch");
@@ -60,8 +55,7 @@ void ConfigManager::select_auton(int id)
     selected_auton = id;
     this->save_config();
 }
-void ConfigManager::select_team(int team)
-{
+void ConfigManager::select_team(int team) {
     //if (team > auton_routines.size()){
     //if (auton_routines.size() == 0)
     //  throw std::range_error("An auton must exist! This is a nullptr catch");

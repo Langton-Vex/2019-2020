@@ -32,8 +32,7 @@ ConfigManager configManager;
 
 void init_autonomous(); // uh oh global space
 
-void initialize()
-{
+void initialize() {
     lift.flipDisable(true);
     init_autonomous();
 

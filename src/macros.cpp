@@ -1,14 +1,12 @@
 #include "main.h"
 
-void Macro::run()
-{
+void Macro::run() {
     if (mutex.take(TIMEOUT_MAX)) {
         func();
         mutex.give();
     }
 }
-Macro::Macro(MacroFunc f)
-{
+Macro::Macro(MacroFunc f) {
     func = f;
     empty = false;
 }
@@ -26,8 +24,7 @@ Macro macros[12] = { Macro(), Macro(), Macro(), Macro(),
     //X      ,Y      ,A      ,B
     Macro(), Macro(), Macro(), Macro() };
 
-void macros_update(pros::Controller controller)
-{
+void macros_update(pros::Controller controller) {
     /*
       for (int i=0;i<12;i++){
       if(controller.get_digital_new_press(button_list[i]) && !macros[i].empty){

@@ -5,8 +5,7 @@ extern ConfigManager configManager;
 const auto HOR_RES = 480;
 const auto VER_RES = 240;
 
-void GUI::gui_build()
-{
+void GUI::gui_build() {
     lv_theme_set_current(th);
     th = lv_theme_get_current(); /*If `LV_THEME_LIVE_UPDATE  1` `th` is not used directly so get the real theme after set*/
     lv_obj_t* scr = lv_scr_act();
@@ -25,8 +24,7 @@ void GUI::gui_build()
     build_diagnostics(diagnostics);
 };
 
-void GUI::build_main(lv_obj_t* parent)
-{
+void GUI::build_main(lv_obj_t* parent) {
     lv_page_set_scrl_layout(parent, LV_LAYOUT_PRETTY);
 
     lv_theme_t* th = lv_theme_get_current();
@@ -123,8 +121,7 @@ void GUI::build_main(lv_obj_t* parent)
     lv_obj_align(side_label, side, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
 }
 
-void GUI::build_console(lv_obj_t* parent)
-{
+void GUI::build_console(lv_obj_t* parent) {
     lv_page_set_scrl_layout(parent, LV_LAYOUT_PRETTY);
 
     lv_theme_t* th = lv_theme_get_current();
@@ -159,8 +156,7 @@ void GUI::build_console(lv_obj_t* parent)
     lv_ta_set_text(console_box, "Initializing hackerman console:\n");
 }
 
-void GUI::build_diagnostics(lv_obj_t* parent)
-{
+void GUI::build_diagnostics(lv_obj_t* parent) {
     lv_page_set_scrl_layout(parent, LV_LAYOUT_PRETTY);
 
     lv_theme_t* th = lv_theme_get_current();
@@ -219,15 +215,13 @@ void GUI::build_diagnostics(lv_obj_t* parent)
     lv_gauge_set_scale(claw_temp_guage, 220, 13, 8);
 }
 
-lv_res_t GUI::cb_auton_select(lv_obj_t* auton_select)
-{
+lv_res_t GUI::cb_auton_select(lv_obj_t* auton_select) {
     configManager.select_auton(lv_roller_get_selected(auton_select));
 
     return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
 }
 
-lv_res_t GUI::cb_side(lv_obj_t* side)
-{
+lv_res_t GUI::cb_side(lv_obj_t* side) {
     bool switch_state = lv_sw_get_state(side); // false is blue, true is red
     if (switch_state)
         configManager.select_team(-1);

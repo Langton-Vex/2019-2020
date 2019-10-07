@@ -14,4 +14,4 @@ Peripherals_t::Peripherals_t(int left, int right, int lefttwo, int righttwo,
     , rightarm_mtr(rightarm, MOTOR_GEARSET_36, true, MOTOR_ENCODER_DEGREES)
     ,
 
-    master_controller(pros::E_CONTROLLER_MASTER) {};
+    master_controller(pros::E_CONTROLLER_MASTER){};

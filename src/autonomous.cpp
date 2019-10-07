@@ -31,8 +31,7 @@ MotorGroup intake({ leftintake_port, rightintake_port });
 
 extern AsyncPosIntegratedController lift;
 
-void near_small()
-{
+void near_small() {
     printf("near small running");
     pros::delay(20);
 
@@ -46,8 +45,7 @@ void near_small()
     lift.setTarget(0);
 }
 
-void colour_tile()
-{
+void colour_tile() {
     ccont.setMaxVelocity(150);
     int side = configManager.selected_team;
 
@@ -97,15 +95,13 @@ void colour_tile()
     lift.setTarget(0);
 }
 
-void do_nothing() {};
+void do_nothing(){};
 
-void move_15()
-{
+void move_15() {
     ccont.moveDistance(15_in);
 }
 
-void init_autonomous()
-{
+void init_autonomous() {
 
     lift.flipDisable(true);
 
@@ -116,8 +112,7 @@ void init_autonomous()
     configManager.register_auton("Move 15", move_15);
 }
 
-void autonomous()
-{
+void autonomous() {
     if (configManager.auton_routines.size() < configManager.selected_auton) {
         auton_routine routine = configManager.auton_routines[configManager.selected_auton];
         lift.flipDisable(false);

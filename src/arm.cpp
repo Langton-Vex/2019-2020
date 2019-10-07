@@ -13,8 +13,7 @@ extern AsyncPosIntegratedController lift;
 double major_positions[4] = { 0, 250, 500, 750 };
 //double minor_positions[4] = {0.0,0.05,0.1,0.1};
 
-Arm::Arm()
-{
+Arm::Arm() {
     peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     peripherals.rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
@@ -24,8 +23,7 @@ Arm::Arm()
     sensitivity = 0.0001;
 }
 
-void Arm::user_control()
-{
+void Arm::user_control() {
     int power = peripherals.master_controller.get_analog(ANALOG_LEFT_Y);
 
     bool arm_up = peripherals.master_controller.get_digital_new_press(DIGITAL_UP);
@@ -77,14 +75,12 @@ void Arm::user_control()
     }
 }
 
-void Arm::set(int power)
-{
+void Arm::set(int power) {
     //if (abs(power) < 10) power = 5;
     peripherals.leftarm_mtr.move(-power);
     peripherals.rightarm_mtr.move(-power);
 }
-void Arm::set_pos(double position)
-{
+void Arm::set_pos(double position) {
     /*
     if (position < 0.1) {
       peripherals.leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);

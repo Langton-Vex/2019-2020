@@ -21,8 +21,7 @@ extern Claw claw;
 
 extern GUI gui;
 
-void set_temperature(void* param)
-{
+void set_temperature(void* param) {
     std::uint32_t now = pros::millis();
     while (true) {
         std::string temp = std::to_string(peripherals.leftarm_mtr.get_temperature());
@@ -48,8 +47,7 @@ void set_temperature(void* param)
     }
 }
 
-void opcontrol()
-{
+void opcontrol() {
 
     pros::Task temp_task(set_temperature, nullptr, "temp_task");
 
