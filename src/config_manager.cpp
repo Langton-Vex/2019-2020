@@ -31,11 +31,10 @@ void ConfigManager::load_config() {
 
         input_file.getline(temp_string, 256);
         selected_auton = std::stoi(temp_string);
-        ;
 
         input_file.getline(temp_string, 256);
         selected_team = std::stoi(temp_string);
-        ;
+
         input_file.close();
     }
 }
