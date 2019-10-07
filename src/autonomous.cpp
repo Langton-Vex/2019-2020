@@ -66,7 +66,7 @@ void colour_tile() {
     intake.moveVelocity(-127);
     lift.setTarget(0);
     lift.waitUntilSettled();
-    pros::delay(500); // This defo needs changing
+    pros::delay(500); // TODO: This defo needs changing
     //intake.moveVelocity(0);
     lift.setTarget(-200);
     lift.waitUntilSettled();
@@ -101,8 +101,17 @@ void move_15() {
     ccont.moveDistance(15_in);
 }
 
-void init_autonomous() {
+void auton_safety(void* param) {
+    while (pros::competition::is_autonomous()) {
+        double power_mult = chassis.power_mult_calc();
+        ccont.setMaxVelocity(chassis.motor_speed * power_mult);
+        pros::delay(20);
+    }
+}
 
+
+
+void init_autonomous() {
     lift.flipDisable(true);
 
     configManager.register_auton("near small", near_small);
@@ -114,10 +123,14 @@ void init_autonomous() {
 
 void autonomous() {
     if (configManager.auton_routines.size() < configManager.selected_auton) {
+
+        pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
+
         auton_routine routine = configManager.auton_routines[configManager.selected_auton];
         lift.flipDisable(false);
         routine(); // nullptr could happen :o
         lift.flipDisable(true);
+        auton_task.remove();
     } else {
         printf("Selected auton is greater than amount of autons");
     }

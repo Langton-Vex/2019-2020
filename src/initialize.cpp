@@ -19,6 +19,8 @@ extern const int rightarm_port = 2;
 auto lift = okapi::AsyncControllerFactory::posIntegrated(
     { leftarm_port, -rightarm_port });
 
+// TODO: These need to be mutex managed pointers
+
 Peripherals_t peripherals(left_port, right_port, lefttwo_port, righttwo_port,
     leftintake_port, rightintake_port, leftarm_port, rightarm_port);
 

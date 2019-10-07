@@ -12,11 +12,14 @@ class Chassis{
     void move_forward(double distance,int velocity);
     void point_turn(double angle,int velocity);
 
+    double power_mult_calc();
+
     double turn_radius;
     double wheel_circumference;
+    int motor_speed;
   protected:
     //Peripherals_t peripherals;
-    int motor_speed;
+
     bool slowmode = false;
 };
 
