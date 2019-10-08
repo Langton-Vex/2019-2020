@@ -34,7 +34,7 @@ extern AsyncPosIntegratedController lift;
 void lift_stack(int cubes) {
     lift.setTarget(-30);
     lift.waitUntilSettled();
-    intake.moveVelocity(200);
+    intake.moveVelocity(-200);
     lift.setMaxVelocity(27);
     pros::delay(630);
     lift.setTarget(-(18.4681 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
@@ -104,12 +104,12 @@ void four_stack() {
     lift.setTarget(24.7 * 18.4681);
     lift.waitUntilSettled();
     ccont.moveDistance(5.94_in);
-    ccont.waitUntilSettled();
-    intake.moveVelocity(200);
+    intake.moveVelocity(-200);
+    lift.setTarget(lift.getTarget() + (18.4681 * 1.5));
     pros::delay(630);
+    lift.waitUntilSettled();
     intake.moveVelocity(0);
     ccont.moveDistance(-5.94_in);
-    ccont.waitUntilSettled();
     lift.setTarget(0);
     lift.waitUntilSettled();
 
@@ -132,6 +132,41 @@ void four_stack() {
 /* This autonomous starts with the right side of the robot lined up with the
    middle of the left mid tower cube */
 void four_floor_small() {
+    ccont.moveDistance(20_in);
+    ccont.moveDistance(-3.5_in);
+
+    lift.setTarget(24.7 * 18.4681);
+    ccont.turnAngle(90_deg);
+    lift.waitUntilSettled();
+    ccont.moveDistance(7_in);
+    intake.moveVelocity(-200);
+
+    ccont.moveDistance(7_in);
+    intake.moveVelocity(-200);
+    lift.setTarget(lift.getTarget() + (18.4681 * 1.5));
+    pros::delay(630);
+    lift.waitUntilSettled();
+    ccont.moveDistance(-7_in);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    ccont.moveDistance(-13_in);
+    ccont.turnAngle(90_deg);
+    ccont.moveDistance(4_in);
+    ccont.turnAngle(90_deg);
+    ccont.moveDistance(15_in);
+    ccont.turnAngle(90_deg);
+
+    intake.moveVelocity(200);
+    for (int i = 0; i < 4; i++) {
+        lift.setTarget(-30);
+        ccont.moveDistance(5.5_in);
+        lift.setTarget(0);
+        pros::delay(630);
+    }
+
+    ccont.moveDistance(-35_in);
+    ccont.turnAngle(-100_deg);
+    ccont.moveDistance(14_in);
 }
 
 void do_nothing() {
@@ -163,6 +198,7 @@ void init_autonomous() {
     configManager.register_auton("colour tile", colour_tile);
     configManager.register_auton("do nothing", do_nothing);
     configManager.register_auton("four stack grab", four_stack);
+    configManager.register_auton("four floor small", four_floor_small);
 
     configManager.register_auton("Move 15", move_15);
 }
