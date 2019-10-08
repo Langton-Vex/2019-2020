@@ -31,72 +31,108 @@ MotorGroup intake({ leftintake_port, rightintake_port });
 
 extern AsyncPosIntegratedController lift;
 
-void near_small() {
-    printf("near small running");
-    pros::delay(20);
-
-    ccont.turnAngle(-100_deg);
-    ccont.moveDistance(18_in);
-    intake.moveVelocity(127);
-    lift.setTarget(-400);
+void lift_stack(int cubes) {
+    lift.setTarget(-30);
     lift.waitUntilSettled();
+    intake.moveVelocity(200);
+    lift.setMaxVelocity(27);
+    pros::delay(630);
+    lift.setTarget(-(18.4681 * 5.5 * (cubes-1))); //TODO: Make this not hard-coded
+    lift.waitUntilSettled(); // Perfect stacking speeds from 4 inches up
     intake.moveVelocity(0);
-    ccont.moveDistance(-16_in);
-    lift.setTarget(0);
+    lift.setMaxVelocity(100);
 }
 
+// Starts pointing towards small goal zone
+void near_small() {
+    ccont.moveDistance(15.6_in);
+
+    lift_stack(1);
+
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    ccont.moveDistance(-16_in);
+
+}
+
+// Starts pointing towards singular cube one tile left of large goal zone
 void colour_tile() {
+
     ccont.setMaxVelocity(150);
     int side = configManager.selected_team;
-
     lift.setMaxVelocity(100);
 
-    pros::lcd::set_text(1, "running autonomous");
-    //ccont.moveDistance(1_in);
-    //ccont.turnAngle(90_deg);
-    lift.setTarget(-400);
+    ccont.moveDistanceAsync(11.5_in);
+    lift.setTarget(-30);
     lift.waitUntilSettled();
-    ccont.moveDistanceAsync(8_in);
-
     ccont.waitUntilSettled();
 
     //ccont.turnAngle(-110_deg);
     //ccont.moveDistance(5_in);
 
-    intake.moveVelocity(-127);
+    intake.moveVelocity(200);
     lift.setTarget(0);
     lift.waitUntilSettled();
-    pros::delay(500); // TODO: This defo needs changing
+    //pros::delay(500); // TODO: This defo needs changing
     //intake.moveVelocity(0);
-    lift.setTarget(-200);
+    //lift.setTarget(-200);
+    //lift.waitUntilSettled();
+
+    ccont.moveDistance(-5.6_in);
+    intake.moveVelocity(0);
+    ccont.turnAngle(90_deg * side);
+    ccont.moveDistance(27_in);
+
+    lift_stack(2);
+
+    lift.setMaxVelocity(100);
+    lift.setTarget(0);
     lift.waitUntilSettled();
 
-    ccont.moveDistance(-5_in);
-    ccont.turnAngle(110_deg * side);
-    ccont.moveDistance(34_in);
-    intake.moveVelocity(0);
-    lift.setTarget(0);
-    lift.waitUntilSettled();
-    intake.moveVelocity(127);
-    pros::delay(250);
-    lift.setMaxVelocity(50);
-    lift.setTarget(-500);
-    lift.waitUntilSettled();
-    pros::delay(250);
-    lift.setMaxVelocity(200);
-    lift.setTarget(-1000);
-    lift.waitUntilSettled();
-    lift.setTarget(-400);
-    lift.waitUntilSettled();
-    pros::delay(500);
-    intake.moveVelocity(0);
-    ccont.setMaxVelocity(100);
     ccont.moveDistance(-16_in);
-    lift.setTarget(0);
 }
 
-void do_nothing(){
-  pros::delay(5000);
+/* This starts with the left side of the robot in line with the middle of
+cube to the right of the medium sized tower */
+void four_stack(){
+  int side = configManager.selected_team;
+  lift.setMaxVelocity(100);
+
+  ccont.moveDistance(20_in);
+  ccont.moveDistance(-3.5_in);
+  ccont.turnAngle(-90_deg);
+
+  lift.setTarget(24.7 * 18.4681);
+  lift.waitUntilSettled();
+  ccont.moveDistance(5.94_in);
+  ccont.waitUntilSettled();
+  intake.moveVelocity(200);
+  pros::delay(630);
+  intake.moveVelocity(0);
+  ccont.moveDistance(-5.94_in);
+  ccont.waitUntilSettled();
+  lift.setTarget(0);
+  lift.waitUntilSettled();
+
+  ccont.turnAngle(90_deg);
+  ccont.moveDistance(13_in);
+  ccont.turnAngle(90_deg);
+  ccont.moveDistance(12.5_in);
+  lift.setTarget(18*18.4681);
+  ccont.turnAngle(-90_deg);
+  ccont.moveDistance(6_in);
+  lift.waitUntilSettled();
+  intake.moveVelocity(200);
+  lift.setTarget(0);
+  lift.waitUntilSettled();
+  ccont.turnAngle(90_deg);
+  ccont.moveDistance(32_in);
+  ccont.turnAngle(80_deg);
+  ccont.moveDistance(20_in);
+}
+
+void do_nothing() {
+    pros::delay(5000);
 };
 
 void move_15() {
@@ -107,7 +143,11 @@ void auton_safety(void* param) {
     while (true) {
         double power_mult = chassis.power_mult_calc();
         //printf("power mult: %f\n",power_mult);
-        ccont.setMaxVelocity(chassis.motor_speed * power_mult);
+        int max_speed = chassis.motor_speed * power_mult;
+        if (max_speed > 150)
+            max_speed = 150;
+        chassis.modify_profiled_velocity(max_speed);
+        ccont.setMaxVelocity(max_speed);
 
         pros::delay(20);
     }
@@ -119,6 +159,7 @@ void init_autonomous() {
     configManager.register_auton("near small", near_small);
     configManager.register_auton("colour tile", colour_tile);
     configManager.register_auton("do nothing", do_nothing);
+    configManager.register_auton("four stack grab", four_stack;
 
     configManager.register_auton("Move 15", move_15);
 }

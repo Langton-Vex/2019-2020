@@ -36,8 +36,18 @@ double Chassis::power_mult_calc() {
     return power_mult;
 }
 
+void Chassis::modify_profiled_velocity(int velocity) {
+    peripherals.left_mtr.modify_profiled_velocity(velocity);
+    peripherals.lefttwo_mtr.modify_profiled_velocity(velocity);
+    peripherals.right_mtr.modify_profiled_velocity(velocity);
+    peripherals.righttwo_mtr.modify_profiled_velocity(velocity);
+};
+
 void Chassis::set(int power, int turn) {
 
+    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
+    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
+    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
     //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
     //float turne = 1/(sgn(turn) * 127) * pow((float)turn,2);
 

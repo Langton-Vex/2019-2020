@@ -13,6 +13,7 @@ class Chassis{
     void point_turn(double angle,int velocity);
 
     double power_mult_calc();
+    void modify_profiled_velocity(int velocity);
 
     double turn_radius;
     double wheel_circumference;
