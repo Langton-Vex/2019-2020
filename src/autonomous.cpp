@@ -95,16 +95,20 @@ void colour_tile() {
     lift.setTarget(0);
 }
 
-void do_nothing(){};
+void do_nothing(){
+  pros::delay(5000);
+};
 
 void move_15() {
     ccont.moveDistance(15_in);
 }
 
 void auton_safety(void* param) {
-    while (pros::competition::is_autonomous()) {
+    while (true) {
         double power_mult = chassis.power_mult_calc();
+        //printf("power mult: %f\n",power_mult);
         ccont.setMaxVelocity(chassis.motor_speed * power_mult);
+
         pros::delay(20);
     }
 }
@@ -120,7 +124,7 @@ void init_autonomous() {
 }
 
 void autonomous() {
-    if (configManager.auton_routines.size() < configManager.selected_auton) {
+    if (configManager.auton_routines.size() > configManager.selected_auton) {
 
         pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
 
