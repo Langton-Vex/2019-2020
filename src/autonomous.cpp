@@ -37,7 +37,7 @@ void lift_stack(int cubes) {
     intake.moveVelocity(200);
     lift.setMaxVelocity(27);
     pros::delay(630);
-    lift.setTarget(-(18.4681 * 5.5 * (cubes-1))); //TODO: Make this not hard-coded
+    lift.setTarget(-(18.4681 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
     lift.waitUntilSettled(); // Perfect stacking speeds from 4 inches up
     intake.moveVelocity(0);
     lift.setMaxVelocity(100);
@@ -52,7 +52,6 @@ void near_small() {
     lift.setTarget(0);
     lift.waitUntilSettled();
     ccont.moveDistance(-16_in);
-
 }
 
 // Starts pointing towards singular cube one tile left of large goal zone
@@ -94,41 +93,41 @@ void colour_tile() {
 
 /* This starts with the left side of the robot in line with the middle of
 cube to the right of the medium sized tower */
-void four_stack(){
-  int side = configManager.selected_team;
-  lift.setMaxVelocity(100);
+void four_stack() {
+    int side = configManager.selected_team;
+    lift.setMaxVelocity(100);
 
-  ccont.moveDistance(20_in);
-  ccont.moveDistance(-3.5_in);
-  ccont.turnAngle(-90_deg);
+    ccont.moveDistance(20_in);
+    ccont.moveDistance(-3.5_in);
+    ccont.turnAngle(-90_deg);
 
-  lift.setTarget(24.7 * 18.4681);
-  lift.waitUntilSettled();
-  ccont.moveDistance(5.94_in);
-  ccont.waitUntilSettled();
-  intake.moveVelocity(200);
-  pros::delay(630);
-  intake.moveVelocity(0);
-  ccont.moveDistance(-5.94_in);
-  ccont.waitUntilSettled();
-  lift.setTarget(0);
-  lift.waitUntilSettled();
+    lift.setTarget(24.7 * 18.4681);
+    lift.waitUntilSettled();
+    ccont.moveDistance(5.94_in);
+    ccont.waitUntilSettled();
+    intake.moveVelocity(200);
+    pros::delay(630);
+    intake.moveVelocity(0);
+    ccont.moveDistance(-5.94_in);
+    ccont.waitUntilSettled();
+    lift.setTarget(0);
+    lift.waitUntilSettled();
 
-  ccont.turnAngle(90_deg);
-  ccont.moveDistance(13_in);
-  ccont.turnAngle(90_deg);
-  ccont.moveDistance(12.5_in);
-  lift.setTarget(18*18.4681);
-  ccont.turnAngle(-90_deg);
-  ccont.moveDistance(6_in);
-  lift.waitUntilSettled();
-  intake.moveVelocity(200);
-  lift.setTarget(0);
-  lift.waitUntilSettled();
-  ccont.turnAngle(90_deg);
-  ccont.moveDistance(32_in);
-  ccont.turnAngle(80_deg);
-  ccont.moveDistance(20_in);
+    ccont.turnAngle(90_deg);
+    ccont.moveDistance(13_in);
+    ccont.turnAngle(90_deg);
+    ccont.moveDistance(12.5_in);
+    lift.setTarget(18 * 18.4681);
+    ccont.turnAngle(-90_deg);
+    ccont.moveDistance(6_in);
+    lift.waitUntilSettled();
+    intake.moveVelocity(200);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    ccont.turnAngle(90_deg);
+    ccont.moveDistance(32_in);
+    ccont.turnAngle(80_deg);
+    ccont.moveDistance(20_in);
 }
 
 void do_nothing() {
