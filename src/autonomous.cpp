@@ -99,7 +99,7 @@ void four_stack() {
 
     ccont.moveDistance(20_in);
     ccont.moveDistance(-3.5_in);
-    ccont.turnAngle(-90_deg);
+    ccont.turnAngle(-90_deg * side);
 
     lift.setTarget(24.7 * 18.4681);
     lift.waitUntilSettled();
@@ -113,21 +113,25 @@ void four_stack() {
     lift.setTarget(0);
     lift.waitUntilSettled();
 
-    ccont.turnAngle(90_deg);
+    ccont.turnAngle(90_deg * side);
     ccont.moveDistance(13_in);
-    ccont.turnAngle(90_deg);
+    ccont.turnAngle(90_deg * side);
     ccont.moveDistance(12.5_in);
     lift.setTarget(18 * 18.4681);
-    ccont.turnAngle(-90_deg);
+    ccont.turnAngle(-90_deg * side);
     ccont.moveDistance(6_in);
     lift.waitUntilSettled();
     intake.moveVelocity(200);
     lift.setTarget(0);
     lift.waitUntilSettled();
-    ccont.turnAngle(90_deg);
+    ccont.turnAngle(90_deg * side);
     ccont.moveDistance(32_in);
-    ccont.turnAngle(80_deg);
+    ccont.turnAngle(80_deg * side);
     ccont.moveDistance(20_in);
+}
+/* This autonomous starts with the right side of the robot lined up with the
+   middle of the left mid tower cube */
+void four_floor_small() {
 }
 
 void do_nothing() {
