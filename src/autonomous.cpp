@@ -158,7 +158,7 @@ void init_autonomous() {
     configManager.register_auton("near small", near_small);
     configManager.register_auton("colour tile", colour_tile);
     configManager.register_auton("do nothing", do_nothing);
-    configManager.register_auton("four stack grab", four_stack;
+    configManager.register_auton("four stack grab", four_stack);
 
     configManager.register_auton("Move 15", move_15);
 }
