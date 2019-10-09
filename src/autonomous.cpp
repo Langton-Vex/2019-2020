@@ -32,12 +32,12 @@ MotorGroup intake({ leftintake_port, rightintake_port });
 extern AsyncPosIntegratedController lift;
 
 void lift_stack(int cubes) {
-    lift.setTarget(-30);
+    lift.setTarget(-108);
     lift.waitUntilSettled();
     intake.moveVelocity(-200);
     lift.setMaxVelocity(27);
     pros::delay(630);
-    lift.setTarget(-(18.4681 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
+    lift.setTarget(lift.getTarget() + -(18.1123 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
     lift.waitUntilSettled(); // Perfect stacking speeds from 4 inches up
     intake.moveVelocity(0);
     lift.setMaxVelocity(100);
@@ -49,9 +49,9 @@ void near_small() {
 
     lift_stack(1);
 
-    lift.setTarget(0);
-    lift.waitUntilSettled();
+
     ccont.moveDistance(-16_in);
+    lift.setTarget(0);
 }
 
 // Starts pointing towards singular cube one tile left of large goal zone
@@ -62,7 +62,7 @@ void colour_tile() {
     lift.setMaxVelocity(100);
 
     ccont.moveDistanceAsync(11.5 * inch);
-    lift.setTarget(-30);
+    lift.setTarget(-108);
     lift.waitUntilSettled();
     ccont.waitUntilSettled();
 
@@ -85,10 +85,9 @@ void colour_tile() {
     lift_stack(2);
 
     lift.setMaxVelocity(100);
-    lift.setTarget(0);
-    lift.waitUntilSettled();
 
     ccont.moveDistance(-16 * inch);
+    lift.setTarget(0);
 }
 
 /* This starts with the left side of the robot in line with the middle of
@@ -101,11 +100,11 @@ void four_stack() {
     ccont.moveDistance(-3.5 * inch);
     ccont.turnAngle(-90_deg * side);
 
-    lift.setTarget(24.7 * 18.4681);
+    lift.setTarget(-(24.7 * 18.1123));
     lift.waitUntilSettled();
     ccont.moveDistance(5.94 * inch);
     intake.moveVelocity(-200);
-    lift.setTarget(lift.getTarget() + (18.4681 * 1.5));
+    lift.setTarget(lift.getTarget() -(18.4681 * 1.5));
     pros::delay(630);
     lift.waitUntilSettled();
     intake.moveVelocity(0);
@@ -117,7 +116,7 @@ void four_stack() {
     ccont.moveDistance(13_in);
     ccont.turnAngle(90_deg * side);
     ccont.moveDistance(12.5 * inch);
-    lift.setTarget(18 * 18.4681);
+    lift.setTarget(-(18 * 18.1123));
     ccont.turnAngle(-90_deg * side);
     ccont.moveDistance(6_in);
     lift.waitUntilSettled();
@@ -135,7 +134,7 @@ void four_floor_small() {
     ccont.moveDistance(20_in);
     ccont.moveDistance(-3.5 * inch);
 
-    lift.setTarget(24.7 * 18.4681);
+    lift.setTarget(-(24.7 * 18.1123));
     ccont.turnAngle(90_deg);
     lift.waitUntilSettled();
     ccont.moveDistance(7_in);
@@ -143,7 +142,7 @@ void four_floor_small() {
 
     ccont.moveDistance(7_in);
     intake.moveVelocity(-200);
-    lift.setTarget(lift.getTarget() + (18.4681 * 1.5));
+    lift.setTarget(lift.getTarget() - (18.1123 * 1.5));
     pros::delay(630);
     lift.waitUntilSettled();
     ccont.moveDistance(-7_in);
@@ -158,7 +157,7 @@ void four_floor_small() {
 
     intake.moveVelocity(200);
     for (int i = 0; i < 4; i++) {
-        lift.setTarget(-30);
+        lift.setTarget(-108);
         ccont.moveDistance(5.5 * inch);
         lift.setTarget(0);
         pros::delay(630);
