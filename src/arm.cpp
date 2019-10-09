@@ -31,6 +31,13 @@ void Arm::user_control() {
     //int block_up = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
     //int block_down = peripherals.master_controller.get_digital_new_press(DIGITAL_R2);
 
+    bool tare = peripherals.master_controller.get_digital_new_press(DIGITAL_B);
+
+    if (tare) {
+        peripherals.leftarm_mtr.tare_position();
+        peripherals.rightarm_mtr.tare_position();
+    }
+
     if (arm_up && (current_major_position <= 3)) {
         current_major_position++;
     } else if (arm_down && (current_major_position > 0)) {

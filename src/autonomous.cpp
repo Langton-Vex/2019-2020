@@ -45,7 +45,7 @@ void lift_stack(int cubes) {
 
 // Starts pointing towards small goal zone
 void near_small() {
-    ccont.moveDistance(15.6_in);
+    ccont.moveDistance(15.6 * inch);
 
     lift_stack(1);
 
@@ -61,7 +61,7 @@ void colour_tile() {
     int side = configManager.selected_team;
     lift.setMaxVelocity(100);
 
-    ccont.moveDistanceAsync(11.5_in);
+    ccont.moveDistanceAsync(11.5 * inch);
     lift.setTarget(-30);
     lift.waitUntilSettled();
     ccont.waitUntilSettled();
@@ -77,7 +77,7 @@ void colour_tile() {
     //lift.setTarget(-200);
     //lift.waitUntilSettled();
 
-    ccont.moveDistance(-5.6_in);
+    ccont.moveDistance(-5.6 * inch);
     intake.moveVelocity(0);
     ccont.turnAngle(90_deg * side);
     ccont.moveDistance(27_in);
@@ -88,7 +88,7 @@ void colour_tile() {
     lift.setTarget(0);
     lift.waitUntilSettled();
 
-    ccont.moveDistance(-16_in);
+    ccont.moveDistance(-16 * inch);
 }
 
 /* This starts with the left side of the robot in line with the middle of
@@ -97,26 +97,26 @@ void four_stack() {
     int side = configManager.selected_team;
     lift.setMaxVelocity(100);
 
-    ccont.moveDistance(20_in);
-    ccont.moveDistance(-3.5_in);
+    ccont.moveDistance(20 * inch);
+    ccont.moveDistance(-3.5 * inch);
     ccont.turnAngle(-90_deg * side);
 
     lift.setTarget(24.7 * 18.4681);
     lift.waitUntilSettled();
-    ccont.moveDistance(5.94_in);
+    ccont.moveDistance(5.94 * inch);
     intake.moveVelocity(-200);
     lift.setTarget(lift.getTarget() + (18.4681 * 1.5));
     pros::delay(630);
     lift.waitUntilSettled();
     intake.moveVelocity(0);
-    ccont.moveDistance(-5.94_in);
+    ccont.moveDistance(-5.94 * inch);
     lift.setTarget(0);
     lift.waitUntilSettled();
 
     ccont.turnAngle(90_deg * side);
     ccont.moveDistance(13_in);
     ccont.turnAngle(90_deg * side);
-    ccont.moveDistance(12.5_in);
+    ccont.moveDistance(12.5 * inch);
     lift.setTarget(18 * 18.4681);
     ccont.turnAngle(-90_deg * side);
     ccont.moveDistance(6_in);
@@ -133,7 +133,7 @@ void four_stack() {
    middle of the left mid tower cube */
 void four_floor_small() {
     ccont.moveDistance(20_in);
-    ccont.moveDistance(-3.5_in);
+    ccont.moveDistance(-3.5 * inch);
 
     lift.setTarget(24.7 * 18.4681);
     ccont.turnAngle(90_deg);
@@ -159,7 +159,7 @@ void four_floor_small() {
     intake.moveVelocity(200);
     for (int i = 0; i < 4; i++) {
         lift.setTarget(-30);
-        ccont.moveDistance(5.5_in);
+        ccont.moveDistance(5.5 * inch);
         lift.setTarget(0);
         pros::delay(630);
     }
@@ -174,14 +174,16 @@ void do_nothing() {
 };
 
 void move_15() {
+    lift.setTarget(-800);
     ccont.moveDistance(15_in);
+    ccont.moveDistance(-15_in);
 }
 
 void auton_safety(void* param) {
     while (true) {
         double power_mult = chassis.power_mult_calc();
         //printf("power mult: %f\n",power_mult);
-        int max_speed = chassis.motor_speed * power_mult;
+        int max_speed = 150 * round(power_mult);
         if (max_speed > 150)
             max_speed = 150;
         chassis.modify_profiled_velocity(max_speed);
@@ -206,13 +208,13 @@ void init_autonomous() {
 void autonomous() {
     if (configManager.auton_routines.size() > configManager.selected_auton) {
 
-        pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
+        //pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
 
         auton_routine routine = configManager.auton_routines[configManager.selected_auton];
         lift.flipDisable(false);
         routine(); // nullptr could happen :o
         lift.flipDisable(true);
-        auton_task.remove();
+        //auton_task.remove();
     } else {
         printf("Selected auton is greater than amount of autons");
     }
