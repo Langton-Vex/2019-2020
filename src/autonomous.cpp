@@ -167,6 +167,22 @@ void four_floor_small() {
     ccont.moveDistance(14_in);
 }
 
+//  starts in line with the 4 floor cubes
+void simple_four_floor(){
+  lift.setTarget(-(5.5 * 18.1123));
+  ccont.moveDistance(17.15_in);
+  intake.moveVelocity(200);
+  lift.setTarget(0);
+  lift.waitUntilSettled();
+  lift.setTarget(-(5.5 * 18.1123));
+  ccont.moveDistance(5.5_in);
+  lift.setTarget(0);
+  lift.waitUntilSettled();
+  ccont.moveDistance(-3_in);
+  ccont.turnAngle(-135_deg);
+  lift.setTarget(-(28.5 * 18.1123));
+  lift_stack(3);
+}
 void do_nothing() {
     pros::delay(5000);
 };
@@ -199,6 +215,7 @@ void init_autonomous() {
     configManager.register_auton("do nothing", do_nothing);
     configManager.register_auton("four stack grab", four_stack);
     configManager.register_auton("four floor small", four_floor_small);
+    configManager.register_auton("four floor simple", simple_four_floor);
 
     configManager.register_auton("Move 15", move_15);
 }
