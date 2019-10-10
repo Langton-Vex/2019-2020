@@ -22,12 +22,12 @@ const auto CHASSIS_WIDTH = 370_mm;
 // intake is roughly 5
 
 auto ccont = ChassisControllerFactory::create(
-    { left_port, lefttwo_port }, // peripherals.left_port,peripherals.lefttwo_port
-    { right_port, righttwo_port }, // peripherals.right_port,peripherals.righttwo_port
+    { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) }, // peripherals.left_port,peripherals.lefttwo_port
+    { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) }, // peripherals.right_port,peripherals.righttwo_port
     AbstractMotor::gearset::green,
     { WHEEL_DIAMETER, CHASSIS_WIDTH });
 
-MotorGroup intake({ leftintake_port, rightintake_port });
+MotorGroup intake({ static_cast<int8_t>(leftintake_port), static_cast<int8_t>(rightintake_port) });
 
 extern AsyncPosIntegratedController lift;
 
@@ -174,20 +174,20 @@ void four_floor_small() {
 }
 
 //  starts in line with the 4 floor cubes
-void simple_four_floor(){
-  lift.setTarget(-(5.5 * 18.1123));
-  ccont.moveDistance(17.15_in);
-  intake.moveVelocity(200);
-  lift.setTarget(0);
-  lift.waitUntilSettled();
-  lift.setTarget(-(5.5 * 18.1123));
-  ccont.moveDistance(5.5_in);
-  lift.setTarget(0);
-  lift.waitUntilSettled();
-  ccont.moveDistance(-3_in);
-  ccont.turnAngle(-135_deg);
-  lift.setTarget(-(28.5 * 18.1123));
-  lift_stack(3);
+void simple_four_floor() {
+    lift.setTarget(-(5.5 * 18.1123));
+    ccont.moveDistance(17.15_in);
+    intake.moveVelocity(200);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    lift.setTarget(-(5.5 * 18.1123));
+    ccont.moveDistance(5.5_in);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    ccont.moveDistance(-3_in);
+    ccont.turnAngle(-135_deg);
+    lift.setTarget(-(28.5 * 18.1123));
+    lift_stack(3);
 }
 void do_nothing() {
     pros::delay(5000);
