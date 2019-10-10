@@ -100,14 +100,14 @@ void four_stack() {
     int side = configManager.selected_team;
     lift.setMaxVelocity(100);
 
-    ccont.moveDistance(20 * inch);
-    ccont.moveDistance(-5.5 * inch);
+    ccont.moveDistance(20_in);
+    ccont.moveDistance(-3.5 * inch);
     ccont.turnAngle(-90_deg * side);
 
     lift.setTarget(-(24.7 * 18.1123));
     lift.waitUntilSettled();
     ccont.setMaxVelocity(100);
-    ccont.moveDistance(6.5 * inch);
+    ccont.moveDistance(7_in);
     intake.moveVelocity(-200);
     lift.setTarget(lift.getTarget() - (18.1123 * 4));
     pros::delay(1200);
@@ -117,7 +117,7 @@ void four_stack() {
     lift.setTarget(0);
     lift.waitUntilSettled();
 
-    ccont.turnAngle(-90_deg * side);
+    ccont.turnAngle(90_deg * side);
     ccont.moveDistance(13_in);
     ccont.turnAngle(90_deg * side);
     ccont.moveDistance(12.5 * inch);
