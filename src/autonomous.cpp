@@ -45,12 +45,7 @@ void lift_stack(int cubes) {
 // Starts pointing towards small goal zone
 void near_small() {
     ccont.moveDistance(17 * inch);
-
-    lift_stack(1);
-
     ccont.moveDistance(-18_in);
-    lift.setTarget(0);
-    lift.waitUntilSettled();
 }
 
 // Starts pointing towards singular cube one tile left of large goal zone
