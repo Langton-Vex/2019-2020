@@ -33,10 +33,10 @@ extern AsyncPosIntegratedController lift;
 
 void lift_stack(int cubes) {
     lift.setMaxVelocity(24);
-    lift.setTarget(-108);
+    lift.setTarget(-118);
     intake.moveVelocity(-200);
     pros::delay(1500);
-    lift.setTarget(lift.getTarget() + -(18.1123 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
+    lift.setTarget(lift.getTarget() + -(18.15 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
     lift.waitUntilSettled(); // Perfect stacking speeds from 4 inches up
     intake.moveVelocity(0);
     lift.setMaxVelocity(100);

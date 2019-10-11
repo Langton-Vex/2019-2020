@@ -9,6 +9,7 @@ extern int left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
 extern AsyncPosIntegratedController lift;
+void lift_stack(int cubes);
 
 double major_positions[4] = { 0, 250, 500, 750 };
 //double minor_positions[4] = {0.0,0.05,0.1,0.1};
@@ -26,23 +27,28 @@ Arm::Arm() {
 void Arm::user_control() {
     int power = peripherals.master_controller.get_analog(ANALOG_LEFT_Y);
 
-    bool arm_up = peripherals.master_controller.get_digital_new_press(DIGITAL_UP);
-    bool arm_down = peripherals.master_controller.get_digital_new_press(DIGITAL_DOWN);
+    //bool arm_up = peripherals.master_controller.get_digital_new_press(DIGITAL_UP);
+    //bool arm_down = peripherals.master_controller.get_digital_new_press(DIGITAL_DOWN);
     //int block_up = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
     //int block_down = peripherals.master_controller.get_digital_new_press(DIGITAL_R2);
 
     bool tare = peripherals.master_controller.get_digital_new_press(DIGITAL_B);
+    bool stack = peripherals.master_controller.get_digital_new_press(DIGITAL_DOWN);
 
     if (tare) {
         peripherals.leftarm_mtr.tare_position();
         peripherals.rightarm_mtr.tare_position();
     }
-
+    if (stack){
+      lift_stack(4);
+    }
+    /*
     if (arm_up && (current_major_position <= 3)) {
         current_major_position++;
     } else if (arm_down && (current_major_position > 0)) {
         current_major_position--;
     }
+    */
     /*
       if (block_up && (current_minor_position <= 3)){
         current_minor_position++;
