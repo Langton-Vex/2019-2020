@@ -32,11 +32,11 @@ MotorGroup intake({ static_cast<int8_t>(leftintake_port), static_cast<int8_t>(ri
 extern AsyncPosIntegratedController lift;
 
 void lift_stack(int cubes) {
-    lift.setMaxVelocity(24);
+    lift.setMaxVelocity(22);
     lift.setTarget(-118);
     intake.moveVelocity(-200);
     pros::delay(1500);
-    lift.setTarget(lift.getTarget() + -(18.15 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
+    lift.setTarget(lift.getTarget() + -(18.45 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
     lift.waitUntilSettled(); // Perfect stacking speeds from 4 inches up
     intake.moveVelocity(0);
     lift.setMaxVelocity(100);
@@ -53,14 +53,14 @@ void colour_tile() {
 
     ccont.setMaxVelocity(150);
     int side = configManager.selected_team;
-    lift.setMaxVelocity(100);
+    lift.setMaxVelocity(200);
 
-    lift.setTarget(-118);
+    lift.setTarget(-148);
     ccont.setMaxVelocity(100);
-    ccont.moveDistanceAsync(10.5 * inch);
+    ccont.moveDistanceAsync(11.5 * inch);
     lift.waitUntilSettled();
     ccont.waitUntilSettled();
-
+    lift.setMaxVelocity(100);
     //ccont.turnAngle(-110_deg);
     //ccont.moveDistance(5_in);
 
@@ -77,10 +77,62 @@ void colour_tile() {
     ccont.moveDistance(-7.5 * inch);
     intake.moveVelocity(0);
     ccont.turnAngle(100_deg * side);
-    ccont.moveDistance(34_in);
+    ccont.moveDistance(38_in);
     lift.setTarget(0);
     lift.waitUntilSettled();
     lift_stack(2);
+
+    lift.setMaxVelocity(100);
+    ccont.setMaxVelocity(100);
+    ccont.moveDistance(-17 * inch);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+}
+
+void colour_tile_3_point() {
+
+    ccont.setMaxVelocity(150);
+    int side = configManager.selected_team;
+    lift.setMaxVelocity(200);
+
+    lift.setTarget(-148);
+    ccont.setMaxVelocity(100);
+    ccont.moveDistanceAsync(11.5 * inch);
+    ccont.waitUntilSettled();
+    lift.setMaxVelocity(100);
+    //ccont.turnAngle(-110_deg);
+    //ccont.moveDistance(5_in);
+
+    intake.moveVelocity(200);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    lift.setTarget(-100);
+    pros::delay(1000);
+    //pros::delay(500); // TODO: This defo needs changing
+    //intake.moveVelocity(0);
+    //lift.setTarget(-200);
+    //lift.waitUntilSettled();
+
+    ccont.moveDistance(3*inch);
+    ccont.turnAngle(90_deg);
+    lift.setMaxVelocity(200);
+    lift.setTarget(-158);
+    ccont.moveDistance(18.5*inch);
+    lift.setMaxVelocity(100);
+
+    intake.moveVelocity(200);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    pros::delay(750);
+    //lift.setTarget(-100);
+
+    ccont.moveDistance(17_in);
+    ccont.turnAngle(85_deg);
+    ccont.moveDistance(20_in);
+
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    lift_stack(3);
 
     lift.setMaxVelocity(100);
     ccont.setMaxVelocity(100);
@@ -96,21 +148,23 @@ void four_stack() {
     lift.setMaxVelocity(100);
 
     ccont.moveDistance(20_in);
-    ccont.moveDistance(-3.5 * inch);
+    ccont.moveDistance(-5.5 * inch);
     ccont.turnAngle(-90_deg * side);
 
     lift.setTarget(-(24.7 * 18.1123));
     lift.waitUntilSettled();
-    ccont.setMaxVelocity(100);
+    ccont.setMaxVelocity(75);
     ccont.moveDistance(7_in);
     intake.moveVelocity(-200);
     lift.setTarget(lift.getTarget() - (18.1123 * 4));
     pros::delay(1200);
     lift.waitUntilSettled();
     intake.moveVelocity(0);
-    ccont.moveDistance(-5.94 * inch);
+    ccont.setMaxVelocity(25);
+    ccont.moveDistance(-6_in);
     lift.setTarget(0);
     lift.waitUntilSettled();
+    ccont.setMaxVelocity(150);
 
     ccont.turnAngle(90_deg * side);
     ccont.moveDistance(13_in);
@@ -128,19 +182,38 @@ void four_stack() {
     ccont.turnAngle(80_deg * side);
     ccont.moveDistance(20_in);
 }
+
+void four_stack_only(){
+    int side = configManager.selected_team;
+    lift.setMaxVelocity(100);
+
+  ccont.moveDistance(22 * inch);
+  lift.setTarget(-(18 * 18.1123));
+  lift.waitUntilSettled();
+  ccont.setMaxVelocity(75);
+  ccont.moveDistance(5_in);
+  intake.moveVelocity(200);
+  lift.setTarget(0);
+  lift.waitUntilSettled();
+  ccont.turnAngle(90_deg * side);
+  ccont.moveDistance(32_in);
+  ccont.turnAngle(80_deg * side);
+  ccont.moveDistance(32_in);
+}
 /* This autonomous starts with the right side of the robot lined up with the
    middle of the left mid tower cube */
 void four_floor_small() {
     ccont.moveDistance(20_in);
-    ccont.moveDistance(-3.5 * inch);
+    ccont.moveDistance(-5.5 * inch);
 
     lift.setTarget(-(24.7 * 18.1123));
+    ccont.setMaxVelocity(75);
     ccont.turnAngle(90_deg);
     lift.waitUntilSettled();
     ccont.moveDistance(7_in);
     intake.moveVelocity(-200);
 
-    ccont.moveDistance(7_in);
+    ccont.moveDistance(3_in);
     intake.moveVelocity(-200);
     lift.setTarget(lift.getTarget() - (18.1123 * 1.5));
     pros::delay(1200);
@@ -148,6 +221,7 @@ void four_floor_small() {
     ccont.moveDistance(-7_in);
     lift.setTarget(0);
     lift.waitUntilSettled();
+    ccont.setMaxVelocity(150);
     ccont.moveDistance(-13_in);
     ccont.turnAngle(90_deg);
     ccont.moveDistance(4_in);
@@ -158,6 +232,7 @@ void four_floor_small() {
     intake.moveVelocity(200);
     for (int i = 0; i < 4; i++) {
         lift.setTarget(-108);
+        lift.waitUntilSettled();
         ccont.moveDistance(5.5 * inch);
         lift.setTarget(0);
         pros::delay(1200);
@@ -213,10 +288,12 @@ void init_autonomous() {
 
     configManager.register_auton("near small", near_small);
     configManager.register_auton("colour tile", colour_tile);
+    configManager.register_auton("colour tile three pnt", colour_tile_3_point);
     configManager.register_auton("do nothing", do_nothing);
     configManager.register_auton("four stack grab", four_stack);
     configManager.register_auton("four floor small", four_floor_small);
     configManager.register_auton("four floor simple", simple_four_floor);
+    configManager.register_auton("four stack only", four_stack_only);
 
     configManager.register_auton("Move 15", move_15);
 }
