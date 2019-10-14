@@ -19,7 +19,6 @@ extern ConfigManager configManager;
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
-// intake is roughly 5
 
 auto ccont = ChassisControllerFactory::create(
     { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) }, // peripherals.left_port,peripherals.lefttwo_port
@@ -33,7 +32,7 @@ extern AsyncPosIntegratedController lift;
 
 void lift_stack(int cubes) {
     lift.setMaxVelocity(22);
-    lift.setTarget(-118);
+    lift.setTarget(-108);
     intake.moveVelocity(-200);
     pros::delay(1500);
     lift.setTarget(lift.getTarget() + -(18.45 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
@@ -57,7 +56,7 @@ void colour_tile() {
 
     lift.setTarget(-148);
     ccont.setMaxVelocity(100);
-    ccont.moveDistanceAsync(11.5 * inch);
+    ccont.moveDistanceAsync(11.2 * inch);
     lift.waitUntilSettled();
     ccont.waitUntilSettled();
     lift.setMaxVelocity(100);
@@ -95,7 +94,7 @@ void colour_tile_3_point() {
     int side = configManager.selected_team;
     lift.setMaxVelocity(200);
 
-    lift.setTarget(-148);
+    lift.setTarget(-108);
     ccont.setMaxVelocity(100);
     ccont.moveDistanceAsync(11.5 * inch);
     ccont.waitUntilSettled();
@@ -113,11 +112,11 @@ void colour_tile_3_point() {
     //lift.setTarget(-200);
     //lift.waitUntilSettled();
 
-    ccont.moveDistance(3*inch);
-    ccont.turnAngle(90_deg);
+    ccont.moveDistance(3.5*inch);
+    ccont.turnAngle(90_deg * side);
     lift.setMaxVelocity(200);
-    lift.setTarget(-158);
-    ccont.moveDistance(18.5*inch);
+    lift.setTarget(-148);
+    ccont.moveDistance(19*inch);
     lift.setMaxVelocity(100);
 
     intake.moveVelocity(200);
@@ -126,8 +125,8 @@ void colour_tile_3_point() {
     pros::delay(750);
     //lift.setTarget(-100);
 
-    ccont.moveDistance(17_in);
-    ccont.turnAngle(85_deg);
+    ccont.moveDistance(3*inch);
+    ccont.turnAngle(55_deg * side);
     ccont.moveDistance(20_in);
 
     lift.setTarget(0);
@@ -135,7 +134,7 @@ void colour_tile_3_point() {
     lift_stack(3);
 
     lift.setMaxVelocity(100);
-    ccont.setMaxVelocity(100);
+    ccont.setMaxVelocity(75);
     ccont.moveDistance(-17 * inch);
     lift.setTarget(0);
     lift.waitUntilSettled();

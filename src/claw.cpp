@@ -17,10 +17,10 @@ void Claw::user_control() {
     int current_eject = peripherals.master_controller.get_digital(DIGITAL_L1);
 
     if (current_intake)
-        power = 127;
+        power = -127;
 
     else if (current_eject)
-        power = -127;
+        power = 127;
     else
         power = 0;
 

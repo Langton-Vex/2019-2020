@@ -12,7 +12,7 @@ extern const int right_port = 17;
 extern const int lefttwo_port = 19;
 extern const int righttwo_port = 18;
 extern const int leftintake_port = 3;
-extern const int rightintake_port = 4;
+extern const int rightintake_port = 5;
 extern const int leftarm_port = 1;
 extern const int rightarm_port = 2;
 
