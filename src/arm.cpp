@@ -39,8 +39,8 @@ void Arm::user_control() {
         peripherals.leftarm_mtr.tare_position();
         peripherals.rightarm_mtr.tare_position();
     }
-    if (stack){
-      lift_stack(4);
+    if (stack) {
+        lift_stack(4);
     }
     /*
     if (arm_up && (current_major_position <= 3)) {

@@ -19,7 +19,6 @@ extern ConfigManager configManager;
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
-
 auto ccont = ChassisControllerFactory::create(
     { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) }, // peripherals.left_port,peripherals.lefttwo_port
     { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) }, // peripherals.right_port,peripherals.righttwo_port
@@ -112,11 +111,11 @@ void colour_tile_3_point() {
     //lift.setTarget(-200);
     //lift.waitUntilSettled();
 
-    ccont.moveDistance(3.5*inch);
+    ccont.moveDistance(3.5 * inch);
     ccont.turnAngle(90_deg * side);
     lift.setMaxVelocity(200);
     lift.setTarget(-148);
-    ccont.moveDistance(19*inch);
+    ccont.moveDistance(19 * inch);
     lift.setMaxVelocity(100);
 
     intake.moveVelocity(200);
@@ -125,7 +124,7 @@ void colour_tile_3_point() {
     pros::delay(750);
     //lift.setTarget(-100);
 
-    ccont.moveDistance(3*inch);
+    ccont.moveDistance(3 * inch);
     ccont.turnAngle(55_deg * side);
     ccont.moveDistance(20_in);
 
@@ -182,22 +181,22 @@ void four_stack() {
     ccont.moveDistance(20_in);
 }
 
-void four_stack_only(){
+void four_stack_only() {
     int side = configManager.selected_team;
     lift.setMaxVelocity(100);
 
-  ccont.moveDistance(22 * inch);
-  lift.setTarget(-(18 * 18.1123));
-  lift.waitUntilSettled();
-  ccont.setMaxVelocity(75);
-  ccont.moveDistance(5_in);
-  intake.moveVelocity(200);
-  lift.setTarget(0);
-  lift.waitUntilSettled();
-  ccont.turnAngle(90_deg * side);
-  ccont.moveDistance(32_in);
-  ccont.turnAngle(80_deg * side);
-  ccont.moveDistance(32_in);
+    ccont.moveDistance(22 * inch);
+    lift.setTarget(-(18 * 18.1123));
+    lift.waitUntilSettled();
+    ccont.setMaxVelocity(75);
+    ccont.moveDistance(5_in);
+    intake.moveVelocity(200);
+    lift.setTarget(0);
+    lift.waitUntilSettled();
+    ccont.turnAngle(90_deg * side);
+    ccont.moveDistance(32_in);
+    ccont.turnAngle(80_deg * side);
+    ccont.moveDistance(32_in);
 }
 /* This autonomous starts with the right side of the robot lined up with the
    middle of the left mid tower cube */
