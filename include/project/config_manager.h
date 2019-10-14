@@ -5,24 +5,24 @@
 
 typedef void (*auton_routine)();
 
-class ConfigManager{
+class ConfigManager {
 public:
-  std::vector<std::string> autonomous_names;
-  std::vector<auton_routine> auton_routines;
+    std::vector<std::string> autonomous_names;
+    std::vector<auton_routine> auton_routines;
 
-  int selected_auton = 0; // Keep it safe from nullptr hopefully
-  int selected_team = 1; // Turns negative on red side
+    int selected_auton = 0; // Keep it safe from nullptr hopefully
+    int selected_team = 1; // Turns negative on red side
 
-  ConfigManager();
-  void register_auton(std::string name, auton_routine routine);
-  void select_auton(int id);
-  void select_team(int team);
+    ConfigManager();
+    void register_auton(std::string name, auton_routine routine);
+    void select_auton(int id);
+    void select_team(int team);
 
-  void save_config();
-  void load_config();
+    void save_config();
+    void load_config();
 
 protected:
-  std::string save_filepath = "/usd/comp_config.cfg";
+    std::string save_filepath = "/usd/comp_config.cfg";
 };
 
 #endif

@@ -5,4 +5,4 @@
 
 extern Chassis chassis;
 
-#endif  // _GLOBALS_H_
+#endif // _GLOBALS_H_

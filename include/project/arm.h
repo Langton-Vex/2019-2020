@@ -5,8 +5,8 @@
 struct Peripherals_t;
 #include "main.h"
 
-class Arm{
-  public:
+class Arm {
+public:
     Arm();
     void user_control();
     void set(int power);
@@ -15,17 +15,13 @@ class Arm{
     unsigned int current_major_position;
     unsigned int current_minor_position;
 
-
-
     double user_pos_modifier;
     double sensitivity;
     double height_per;
-  protected:
+
+protected:
     //Peripherals_t peripherals;
     double current_goal_height;
-
-
 };
-
 
 #endif
