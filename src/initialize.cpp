@@ -16,8 +16,9 @@ extern const int rightintake_port = 5;
 extern const int leftarm_port = 1;
 extern const int rightarm_port = 2;
 
-auto lift = okapi::AsyncControllerFactory::posIntegrated(
-    { leftarm_port, -rightarm_port });
+auto lift = okapi::AsyncPosControllerBuilder()
+                .withMotor({ leftarm_port, -rightarm_port })
+                .build();
 
 // TODO: These need to be mutex managed pointers
 
@@ -35,7 +36,7 @@ ConfigManager configManager;
 void init_autonomous(); // uh oh global space
 
 void initialize() {
-    lift.flipDisable(true);
+    lift->flipDisable(true);
     init_autonomous();
 
     pros::delay(100);

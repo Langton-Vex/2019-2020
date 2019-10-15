@@ -70,7 +70,7 @@ void opcontrol() {
             leftSide, rightSide, strafeMotor,
             okapi::AbstractMotor::gearset::green,
             okapi::AbstractMotor::gearset::green,
-            { 4.3 * okapi::inch, okapi::millimeter * 370 }));
+            { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
 
     cc->driveStraightAsync(10 * okapi::inch);
     /*
