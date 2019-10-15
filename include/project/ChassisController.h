@@ -25,6 +25,14 @@ public:
 
     okapi::QAcceleration max_acceleration; // TODO: implement
     ControllerMode mode;
+    std::unique_ptr<pros::Task> task;
+    int asyncUpdateDelay = 20;
+
+    int maxVelocity;
+
+    static void trampoline(void* param);
+
+    void asyncThread();
 
     // I don't like weird constructors OK
 
@@ -62,14 +70,15 @@ public:
         okapi::QAngle angle);
 
     void waitUntilSettled();
-    void waitUntilDistanceSettled();
-    void waitUntilTurnSettled();
-    void waitUntilStrafeSettled();
+    bool waitUntilDistanceSettled();
+    bool waitUntilTurnSettled();
+    bool waitUntilStrafeSettled();
 
     void waitUntilTravelled(okapi::QLength distance);
 
     void disable_controllers();
     void reset();
+    void setMaxVelocity(int speed);
 
     void step();
     void start_task();

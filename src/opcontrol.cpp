@@ -71,7 +71,12 @@ void opcontrol() {
             okapi::AbstractMotor::gearset::green,
             okapi::AbstractMotor::gearset::green,
             { 4.3 * okapi::inch, okapi::millimeter * 370 }));
+
     cc->driveStraightAsync(10 * okapi::inch);
+    /*
+    cc->start_task();
+    cc->waitUntilSettled();
+    */
     while (true) {
         cc->step();
         //macros_update(peripherals.master_controller);

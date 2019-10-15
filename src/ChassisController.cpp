@@ -90,14 +90,53 @@ void ChassisController::strafe(okapi::QLength distance){};
 void ChassisController::strafeAsync(okapi::QLength distance){};
 
 void ChassisController::waitUntilSettled() {
-    auto rate = timeUtil->getRate();
+    // Thanks okapi
+    bool completelySettled = false;
+    while (!completelySettled) {
+        switch (mode) {
+        case ControllerMode::straight:
+            completelySettled = waitUntilDistanceSettled();
+            break;
+        case ControllerMode::turn:
+            completelySettled = waitUntilTurnSettled();
+            break;
+        case ControllerMode::strafe:
+            completelySettled = waitUntilStrafeSettled();
+            break;
+        case ControllerMode::none:
+            completelySettled = true;
+            break;
+        }
+        pros::delay(2); // Just in case
+    }
     // finally:
     disable_controllers();
 };
 
-void ChassisController::waitUntilDistanceSettled(){};
-void ChassisController::waitUntilTurnSettled(){};
-void ChassisController::waitUntilStrafeSettled(){};
+bool ChassisController::waitUntilDistanceSettled() {
+    while (!straightPID->isSettled() || !turnPID->isSettled()) { // Boolean logic is weird
+        if (mode != ControllerMode::straight)
+            return false;
+        pros::delay(2);
+    }
+    return true;
+};
+bool ChassisController::waitUntilTurnSettled() {
+    while (!turnPID->isSettled()) { // Boolean logic is weird
+        if (mode != ControllerMode::turn)
+            return false;
+        pros::delay(2);
+    }
+    return true;
+};
+bool ChassisController::waitUntilStrafeSettled() {
+    while (!strafePID->isSettled()) { // Boolean logic is weird
+        if (mode != ControllerMode::strafe)
+            return false;
+        pros::delay(2);
+    }
+    return true;
+};
 
 void ChassisController::disable_controllers() {
     straightPID->flipDisable(true);
@@ -107,33 +146,71 @@ void ChassisController::disable_controllers() {
     hypotPID->flipDisable(true);
 };
 
+void ChassisController::setMaxVelocity(int speed) {
+    maxVelocity = speed;
+};
+
 void ChassisController::step() {
     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
     double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
 
+    double leftVelocity = 0;
+    double rightVelocity = 0;
+
     if (mode == ControllerMode::straight) {
         double straightOut = straightPID->step(distance_forward);
         double angleOut = anglePID->step(angleChange);
 
-        double leftVelocity = (double)straightGearset->internalGearset * (straightOut - angleOut);
-        double rightVelocity = (double)straightGearset->internalGearset * (straightOut + angleOut);
+        leftVelocity = (double)straightGearset->internalGearset * (straightOut - angleOut);
+        rightVelocity = (double)straightGearset->internalGearset * (straightOut + angleOut);
 
         printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
-
-        leftSide->moveVelocity(leftVelocity);
-        rightSide->moveVelocity(rightVelocity);
     }
 
     if (mode == ControllerMode::turn) {
         double turnOut = turnPID->step(turnChange);
 
-        double leftVelocity = straightGearset->ratio * turnOut;
-        double rightVelocity = straightGearset->ratio * turnOut * -1.0;
+        leftVelocity = (double)straightGearset->internalGearset * turnOut;
+        rightVelocity = (double)straightGearset->internalGearset * turnOut * -1.0;
+    }
+    // Speed limits that are updated every loop, awesome!
+    leftVelocity = fmin(leftVelocity, leftSide->getActualVelocity() + maxVelocity);
+    rightVelocity = fmin(rightVelocity, rightSide->getActualVelocity() + maxVelocity);
 
-        leftSide->moveVelocity(leftVelocity);
-        rightSide->moveVelocity(rightVelocity);
+    leftSide->moveVelocity(leftVelocity);
+    rightSide->moveVelocity(rightVelocity);
+};
+
+void ChassisController::trampoline(void* param) {
+    ChassisController* cc;
+    if (param) {
+        cc = static_cast<ChassisController*>(param);
+        // This throws if something has gone wrong
+    } else {
+        printf("Invalid pointer for trampoline to CC!");
+        return;
+    } // What do you do here?
+    cc->asyncThread();
+}
+
+void ChassisController::asyncThread() {
+    while (true) {
+        this->step();
+        pros::delay(this->asyncUpdateDelay);
+    }
+}
+
+void ChassisController::start_task() {
+    if (!task) {
+        task = std::make_unique<pros::Task>(pros::Task(trampoline, this,
+            TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
+            "Chassis Controller Async Task"));
     }
 };
-void start_task(){};
-void stop_task(){};
+void ChassisController::stop_task() {
+    task->remove();
+    while (task->get_state() != pros::E_TASK_STATE_DELETED)
+        pros::delay(20);
+    task.reset();
+};
