@@ -116,8 +116,8 @@ void ChassisController::step() {
         double straightOut = straightPID->step(distance_forward);
         double angleOut = anglePID->step(angleChange);
 
-        double leftVelocity = straightGearset->ratio * (straightOut - angleOut);
-        double rightVelocity = straightGearset->ratio * (straightOut + angleOut);
+        double leftVelocity = straightGearset->gearset * (straightOut - angleOut);
+        double rightVelocity = straightGearset->gearset * (straightOut + angleOut);
 
         printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
 
