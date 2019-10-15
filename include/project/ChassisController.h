@@ -15,11 +15,16 @@ public:
         PIDTuning straightTuning, PIDTuning angleTuning,
         PIDTuning turnTuning, PIDTuning strafeTuning,
         PIDTuning hypotTuning, okapi::MotorGroup leftSide,
-        okapi::MotorGroup rightSide, okapi::Motor strafe);
-    ~ChassisController(); /* TODO: Make this controller use okapi's models
+        okapi::MotorGroup rightSide, okapi::Motor strafe,
+        okapi::AbstractMotor::GearsetRatioPair istraightGearset,
+        okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
+        okapi::ChassisScales iscales);
+    //~ChassisController();
+    /* TODO: Make this controller use okapi's models
                            For cross robot compatability*/
 
     okapi::QAcceleration max_acceleration; // TODO: implement
+    ControllerMode mode;
 
     // I don't like weird constructors OK
 
@@ -36,6 +41,8 @@ public:
     std::unique_ptr<okapi::MotorGroup> leftSide;
     std::unique_ptr<okapi::MotorGroup> rightSide;
     std::unique_ptr<okapi::Motor> strafeMotor;
+
+    double leftSideStart, rightSideStart, strafeStart;
 
     void driveStraight(okapi::QLength distance);
     void driveStraightAsync(okapi::QLength distance);
@@ -55,9 +62,14 @@ public:
         okapi::QAngle angle);
 
     void waitUntilSettled();
+    void waitUntilDistanceSettled();
+    void waitUntilTurnSettled();
+    void waitUntilStrafeSettled();
+
     void waitUntilTravelled(okapi::QLength distance);
 
     void disable_controllers();
+    void reset();
 
     void step();
     void start_task();
@@ -65,6 +77,7 @@ public:
 
 private:
     std::unique_ptr<okapi::TimeUtil> timeUtil;
+    std::unique_ptr<okapi::SettledUtil> settledUtil;
 };
 
 #endif

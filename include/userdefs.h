@@ -16,6 +16,7 @@ class Chassis;
 //class Claw;
 class GUI;
 
+#include "project/ControllerMode.h"
 #include "project/PIDTuning.h"
 #include "project/ChassisController.h"
 #include "project/gui.h"

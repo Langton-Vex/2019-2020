@@ -21,6 +21,9 @@ extern Claw claw;
 
 extern GUI gui;
 
+extern int left_port, right_port, lefttwo_port, righttwo_port,
+    leftarm_port, rightarm_port, leftintake_port, rightintake_port;
+
 void set_temperature(void* param) {
     std::uint32_t now = pros::millis();
     while (true) {
@@ -49,14 +52,35 @@ void set_temperature(void* param) {
 
 void opcontrol() {
 
-    pros::Task temp_task(set_temperature, nullptr, "temp_task");
+    //pros::Task temp_task(set_temperature, nullptr, "temp_task");
+    PIDTuning straightTuning = PIDTuning(500000.0, 5000.0, 0);
+    PIDTuning angleTuning = PIDTuning(0, 0, 0);
+    PIDTuning turnTuning = PIDTuning(10, 0, 0);
+    PIDTuning strafeTuning = PIDTuning(0, 0, 0);
+    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
+    okapi::MotorGroup leftSide(
+        { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+    okapi::MotorGroup rightSide(
+        { static_cast<int8_t>(-right_port), static_cast<int8_t>(-righttwo_port) });
+    okapi::Motor strafeMotor(11);
 
+    std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
+        ChassisController(
+            straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
+            leftSide, rightSide, strafeMotor,
+            okapi::AbstractMotor::gearset::green,
+            okapi::AbstractMotor::gearset::green,
+            { 4.3 * okapi::inch, okapi::millimeter * 370 }));
+    cc->driveStraightAsync(10 * okapi::inch);
     while (true) {
+        cc->step();
         //macros_update(peripherals.master_controller);
 
+        /*
         arm.user_control();
         chassis.user_control();
         claw.user_control();
+        */
 
         pros::delay(20);
     }
