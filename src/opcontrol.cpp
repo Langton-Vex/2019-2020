@@ -53,7 +53,7 @@ void set_temperature(void* param) {
 void opcontrol() {
 
     //pros::Task temp_task(set_temperature, nullptr, "temp_task");
-    PIDTuning straightTuning = PIDTuning(500000.0, 5000.0, 0);
+    PIDTuning straightTuning = PIDTuning(100.0, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
     PIDTuning turnTuning = PIDTuning(10, 0, 0);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
