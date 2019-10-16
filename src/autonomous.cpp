@@ -19,13 +19,7 @@ extern ConfigManager configManager;
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
-std::shared_ptr<okapi::ChassisControllerIntegrated> ccont = std::static_pointer_cast<okapi::ChassisControllerIntegrated>(
-    ChassisControllerBuilder()
-        .withMotors({ static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) },
-            { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) })
-        .withGearset(AbstractMotor::gearset::green)
-        .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
-        .build());
+std::shared_ptr<okapi::ChassisControllerIntegrated> ccont;
 
 MotorGroup intake({ static_cast<int8_t>(leftintake_port), static_cast<int8_t>(rightintake_port) });
 
@@ -284,6 +278,15 @@ void auton_safety(void* param) {
 }
 
 void init_autonomous() {
+
+    ccont = std::static_pointer_cast<okapi::ChassisControllerIntegrated>(
+        ChassisControllerBuilder()
+            .withMotors({ static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) },
+                { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) })
+            .withGearset(AbstractMotor::gearset::green)
+            .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
+            .build());
+
     lift->flipDisable(true);
 
     configManager.register_auton("near small", near_small);

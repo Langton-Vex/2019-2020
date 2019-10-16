@@ -53,13 +53,14 @@ void set_temperature(void* param) {
 void opcontrol() {
 
     //pros::Task temp_task(set_temperature, nullptr, "temp_task");
-    PIDTuning straightTuning = PIDTuning(100.0, 0.0, 0);
+    pros::delay(20);
+    PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
     PIDTuning turnTuning = PIDTuning(10, 0, 0);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
-        { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+        { static_cast<int8_t>(-left_port), static_cast<int8_t>(-lefttwo_port) });
     okapi::MotorGroup rightSide(
         { static_cast<int8_t>(-right_port), static_cast<int8_t>(-righttwo_port) });
     okapi::Motor strafeMotor(11);
