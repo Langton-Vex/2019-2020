@@ -28,7 +28,7 @@ public:
     std::unique_ptr<pros::Task> task;
     int asyncUpdateDelay = 20;
 
-    int maxVelocity;
+    int maxVelocity = 200;
 
     static void trampoline(void* param);
 
@@ -79,6 +79,7 @@ public:
     void disable_controllers();
     void reset();
     void setMaxVelocity(int speed);
+    void tune();
 
     void step();
     void start_task();

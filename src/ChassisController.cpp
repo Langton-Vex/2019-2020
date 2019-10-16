@@ -175,11 +175,9 @@ void ChassisController::step() {
         rightVelocity = (double)straightGearset->internalGearset * turnOut * -1.0;
     }
     // Speed limits that are updated every loop, awesome!
-    leftVelocity = fmin(leftVelocity, leftSide->getActualVelocity() + maxVelocity);
-    rightVelocity = fmin(rightVelocity, rightSide->getActualVelocity() + maxVelocity);
 
-    leftSide->moveVelocity(leftVelocity);
-    rightSide->moveVelocity(rightVelocity);
+    leftSide->moveVelocity(std::min((int)round(leftVelocity),maxVelocity));
+    rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
 };
 
 void ChassisController::trampoline(void* param) {
