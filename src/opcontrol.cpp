@@ -15,9 +15,9 @@
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-extern Chassis chassis;
-extern Arm arm;
-extern Claw claw;
+extern std::unique_ptr<Chassis> chassis;
+extern std::unique_ptr<Arm> arm;
+extern std::unique_ptr<Claw> claw;
 
 extern GUI gui;
 
@@ -53,39 +53,46 @@ void set_temperature(void* param) {
 void opcontrol() {
 
     //pros::Task temp_task(set_temperature, nullptr, "temp_task");
-    PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
-    PIDTuning angleTuning = PIDTuning(0, 0, 0);
-    PIDTuning turnTuning = PIDTuning(10, 0, 0);
-    PIDTuning strafeTuning = PIDTuning(0, 0, 0);
-    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
-    okapi::MotorGroup leftSide(
-        { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
-    okapi::MotorGroup rightSide(
-        { static_cast<int8_t>(-right_port), static_cast<int8_t>(-righttwo_port) });
-    okapi::Motor strafeMotor(11);
 
-    std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
-        ChassisController(
-            straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
-            leftSide, rightSide, strafeMotor,
-            okapi::AbstractMotor::gearset::green,
-            okapi::AbstractMotor::gearset::green,
-            { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
+  /*
+  std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
+      ChassisController(
+          straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
+          leftSide, rightSide, strafeMotor,
+          okapi::AbstractMotor::gearset::green,
+          okapi::AbstractMotor::gearset::green,
+          { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
 
-    cc->driveStraightAsync(10 * okapi::inch);
-    /*
-    cc->start_task();
-    cc->waitUntilSettled();
-    */
+  PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
+  PIDTuning angleTuning = PIDTuning(0, 0, 0);
+  PIDTuning turnTuning = PIDTuning(0.001, 0, 0);
+  PIDTuning strafeTuning = PIDTuning(0, 0, 0);
+  PIDTuning hypotTuning = PIDTuning(0, 0, 0);
+  okapi::MotorGroup leftSide(
+      { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+  okapi::MotorGroup rightSide(
+      { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
+  okapi::Motor strafeMotor(11);
+
+
+  cc->start_task();
+  cc->driveStraight(5 * okapi::inch);
+  cc->turnAngle(90 * okapi::degree);
+
+
+  cc->waitUntilSettled();
+  */
+
     while (true) {
-        cc->step();
+        //cc->step();
         //macros_update(peripherals->master_controller);
 
-        /*
-        arm.user_control();
-        chassis.user_control();
-        claw.user_control();
-        */
+
+        arm->user_control();
+        chassis->user_control();
+        claw->user_control();
+
+
 
         pros::delay(20);
     }

@@ -8,7 +8,7 @@ using namespace okapi;
 extern int left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
-extern AsyncPosIntegratedController lift;
+extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 void lift_stack(int cubes);
 
 double major_positions[4] = { 0, 250, 500, 750 };
@@ -77,14 +77,14 @@ void Arm::user_control() {
     //double power_mult = 1;
     power = power /* * power_mult*/;
     if (power > 5 || power < 5) {
-        if (!lift.isDisabled())
-            lift.flipDisable(true);
+        if (!lift->isDisabled())
+            lift->flipDisable(true);
 
         this->set(power);
-        lift.setTarget(peripherals->leftarm_mtr.get_position());
+        lift->setTarget(peripherals->leftarm_mtr.get_position());
     } else {
-        if (lift.isDisabled())
-            lift.flipDisable(false);
+        if (lift->isDisabled())
+            lift->flipDisable(false);
     }
 }
 

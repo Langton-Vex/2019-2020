@@ -9,9 +9,9 @@
    already exists
 */
 
-class ChassisController {
+class ChassisControllerHDrive {
 public:
-    ChassisController(
+    ChassisControllerHDrive(
         PIDTuning straightTuning, PIDTuning angleTuning,
         PIDTuning turnTuning, PIDTuning strafeTuning,
         PIDTuning hypotTuning, okapi::MotorGroup leftSide,
