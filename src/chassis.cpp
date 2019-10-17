@@ -2,10 +2,10 @@
 #include "math.h"
 #include "stdexcept"
 
-extern Arm arm;
+extern std::unique_ptr<Arm> arm;
 
 Chassis::Chassis() {
-    pros::motor_gearset_e_t motor_gearset = peripherals.left_mtr.get_gearing();
+    pros::motor_gearset_e_t motor_gearset = peripherals->left_mtr.get_gearing();
     if (motor_gearset == MOTOR_GEARSET_06)
         motor_speed = 600;
     else if (motor_gearset == MOTOR_GEARSET_18)
@@ -16,10 +16,10 @@ Chassis::Chassis() {
 }
 
 void Chassis::user_control() {
-    int power = peripherals.master_controller.get_analog(ANALOG_RIGHT_Y);
-    int turn = peripherals.master_controller.get_analog(ANALOG_RIGHT_X);
+    int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
+    int turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
 
-    int slowmode_button = peripherals.master_controller.get_digital_new_press(DIGITAL_R1);
+    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_R1);
     if (slowmode_button == 1)
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
@@ -32,15 +32,15 @@ void Chassis::user_control() {
 }
 
 double Chassis::power_mult_calc() {
-    double power_mult = (arm.height_per < 0.5) ? (1.0 - arm.height_per) : 0.5;
+    double power_mult = (arm->height_per < 0.5) ? (1.0 - arm->height_per) : 0.5;
     return power_mult;
 }
 
 void Chassis::modify_profiled_velocity(int velocity) {
-    peripherals.left_mtr.modify_profiled_velocity(velocity);
-    peripherals.lefttwo_mtr.modify_profiled_velocity(velocity);
-    peripherals.right_mtr.modify_profiled_velocity(velocity);
-    peripherals.righttwo_mtr.modify_profiled_velocity(velocity);
+    peripherals->left_mtr.modify_profiled_velocity(velocity);
+    peripherals->lefttwo_mtr.modify_profiled_velocity(velocity);
+    peripherals->right_mtr.modify_profiled_velocity(velocity);
+    peripherals->righttwo_mtr.modify_profiled_velocity(velocity);
 };
 
 void Chassis::set(int power, int turn) {
@@ -58,13 +58,13 @@ void Chassis::set(int power, int turn) {
     int right = (int)powere - (int)turne;
     //pros::lcd::print(0, "Left: %d\nRight: %d\n", left,right);
 
-    peripherals.left_mtr.move_velocity(left);
-    peripherals.right_mtr.move_velocity(right);
-    peripherals.lefttwo_mtr.move_velocity(left);
-    peripherals.righttwo_mtr.move_velocity(right);
+    peripherals->left_mtr.move_velocity(left);
+    peripherals->right_mtr.move_velocity(right);
+    peripherals->lefttwo_mtr.move_velocity(left);
+    peripherals->righttwo_mtr.move_velocity(right);
 
-    std::string left_v = std::to_string(peripherals.left_mtr.get_actual_velocity());
-    std::string right_v = std::to_string(peripherals.right_mtr.get_actual_velocity());
+    std::string left_v = std::to_string(peripherals->left_mtr.get_actual_velocity());
+    std::string right_v = std::to_string(peripherals->right_mtr.get_actual_velocity());
     //pros::lcd::set_text(3,left_v);
     //pros::lcd::set_text(4,right_v);
 }

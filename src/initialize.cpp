@@ -20,13 +20,12 @@ std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
 // TODO: These need to be mutex managed pointers
 
-Peripherals_t peripherals(left_port, right_port, lefttwo_port, righttwo_port,
-    leftintake_port, rightintake_port, leftarm_port, rightarm_port);
+std::unique_ptr<Peripherals_t> peripherals;
 
 //Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
-Chassis chassis;
-Arm arm;
-Claw claw;
+std::unique_ptr<Chassis> chassis;
+std::unique_ptr<Arm> arm;
+std::unique_ptr<Claw> claw;
 
 GUI gui;
 ConfigManager configManager;
@@ -34,10 +33,26 @@ ConfigManager configManager;
 void init_autonomous(); // uh oh global space
 
 void initialize() {
+<<<<<<< HEAD
     lift = std::static_pointer_cast<okapi::AsyncPosIntegratedController>(
         okapi::AsyncPosControllerBuilder()
             .withMotor({ leftarm_port, -rightarm_port })
             .build());
+=======
+    std::shared_ptr<okapi::AsyncPositionController<double, double> >
+    lift_controller = okapi::AsyncPosControllerBuilder()
+            .withMotor({ leftarm_port, -rightarm_port })
+            .build();
+    lift = std::static_pointer_cast<okapi::AsyncPosIntegratedController>(lift_controller);
+
+    peripherals = std::make_unique<Peripherals_t>(Peripherals_t(left_port,
+      right_port, lefttwo_port, righttwo_port,leftintake_port, rightintake_port, leftarm_port, rightarm_port));
+
+    chassis = std::make_unique<Chassis>(Chassis());
+    arm = std::make_unique<Arm>(Arm());
+    claw = std::make_unique<Claw>(Claw());
+
+>>>>>>> 0e852e1dee0ad9feb35f98192491120a0df6eb68
     pros::delay(20);
     lift->flipDisable(true);
     init_autonomous();

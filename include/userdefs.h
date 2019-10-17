@@ -9,12 +9,9 @@ float sgn(int x);
 
 #include "project/macros.h"
 
-extern Peripherals_t peripherals;
+#include <memory>
+extern std::unique_ptr<Peripherals_t> peripherals;
 
-class Chassis;
-//class Arm;
-//class Claw;
-class GUI;
 
 #include "project/ControllerMode.h"
 #include "project/PIDTuning.h"

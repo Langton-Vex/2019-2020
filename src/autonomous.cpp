@@ -302,6 +302,35 @@ void init_autonomous() {
 }
 
 void autonomous() {
+
+
+  PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
+  PIDTuning angleTuning = PIDTuning(0, 0, 0);
+  PIDTuning turnTuning = PIDTuning(0.002, 0, 0);
+  PIDTuning strafeTuning = PIDTuning(0, 0, 0);
+  PIDTuning hypotTuning = PIDTuning(0, 0, 0);
+  okapi::MotorGroup leftSide(
+      { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+  okapi::MotorGroup rightSide(
+      { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
+  okapi::Motor strafeMotor(11);
+
+
+
+
+  std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
+      ChassisControllerHDrive(
+          straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
+          leftSide, rightSide, strafeMotor,
+          okapi::AbstractMotor::gearset::green,
+          okapi::AbstractMotor::gearset::green,
+          { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
+
+  cc->start_task();
+  cc->driveStraight(5 * okapi::inch);
+  cc->turnAngle(90 * okapi::degree);
+  cc->waitUntilSettled();
+  /*
     if (configManager.auton_routines.size() > configManager.selected_auton) {
 
         //pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
@@ -314,4 +343,6 @@ void autonomous() {
     } else {
         printf("Selected auton is greater than amount of autons");
     }
+
+    */
 }

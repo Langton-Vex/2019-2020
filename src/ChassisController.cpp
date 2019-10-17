@@ -1,6 +1,6 @@
 #include "main.h"
 
-ChassisController::ChassisController(
+ChassisControllerHDrive::ChassisControllerHDrive(
     PIDTuning straightTuning, PIDTuning angleTuning,
     PIDTuning turnTuning, PIDTuning strafeTuning,
     PIDTuning hypotTuning, okapi::MotorGroup ileftSide,
@@ -46,22 +46,22 @@ ChassisController::ChassisController(
 };
 
 /*
-ChassisController::~ChassisController() {
+ChassisControllerHDrive::~ChassisControllerHDrive() {
     disable_controllers();
 };
 */
 
-void ChassisController::reset() {
+void ChassisControllerHDrive::reset() {
     leftSideStart = leftSide->getPosition();
     rightSideStart = rightSide->getPosition();
     strafeStart = strafeMotor->getPosition();
 }
 
-void ChassisController::driveStraight(okapi::QLength distance) {
+void ChassisControllerHDrive::driveStraight(okapi::QLength distance) {
     driveStraightAsync(distance);
     waitUntilSettled();
 };
-void ChassisController::driveStraightAsync(okapi::QLength distance) {
+void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     disable_controllers();
     straightPID->flipDisable(false);
     anglePID->flipDisable(false);
@@ -73,11 +73,11 @@ void ChassisController::driveStraightAsync(okapi::QLength distance) {
         distance.convert(okapi::meter) * scales->straight * straightGearset->ratio);
 };
 
-void ChassisController::turnAngle(okapi::QAngle angle) {
+void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
     turnAngleAsync(angle);
     waitUntilSettled();
 };
-void ChassisController::turnAngleAsync(okapi::QAngle angle) {
+void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     disable_controllers();
     turnPID->flipDisable(false);
     reset();
@@ -86,10 +86,34 @@ void ChassisController::turnAngleAsync(okapi::QAngle angle) {
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
-void ChassisController::strafe(okapi::QLength distance){};
-void ChassisController::strafeAsync(okapi::QLength distance){};
+void ChassisControllerHDrive::strafe(okapi::QLength distance){};
+void ChassisControllerHDrive::strafeAsync(okapi::QLength distance){};
 
-void ChassisController::waitUntilSettled() {
+
+void ChassisControllerHDrive::tune(){
+  /*
+  std::shared_ptr<okapi::MotorGroup> leftShared = std::move(leftSide);
+  std::shared_ptr<okapi::MotorGroup> rightShared = std::move(rightSide);
+
+  std::shared_ptr<okapi::SkidSteerModel>
+    model = std::make_unique<okapi::SkidSteerModel>(
+      okapi::SkidSteerModel(leftShared,rightShared,
+      leftSide->getEncoder(),rightSide->getEncoder(),200.0,12.0));
+
+  //std::shared_ptr<okapi::Motor> strafeShared = std::move(strafeMotor);
+
+  auto straightTuner = okapi::PIDTunerFactory::createPtr(
+    leftShared->getEncoder(),
+  model, 1*okapi::minute, 720,
+  0,0,0, 0.001, 0.001, 0.001);
+
+
+  //okapi::PIDTuner::Output straightTune = straightTuner->autotune();
+  //model.reset();
+  */
+}
+
+void ChassisControllerHDrive::waitUntilSettled() {
     // Thanks okapi
     bool completelySettled = false;
     while (!completelySettled) {
@@ -113,7 +137,7 @@ void ChassisController::waitUntilSettled() {
     disable_controllers();
 };
 
-bool ChassisController::waitUntilDistanceSettled() {
+bool ChassisControllerHDrive::waitUntilDistanceSettled() {
     while (!straightPID->isSettled() || !turnPID->isSettled()) { // Boolean logic is weird
         if (mode != ControllerMode::straight)
             return false;
@@ -121,7 +145,7 @@ bool ChassisController::waitUntilDistanceSettled() {
     }
     return true;
 };
-bool ChassisController::waitUntilTurnSettled() {
+bool ChassisControllerHDrive::waitUntilTurnSettled() {
     while (!turnPID->isSettled()) { // Boolean logic is weird
         if (mode != ControllerMode::turn)
             return false;
@@ -129,7 +153,7 @@ bool ChassisController::waitUntilTurnSettled() {
     }
     return true;
 };
-bool ChassisController::waitUntilStrafeSettled() {
+bool ChassisControllerHDrive::waitUntilStrafeSettled() {
     while (!strafePID->isSettled()) { // Boolean logic is weird
         if (mode != ControllerMode::strafe)
             return false;
@@ -138,7 +162,7 @@ bool ChassisController::waitUntilStrafeSettled() {
     return true;
 };
 
-void ChassisController::disable_controllers() {
+void ChassisControllerHDrive::disable_controllers() {
     straightPID->flipDisable(true);
     anglePID->flipDisable(true);
     turnPID->flipDisable(true);
@@ -146,12 +170,12 @@ void ChassisController::disable_controllers() {
     hypotPID->flipDisable(true);
 };
 
-void ChassisController::setMaxVelocity(int speed) {
+void ChassisControllerHDrive::setMaxVelocity(int speed) {
     maxVelocity = speed;
 };
 // this code makes my pp very hard
 
-void ChassisController::step() {
+void ChassisControllerHDrive::step() {
     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
     double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
@@ -166,7 +190,7 @@ void ChassisController::step() {
         leftVelocity = (double)straightGearset->internalGearset * (straightOut - angleOut);
         rightVelocity = (double)straightGearset->internalGearset * (straightOut + angleOut);
 
-        printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
+        //printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
     }
 
     if (mode == ControllerMode::turn) {
@@ -176,15 +200,19 @@ void ChassisController::step() {
         rightVelocity = (double)straightGearset->internalGearset * turnOut * -1.0;
     }
     // Speed limits that are updated every loop, awesome!
+<<<<<<< HEAD
 
+=======
+    printf("distance: %f, angle: %f, turn: %f\n",distance_forward,angleChange,turnChange);
+>>>>>>> 0e852e1dee0ad9feb35f98192491120a0df6eb68
     leftSide->moveVelocity(std::min((int)round(leftVelocity),maxVelocity));
     rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
 };
 
-void ChassisController::trampoline(void* param) {
-    ChassisController* cc;
+void ChassisControllerHDrive::trampoline(void* param) {
+    ChassisControllerHDrive* cc;
     if (param) {
-        cc = static_cast<ChassisController*>(param);
+        cc = static_cast<ChassisControllerHDrive*>(param);
         // This throws if something has gone wrong
     } else {
         printf("Invalid pointer for trampoline to CC!");
@@ -193,21 +221,21 @@ void ChassisController::trampoline(void* param) {
     cc->asyncThread();
 }
 
-void ChassisController::asyncThread() {
+void ChassisControllerHDrive::asyncThread() {
     while (true) {
         this->step();
         pros::delay(this->asyncUpdateDelay);
     }
 }
 
-void ChassisController::start_task() {
+void ChassisControllerHDrive::start_task() {
     if (!task) {
         task = std::make_unique<pros::Task>(pros::Task(trampoline, this,
             TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
             "Chassis Controller Async Task"));
     }
 };
-void ChassisController::stop_task() {
+void ChassisControllerHDrive::stop_task() {
     task->remove();
     while (task->get_state() != pros::E_TASK_STATE_DELETED)
         pros::delay(20);

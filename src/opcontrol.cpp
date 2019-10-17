@@ -15,9 +15,9 @@
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-extern Chassis chassis;
-extern Arm arm;
-extern Claw claw;
+extern std::unique_ptr<Chassis> chassis;
+extern std::unique_ptr<Arm> arm;
+extern std::unique_ptr<Claw> claw;
 
 extern GUI gui;
 
@@ -27,20 +27,20 @@ extern int left_port, right_port, lefttwo_port, righttwo_port,
 void set_temperature(void* param) {
     std::uint32_t now = pros::millis();
     while (true) {
-        std::string temp = std::to_string(peripherals.leftarm_mtr.get_temperature());
+        std::string temp = std::to_string(peripherals->leftarm_mtr.get_temperature());
         temp.append(" celcius");
-        peripherals.master_controller.set_text(1, 1, temp.c_str());
+        peripherals->master_controller.set_text(1, 1, temp.c_str());
 
         std::string arm_pos_string = "Arm: ";
-        arm_pos_string.append(std::to_string(peripherals.leftarm_mtr.get_position()));
+        arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
 
         lv_ta_set_text(gui.console_box, arm_pos_string.c_str());
 
-        double chassis_temp = (peripherals.left_mtr.get_temperature() + peripherals.right_mtr.get_temperature() + peripherals.lefttwo_mtr.get_temperature() + peripherals.righttwo_mtr.get_temperature()) / 4;
+        double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
 
-        double arm_temp = (peripherals.leftarm_mtr.get_temperature() + peripherals.rightarm_mtr.get_temperature()) / 2;
+        double arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
 
-        double claw_temp = (peripherals.leftintake_mtr.get_temperature() + peripherals.rightintake_mtr.get_temperature()) / 2;
+        double claw_temp = (peripherals->leftintake_mtr.get_temperature() + peripherals->rightintake_mtr.get_temperature()) / 2;
 
         lv_gauge_set_value(gui.chassis_temp_guage, 0, chassis_temp);
         lv_gauge_set_value(gui.arm_temp_guage, 0, arm_temp);
@@ -53,6 +53,7 @@ void set_temperature(void* param) {
 void opcontrol() {
 
     //pros::Task temp_task(set_temperature, nullptr, "temp_task");
+<<<<<<< HEAD
     pros::delay(20);
     PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
@@ -78,15 +79,48 @@ void opcontrol() {
     cc->start_task();
     cc->waitUntilSettled();
     */
-    while (true) {
-        cc->step();
-        //macros_update(peripherals.master_controller);
+=======
 
-        /*
-        arm.user_control();
-        chassis.user_control();
-        claw.user_control();
-        */
+  /*
+  std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
+      ChassisController(
+          straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
+          leftSide, rightSide, strafeMotor,
+          okapi::AbstractMotor::gearset::green,
+          okapi::AbstractMotor::gearset::green,
+          { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
+
+  PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
+  PIDTuning angleTuning = PIDTuning(0, 0, 0);
+  PIDTuning turnTuning = PIDTuning(0.001, 0, 0);
+  PIDTuning strafeTuning = PIDTuning(0, 0, 0);
+  PIDTuning hypotTuning = PIDTuning(0, 0, 0);
+  okapi::MotorGroup leftSide(
+      { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+  okapi::MotorGroup rightSide(
+      { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
+  okapi::Motor strafeMotor(11);
+
+
+  cc->start_task();
+  cc->driveStraight(5 * okapi::inch);
+  cc->turnAngle(90 * okapi::degree);
+
+
+  cc->waitUntilSettled();
+  */
+
+>>>>>>> 0e852e1dee0ad9feb35f98192491120a0df6eb68
+    while (true) {
+        //cc->step();
+        //macros_update(peripherals->master_controller);
+
+
+        arm->user_control();
+        chassis->user_control();
+        claw->user_control();
+
+
 
         pros::delay(20);
     }

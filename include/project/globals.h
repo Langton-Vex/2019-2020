@@ -3,6 +3,5 @@
 
 #include "userdefs.h"
 
-extern Chassis chassis;
 
 #endif // _GLOBALS_H_
