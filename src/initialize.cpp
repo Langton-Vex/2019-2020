@@ -33,12 +33,6 @@ ConfigManager configManager;
 void init_autonomous(); // uh oh global space
 
 void initialize() {
-<<<<<<< HEAD
-    lift = std::static_pointer_cast<okapi::AsyncPosIntegratedController>(
-        okapi::AsyncPosControllerBuilder()
-            .withMotor({ leftarm_port, -rightarm_port })
-            .build());
-=======
     std::shared_ptr<okapi::AsyncPositionController<double, double> >
     lift_controller = okapi::AsyncPosControllerBuilder()
             .withMotor({ leftarm_port, -rightarm_port })
@@ -52,7 +46,6 @@ void initialize() {
     arm = std::make_unique<Arm>(Arm());
     claw = std::make_unique<Claw>(Claw());
 
->>>>>>> 0e852e1dee0ad9feb35f98192491120a0df6eb68
     pros::delay(20);
     lift->flipDisable(true);
     init_autonomous();

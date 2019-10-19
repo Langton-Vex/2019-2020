@@ -200,11 +200,8 @@ void ChassisControllerHDrive::step() {
         rightVelocity = (double)straightGearset->internalGearset * turnOut * -1.0;
     }
     // Speed limits that are updated every loop, awesome!
-<<<<<<< HEAD
 
-=======
     printf("distance: %f, angle: %f, turn: %f\n",distance_forward,angleChange,turnChange);
->>>>>>> 0e852e1dee0ad9feb35f98192491120a0df6eb68
     leftSide->moveVelocity(std::min((int)round(leftVelocity),maxVelocity));
     rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
 };

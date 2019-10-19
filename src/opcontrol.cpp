@@ -53,7 +53,6 @@ void set_temperature(void* param) {
 void opcontrol() {
 
     //pros::Task temp_task(set_temperature, nullptr, "temp_task");
-<<<<<<< HEAD
     pros::delay(20);
     PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
@@ -66,8 +65,8 @@ void opcontrol() {
         { static_cast<int8_t>(-right_port), static_cast<int8_t>(-righttwo_port) });
     okapi::Motor strafeMotor(11);
 
-    std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
-        ChassisController(
+    std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
+        ChassisControllerHDrive(
             straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
             leftSide, rightSide, strafeMotor,
             okapi::AbstractMotor::gearset::green,
@@ -79,7 +78,6 @@ void opcontrol() {
     cc->start_task();
     cc->waitUntilSettled();
     */
-=======
 
   /*
   std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
@@ -110,7 +108,6 @@ void opcontrol() {
   cc->waitUntilSettled();
   */
 
->>>>>>> 0e852e1dee0ad9feb35f98192491120a0df6eb68
     while (true) {
         //cc->step();
         //macros_update(peripherals->master_controller);
