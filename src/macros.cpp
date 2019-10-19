@@ -12,7 +12,7 @@ Macro::Macro(MacroFunc f) {
 }
 
 Macro::Macro() {}
-
+/*
 pros::controller_digital_e_t button_list[12] = { DIGITAL_L1, DIGITAL_L2, DIGITAL_R1, DIGITAL_R2,
     DIGITAL_UP, DIGITAL_DOWN, DIGITAL_LEFT, DIGITAL_RIGHT,
     DIGITAL_X, DIGITAL_Y, DIGITAL_A, DIGITAL_B };
@@ -23,7 +23,7 @@ Macro macros[12] = { Macro(), Macro(), Macro(), Macro(),
     Macro(), Macro(), Macro(), Macro(),
     //X      ,Y      ,A      ,B
     Macro(), Macro(), Macro(), Macro() };
-
+*/
 void macros_update(pros::Controller controller) {
     /*
       for (int i=0;i<12;i++){

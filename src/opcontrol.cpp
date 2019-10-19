@@ -20,8 +20,10 @@ extern int left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
 void set_temperature(void* param) {
+
     std::shared_ptr<GUI> gui = GUI::get();
     std::uint32_t now = pros::millis();
+    
     while (true) {
         std::string temp = std::to_string(peripherals->leftarm_mtr.get_temperature());
         temp.append(" celcius");
@@ -30,7 +32,8 @@ void set_temperature(void* param) {
         std::string arm_pos_string = "Arm: ";
         arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
 
-        lv_ta_set_text(gui->console_box, arm_pos_string.c_str());
+        gui->set_line(0,arm_pos_string.c_str());
+        gui->set_line(1,"Yello");
 
         double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
 
@@ -48,7 +51,7 @@ void set_temperature(void* param) {
 
 void opcontrol() {
 
-    //pros::Task temp_task(set_temperature, nullptr, "temp_task");
+    pros::Task temp_task(set_temperature, nullptr, "temp_task");
     pros::delay(20);
     PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
@@ -103,12 +106,12 @@ void opcontrol() {
 
   cc->waitUntilSettled();
   */
-
     std::shared_ptr<Chassis> chassis = Chassis::get();
     std::shared_ptr<Arm> arm = Arm::get();
     std::shared_ptr<Claw> claw = Claw::get();
 
     while (true) {
+        //lv_ta_add_text(GUI::get()->console_box,std::to_string(pros::millis()).c_str());
         //cc->step();
         //macros_update(peripherals->master_controller);
 

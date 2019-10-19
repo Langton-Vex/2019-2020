@@ -9,7 +9,8 @@
    already exists
 */
 
-class ChassisControllerHDrive {
+class ChassisControllerHDrive : public okapi::ControllerOutput<double>,
+                                public okapi::ControllerInput<double> {
 public:
     ChassisControllerHDrive(
         PIDTuning straightTuning, PIDTuning angleTuning,
@@ -25,6 +26,7 @@ public:
 
     okapi::QAcceleration max_acceleration; // TODO: implement
     ControllerMode mode;
+    TuningMode tuningMode;
     std::unique_ptr<pros::Task> task;
     int asyncUpdateDelay = 20;
 
@@ -80,6 +82,9 @@ public:
     void reset();
     void setMaxVelocity(int speed);
     void tune();
+
+    void controllerSet(double ivalue);
+    double controllerGet();
 
     void step();
     void start_task();

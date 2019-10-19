@@ -140,24 +140,29 @@ void GUI::build_console(lv_obj_t* parent) {
 
     lv_obj_t* h = lv_cont_create(parent, NULL);
     lv_obj_set_style(h, &h_style);
-    lv_obj_set_click(h, false);
+    lv_obj_set_click(h, true);
     lv_cont_set_fit(h, true, true);
 
-    static lv_style_t style_console;
-    lv_style_copy(&style_console, &lv_style_plain);
-    /*
-  style_console.body.main_color = LV_COLOR_BLACK;
-  style_console.body.grad_color = LV_COLOR_BLACK;
-  style_console.body.border.color = LV_COLOR_WHITE;
-  style_console.body.border.width = 1;
-  style_console.body.border.opa = LV_OPA_70;
-  style_console.body.radius = LV_RADIUS_CIRCLE;
-  style_console.body.opa = LV_OPA_60;
-  */
+    static lv_style_t style_sb;
+    lv_style_copy(&style_sb, &lv_style_plain);
+    style_sb.body.main_color = LV_COLOR_BLACK;
+    style_sb.body.grad_color = LV_COLOR_BLACK;
+    style_sb.body.border.color = LV_COLOR_WHITE;
+    style_sb.body.border.width = 1;
+    style_sb.body.border.opa = LV_OPA_70;
+    style_sb.body.radius = LV_RADIUS_CIRCLE;
+    style_sb.body.opa = LV_OPA_60;
+
+    static lv_style_t style_bg;
+    lv_style_copy(&style_bg, &lv_style_pretty);
+    style_bg.body.shadow.width = 8;
+    style_bg.text.color = LV_COLOR_MAKE(0x30, 0x60, 0xd0);
+
     console_box = lv_ta_create(h, NULL);
     lv_obj_set_size(console_box, 400, 125);
     lv_obj_align(console_box, NULL, LV_ALIGN_CENTER, 0, -LV_DPI / 2);
-    lv_ta_set_style(console_box, LV_TA_STYLE_SB, &style_console); /*Apply the scroll bar style*/
+    lv_ta_set_style(console_box, LV_TA_STYLE_SB, &style_sb); /*Apply the scroll bar style*/
+    //lv_ta_set_style(console_box,LV_TA_STYLE_BG, &style_bg);
     lv_ta_set_cursor_type(console_box, LV_CURSOR_NONE);
     lv_ta_set_text(console_box, "Initializing hackerman console:\n");
 }
@@ -237,4 +242,27 @@ lv_res_t GUI::cb_side(lv_obj_t* side) {
         configManager->select_team(1);
 
     return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
+}
+
+void GUI::update_console() {
+    std::stringstream console_stream;
+    for (std::string i : console_buffer) {
+        console_stream << i << std::endl;
+    }
+    lv_ta_set_text(console_box, console_stream.str().c_str()); // What an ugly call
+}
+void GUI::set_line(int line, std::string contents) {
+    if (line >= console_buffer.size()) {
+        for (int i = 0; i < (line - console_buffer.size()); i++)
+            fprintf(stderr,"%d",console_buffer.size());
+            console_buffer.push_back("");
+
+    }
+    console_buffer[line] = contents;
+    update_console();
+}
+
+void GUI::add_line(std::string contents) {
+    console_buffer.push_back(contents);
+    update_console();
 }

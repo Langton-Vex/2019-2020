@@ -2,6 +2,7 @@
 #define _GUI_H_
 
 #include "main.h"
+#include <sstream>
 
 class GUI {
 public:
@@ -17,6 +18,11 @@ public:
     lv_obj_t* arm_temp_guage;
     lv_obj_t* chassis_temp_guage;
     lv_obj_t* claw_temp_guage;
+
+    std::vector<std::string> console_buffer;
+    void update_console();
+    void set_line(int line, std::string contents);
+    void add_line(std::string contents);
 
 protected:
     GUI();

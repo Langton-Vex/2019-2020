@@ -1,4 +1,5 @@
 #include "main.h"
+#include <vector>
 
 ChassisControllerHDrive::ChassisControllerHDrive(
     PIDTuning straightTuning, PIDTuning angleTuning,
@@ -89,28 +90,97 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
 void ChassisControllerHDrive::strafe(okapi::QLength distance){};
 void ChassisControllerHDrive::strafeAsync(okapi::QLength distance){};
 
-void ChassisControllerHDrive::tune() {
-    /*
-  std::shared_ptr<okapi::MotorGroup> leftShared = std::move(leftSide);
-  std::shared_ptr<okapi::MotorGroup> rightShared = std::move(rightSide);
+std::string TuningToString(okapi::PIDTuner::Output tuning){
+  std::string ret = "Kp: ";
+  ret.append(std::to_string(tuning.kP));
+  ret.append("\n");
 
-  std::shared_ptr<okapi::SkidSteerModel>
-    model = std::make_unique<okapi::SkidSteerModel>(
-      okapi::SkidSteerModel(leftShared,rightShared,
-      leftSide->getEncoder(),rightSide->getEncoder(),200.0,12.0));
+  ret.append("Ki :");
+  ret.append(std::to_string(tuning.kI));
+  ret.append("\n");
 
-  //std::shared_ptr<okapi::Motor> strafeShared = std::move(strafeMotor);
-
-  auto straightTuner = okapi::PIDTunerFactory::createPtr(
-    leftShared->getEncoder(),
-  model, 1*okapi::minute, 720,
-  0,0,0, 0.001, 0.001, 0.001);
-
-
-  //okapi::PIDTuner::Output straightTune = straightTuner->autotune();
-  //model.reset();
-  */
+  ret.append("KD :");
+  ret.append(std::to_string(tuning.kD));
+  ret.append("\n");
+  return ret;
 }
+
+void ChassisControllerHDrive::tune() {
+
+    //std::shared_ptr<okapi::Motor> strafeShared = std::move(strafeMotor);
+
+    std::shared_ptr<ChassisControllerHDrive> ct(this);
+
+    auto StraightTuner = okapi::PIDTunerFactory::createPtr(
+        ct, ct, 1 * okapi::minute, 720,
+        0, 0, 0, 0.001, 0.001, 0.001);
+    auto AngleTuner = okapi::PIDTunerFactory::createPtr(
+        ct, ct, 1 * okapi::minute, 0,
+        0, 0, 0, 0.001, 0.001, 0.001);
+    auto TurnTuner = okapi::PIDTunerFactory::createPtr(
+        ct, ct, 1 * okapi::minute, 360,
+        0, 0, 0, 0.001, 0.001, 0.001);
+
+    tuningMode = TuningMode::TuneStraight;
+    okapi::PIDTuner::Output straightTune = StraightTuner->autotune();
+    tuningMode = TuningMode::TuneAngle;
+    okapi::PIDTuner::Output angleTune = StraightTuner->autotune();
+    tuningMode = TuningMode::TuneTurn;
+    okapi::PIDTuner::Output turnTune = StraightTuner->autotune();
+
+    std::string straightValue = TuningToString(straightTune);
+    std::string angleValue = TuningToString(angleTune);
+    std::string turnValue = TuningToString(turnTune);
+
+    std::shared_ptr<GUI> gui = GUI::get();
+    gui->add_line(straightValue);
+    gui->add_line(angleValue);
+    gui->add_line(turnValue);
+
+    //model.reset();
+}
+
+double ChassisControllerHDrive::controllerGet() {
+    switch (tuningMode) {
+    case TuningMode::TuneStraight:
+        return ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
+    case TuningMode::TuneAngle:
+        return ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
+    case TuningMode::TuneTurn:
+        return ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
+    default:
+        return 0.0;
+    }
+}
+
+void ChassisControllerHDrive::controllerSet(double ivalue) {
+    double leftVelocity = 0;
+    double rightVelocity = 0;
+
+    double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
+    double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
+    double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
+
+    if (tuningMode == TuningMode::TuneStraight) {
+        double angleOut = anglePID->step(angleChange);
+
+        leftVelocity = (double)straightGearset->internalGearset * (ivalue - angleOut);
+        rightVelocity = (double)straightGearset->internalGearset * (ivalue + angleOut);
+    }
+    if (tuningMode == TuningMode::TuneTurn) {
+        double turnOut = turnPID->step(turnChange);
+
+        leftVelocity = (double)straightGearset->internalGearset * ivalue;
+        rightVelocity = (double)straightGearset->internalGearset * ivalue * -1.0;
+    }
+    if (tuningMode == TuningMode::TuneAngle) {
+        leftVelocity = (double)straightGearset->internalGearset * (-ivalue);
+        rightVelocity = (double)straightGearset->internalGearset * (ivalue);
+    }
+
+    leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
+    rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
+};
 
 void ChassisControllerHDrive::waitUntilSettled() {
     // Thanks okapi

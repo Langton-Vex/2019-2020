@@ -14,6 +14,7 @@ extern std::unique_ptr<Peripherals_t> peripherals;
 
 
 #include "project/ControllerMode.h"
+#include "project/TuningMode.h"
 #include "project/PIDTuning.h"
 #include "project/ChassisController.h"
 #include "project/gui.h"
