@@ -23,7 +23,7 @@ void set_temperature(void* param) {
 
     std::shared_ptr<GUI> gui = GUI::get();
     std::uint32_t now = pros::millis();
-    
+
     while (true) {
         std::string temp = std::to_string(peripherals->leftarm_mtr.get_temperature());
         temp.append(" celcius");
@@ -32,8 +32,7 @@ void set_temperature(void* param) {
         std::string arm_pos_string = "Arm: ";
         arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
 
-        gui->set_line(0,arm_pos_string.c_str());
-        gui->set_line(1,"Yello");
+        gui->set_line(0, arm_pos_string);
 
         double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
 

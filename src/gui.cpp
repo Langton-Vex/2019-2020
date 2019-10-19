@@ -253,10 +253,8 @@ void GUI::update_console() {
 }
 void GUI::set_line(int line, std::string contents) {
     if (line >= console_buffer.size()) {
-        for (int i = 0; i < (line - console_buffer.size()); i++)
-            fprintf(stderr,"%d",console_buffer.size());
+        for (int i = 0; i < ((line + 1) - console_buffer.size()); i++)
             console_buffer.push_back("");
-
     }
     console_buffer[line] = contents;
     update_console();

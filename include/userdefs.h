@@ -10,6 +10,7 @@ float sgn(int x);
 #include "project/macros.h"
 
 #include <memory>
+
 extern std::unique_ptr<Peripherals_t> peripherals;
 
 

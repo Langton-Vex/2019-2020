@@ -41,6 +41,12 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     timeUtil = std::make_unique<okapi::TimeUtil>(okapi::TimeUtilFactory::create());
     settledUtil = timeUtil->getSettledUtil();
 
+    model = std::make_unique<okapi::SkidSteerModel>(leftSide, rightSide,
+        leftSide->getEncoder(), rightSide->getEncoder(), maxVelocity, maxVoltage);
+
+    odom = std::make_unique<okapi::Odometry>(okapi::TimeUtilFactory::create(),
+        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), *scales);
+
     reset();
 
     disable_controllers();
@@ -56,6 +62,13 @@ void ChassisControllerHDrive::reset() {
     leftSideStart = leftSide->getPosition();
     rightSideStart = rightSide->getPosition();
     strafeStart = strafeMotor->getPosition();
+    mode.clear();
+
+    straightPID->reset();
+    anglePID->reset();
+    turnPID->reset();
+    strafePID->reset();
+    hypotPID->reset();
 }
 
 void ChassisControllerHDrive::driveStraight(okapi::QLength distance) {
@@ -63,10 +76,10 @@ void ChassisControllerHDrive::driveStraight(okapi::QLength distance) {
     waitUntilSettled();
 };
 void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
-    disable_controllers();
+    //disable_controllers();
     straightPID->flipDisable(false);
     anglePID->flipDisable(false);
-    mode = ControllerMode::straight;
+    mode.insert(ControllerMode::straight);
     reset();
 
     anglePID->setTarget(0);
@@ -79,30 +92,62 @@ void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
     waitUntilSettled();
 };
 void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
-    disable_controllers();
+    //disable_controllers();
     turnPID->flipDisable(false);
     reset();
-    mode = ControllerMode::turn;
+    mode.insert(ControllerMode::turn);
 
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
-void ChassisControllerHDrive::strafe(okapi::QLength distance){};
-void ChassisControllerHDrive::strafeAsync(okapi::QLength distance){};
+void ChassisControllerHDrive::strafe(okapi::QLength distance) {
+    strafeAsync(distance);
+    waitUntilSettled();
+};
+void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
+    //disable_controllers();
+    strafePID->flipDisable(false);
+    reset();
+    mode.insert(ControllerMode::strafe);
 
-std::string TuningToString(okapi::PIDTuner::Output tuning){
-  std::string ret = "Kp: ";
-  ret.append(std::to_string(tuning.kP));
-  ret.append("\n");
+    strafePID->setTarget(
+        distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
+};
 
-  ret.append("Ki :");
-  ret.append(std::to_string(tuning.kI));
-  ret.append("\n");
+void ChassisControllerHDrive::driveVector(okapi::QLength straight, okapi::QLength strafe) {
+    driveVectorAsync(straight, strafe);
+    waitUntilSettled();
+};
+void ChassisControllerHDrive::driveVectorAsync(okapi::QLength straight, okapi::QLength strafe) {
+    driveStraightAsync(straight);
+    strafeAsync(strafe);
+};
 
-  ret.append("KD :");
-  ret.append(std::to_string(tuning.kD));
-  ret.append("\n");
-  return ret;
+void ChassisControllerHDrive::diagToPointAsync(okapi::Point point) {
+    okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
+    driveVectorAsync(point.y - state.y, point.x - state.x);
+};
+void ChassisControllerHDrive::diagToPoint(okapi::Point point) {
+    diagToPointAsync(point);
+    waitUntilSettled();
+};
+
+void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};
+void ChassisControllerHDrive::diagToPointAndTurnAsync(okapi::Point point, okapi::QAngle angle){};
+
+std::string TuningToString(okapi::PIDTuner::Output tuning) {
+    std::string ret = "Kp: ";
+    ret.append(std::to_string(tuning.kP));
+    ret.append("\n");
+
+    ret.append("Ki :");
+    ret.append(std::to_string(tuning.kI));
+    ret.append("\n");
+
+    ret.append("KD :");
+    ret.append(std::to_string(tuning.kD));
+    ret.append("\n");
+    return ret;
 }
 
 void ChassisControllerHDrive::tune() {
@@ -124,9 +169,9 @@ void ChassisControllerHDrive::tune() {
     tuningMode = TuningMode::TuneStraight;
     okapi::PIDTuner::Output straightTune = StraightTuner->autotune();
     tuningMode = TuningMode::TuneAngle;
-    okapi::PIDTuner::Output angleTune = StraightTuner->autotune();
+    okapi::PIDTuner::Output angleTune = AngleTuner->autotune();
     tuningMode = TuningMode::TuneTurn;
-    okapi::PIDTuner::Output turnTune = StraightTuner->autotune();
+    okapi::PIDTuner::Output turnTune = TurnTuner->autotune();
 
     std::string straightValue = TuningToString(straightTune);
     std::string angleValue = TuningToString(angleTune);
@@ -185,49 +230,46 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
 void ChassisControllerHDrive::waitUntilSettled() {
     // Thanks okapi
     bool completelySettled = false;
-    while (!completelySettled) {
-        switch (mode) {
-        case ControllerMode::straight:
+    while (mode.size() > 0) {
+        if (mode.find(ControllerMode::straight) != mode.end())
             completelySettled = waitUntilDistanceSettled();
-            break;
-        case ControllerMode::turn:
+        if (mode.find(ControllerMode::turn) != mode.end())
             completelySettled = waitUntilTurnSettled();
-            break;
-        case ControllerMode::strafe:
+        if (mode.find(ControllerMode::strafe) != mode.end())
             completelySettled = waitUntilStrafeSettled();
-            break;
-        case ControllerMode::none:
-            completelySettled = true;
-            break;
-        }
+
         pros::delay(2); // Just in case
     }
+
     // finally:
     disable_controllers();
 };
 
 bool ChassisControllerHDrive::waitUntilDistanceSettled() {
     while (!straightPID->isSettled() || !turnPID->isSettled()) { // Boolean logic is weird
-        if (mode != ControllerMode::straight)
+        if (!(mode.find(ControllerMode::straight) != mode.end()))
             return false;
         pros::delay(2);
     }
+    mode.erase(ControllerMode::straight);
     return true;
 };
 bool ChassisControllerHDrive::waitUntilTurnSettled() {
     while (!turnPID->isSettled()) { // Boolean logic is weird
-        if (mode != ControllerMode::turn)
+        if (!(mode.find(ControllerMode::turn) != mode.end()))
             return false;
         pros::delay(2);
     }
+    mode.erase(ControllerMode::turn);
     return true;
 };
 bool ChassisControllerHDrive::waitUntilStrafeSettled() {
     while (!strafePID->isSettled()) { // Boolean logic is weird
-        if (mode != ControllerMode::strafe)
+        if (!(mode.find(ControllerMode::strafe) != mode.end()))
             return false;
         pros::delay(2);
     }
+    mode.erase(ControllerMode::strafe);
     return true;
 };
 
@@ -242,31 +284,40 @@ void ChassisControllerHDrive::disable_controllers() {
 void ChassisControllerHDrive::setMaxVelocity(int speed) {
     maxVelocity = speed;
 };
-// this code makes my pp very hard
 
 void ChassisControllerHDrive::step() {
+    odom->step();
+
     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
     double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
+    double strafeChange = strafeMotor->getPosition() - strafeStart;
 
     double leftVelocity = 0;
     double rightVelocity = 0;
+    double strafeVelocity = 0;
 
-    if (mode == ControllerMode::straight) {
+    if (mode.find(ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
         double angleOut = anglePID->step(angleChange);
 
-        leftVelocity = (double)straightGearset->internalGearset * (straightOut - angleOut);
-        rightVelocity = (double)straightGearset->internalGearset * (straightOut + angleOut);
+        leftVelocity += (double)straightGearset->internalGearset * (straightOut - angleOut);
+        rightVelocity += (double)straightGearset->internalGearset * (straightOut + angleOut);
 
         //printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
     }
 
-    if (mode == ControllerMode::turn) {
+    if (mode.find(ControllerMode::turn) != mode.end()) {
         double turnOut = turnPID->step(turnChange);
 
-        leftVelocity = (double)straightGearset->internalGearset * turnOut;
-        rightVelocity = (double)straightGearset->internalGearset * turnOut * -1.0;
+        leftVelocity += (double)straightGearset->internalGearset * turnOut;
+        rightVelocity += (double)straightGearset->internalGearset * turnOut * -1.0;
+    }
+
+    if (mode.find(ControllerMode::strafe) != mode.end()) {
+        double strafeOut = strafePID->step(turnChange);
+
+        strafeVelocity += (double)strafeGearset->internalGearset * strafeOut;
     }
     // Speed limits that are updated every loop, awesome!
 

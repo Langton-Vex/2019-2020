@@ -61,6 +61,7 @@
  */
 
 #include <memory>
+#include <unordered_set>
 
 #ifdef __cplusplus
 extern "C" {

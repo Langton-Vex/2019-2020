@@ -25,12 +25,16 @@ public:
                            For cross robot compatability*/
 
     okapi::QAcceleration max_acceleration; // TODO: implement
-    ControllerMode mode;
+    std::unordered_set<ControllerMode> mode;
     TuningMode tuningMode;
     std::unique_ptr<pros::Task> task;
     int asyncUpdateDelay = 20;
 
+    std::unique_ptr<okapi::Odometry> odom;
+    std::shared_ptr<okapi::SkidSteerModel> model;
+
     int maxVelocity = 200;
+    double maxVoltage = 12.0;
 
     static void trampoline(void* param);
 
@@ -48,9 +52,9 @@ public:
     std::unique_ptr<okapi::AbstractMotor::GearsetRatioPair> strafeGearset;
     std::unique_ptr<okapi::ChassisScales> scales;
 
-    std::unique_ptr<okapi::MotorGroup> leftSide;
-    std::unique_ptr<okapi::MotorGroup> rightSide;
-    std::unique_ptr<okapi::Motor> strafeMotor;
+    std::shared_ptr<okapi::AbstractMotor> leftSide;
+    std::shared_ptr<okapi::AbstractMotor> rightSide;
+    std::shared_ptr<okapi::Motor> strafeMotor;
 
     double leftSideStart, rightSideStart, strafeStart;
 
@@ -66,10 +70,11 @@ public:
     void driveVector(okapi::QLength straight, okapi::QLength strafe);
     void driveVectorAsync(okapi::QLength straight, okapi::QLength strafe);
 
-    void driveVectorAndTurn(okapi::QLength straight, okapi::QLength strafe,
-        okapi::QAngle angle);
-    void driveVectorAndTurnAsync(okapi::QLength straight, okapi::QLength strafe,
-        okapi::QAngle angle);
+    void diagToPointAsync(okapi::Point point);
+    void diagToPoint(okapi::Point point);
+
+    void diagToPointAndTurn(okapi::Point point, okapi::QAngle angle);
+    void diagToPointAndTurnAsync(okapi::Point point, okapi::QAngle angle);
 
     void waitUntilSettled();
     bool waitUntilDistanceSettled();

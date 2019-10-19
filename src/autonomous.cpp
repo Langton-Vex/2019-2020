@@ -320,7 +320,8 @@ void autonomous() {
             leftSide, rightSide, strafeMotor,
             okapi::AbstractMotor::gearset::green,
             okapi::AbstractMotor::gearset::green,
-            { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
+            { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
+                okapi::imev5GreenTPR }));
 
     cc->start_task();
     cc->driveStraight(5 * okapi::inch);
