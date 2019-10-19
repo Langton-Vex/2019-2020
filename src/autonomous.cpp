@@ -14,25 +14,23 @@ using namespace okapi;
 extern int left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
-extern ConfigManager configManager;
-
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
 std::shared_ptr<okapi::ChassisControllerIntegrated> ccont;
 
-MotorGroup intake({ static_cast<int8_t>(leftintake_port), static_cast<int8_t>(rightintake_port) });
+std::shared_ptr<MotorGroup> intake;
 
 extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
 void lift_stack(int cubes) {
     lift->setMaxVelocity(22);
     lift->setTarget(-108);
-    intake.moveVelocity(-200);
+    intake->moveVelocity(-200);
     pros::delay(1500);
     lift->setTarget(lift->getTarget() + -(18.45 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
     lift->waitUntilSettled(); // Perfect stacking speeds from 4 inches up
-    intake.moveVelocity(0);
+    intake->moveVelocity(0);
     lift->setMaxVelocity(100);
 }
 
@@ -46,7 +44,7 @@ void near_small() {
 void colour_tile() {
 
     ccont->setMaxVelocity(150);
-    int side = configManager.selected_team;
+    int side = ConfigManager::get()->selected_team;
     lift->setMaxVelocity(200);
 
     lift->setTarget(-148);
@@ -58,18 +56,18 @@ void colour_tile() {
     //ccont->turnAngle(-110_deg);
     //ccont->moveDistance(5_in);
 
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     lift->setTarget(0);
     lift->waitUntilSettled();
     lift->setTarget(-100);
     pros::delay(1000);
     //pros::delay(500); // TODO: This defo needs changing
-    //intake.moveVelocity(0);
+    //intake->moveVelocity(0);
     //lift->setTarget(-200);
     //lift->waitUntilSettled();
 
     ccont->moveDistance(-7.5 * inch);
-    intake.moveVelocity(0);
+    intake->moveVelocity(0);
     ccont->turnAngle(100_deg * side);
     ccont->moveDistance(38_in);
     lift->setTarget(0);
@@ -86,7 +84,7 @@ void colour_tile() {
 void colour_tile_3_point() {
 
     ccont->setMaxVelocity(150);
-    int side = configManager.selected_team;
+    int side = ConfigManager::get()->selected_team;
     lift->setMaxVelocity(200);
 
     lift->setTarget(-108);
@@ -97,13 +95,13 @@ void colour_tile_3_point() {
     //ccont->turnAngle(-110_deg);
     //ccont->moveDistance(5_in);
 
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     lift->setTarget(0);
     lift->waitUntilSettled();
     lift->setTarget(-100);
     pros::delay(1000);
     //pros::delay(500); // TODO: This defo needs changing
-    //intake.moveVelocity(0);
+    //intake->moveVelocity(0);
     //lift->setTarget(-200);
     //lift->waitUntilSettled();
 
@@ -114,7 +112,7 @@ void colour_tile_3_point() {
     ccont->moveDistance(19 * inch);
     lift->setMaxVelocity(100);
 
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     lift->setTarget(0);
     lift->waitUntilSettled();
     pros::delay(750);
@@ -138,7 +136,7 @@ void colour_tile_3_point() {
 /* This starts with the left side of the robot in line with the middle of
 cube to the right of the medium sized tower */
 void four_stack() {
-    int side = configManager.selected_team;
+    int side = ConfigManager::get()->selected_team;
     lift->setMaxVelocity(100);
 
     ccont->moveDistance(20_in);
@@ -149,11 +147,11 @@ void four_stack() {
     lift->waitUntilSettled();
     ccont->setMaxVelocity(75);
     ccont->moveDistance(7_in);
-    intake.moveVelocity(-200);
+    intake->moveVelocity(-200);
     lift->setTarget(lift->getTarget() - (18.1123 * 4));
     pros::delay(1200);
     lift->waitUntilSettled();
-    intake.moveVelocity(0);
+    intake->moveVelocity(0);
     ccont->setMaxVelocity(25);
     ccont->moveDistance(-6_in);
     lift->setTarget(0);
@@ -168,7 +166,7 @@ void four_stack() {
     ccont->turnAngle(-90_deg * side);
     ccont->moveDistance(6_in);
     lift->waitUntilSettled();
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     lift->setTarget(0);
     lift->waitUntilSettled();
     ccont->turnAngle(90_deg * side);
@@ -178,7 +176,7 @@ void four_stack() {
 }
 
 void four_stack_only() {
-    int side = configManager.selected_team;
+    int side = ConfigManager::get()->selected_team;
     lift->setMaxVelocity(100);
 
     ccont->moveDistance(22 * inch);
@@ -186,7 +184,7 @@ void four_stack_only() {
     lift->waitUntilSettled();
     ccont->setMaxVelocity(75);
     ccont->moveDistance(5_in);
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     lift->setTarget(0);
     lift->waitUntilSettled();
     ccont->turnAngle(90_deg * side);
@@ -205,10 +203,10 @@ void four_floor_small() {
     ccont->turnAngle(90_deg);
     lift->waitUntilSettled();
     ccont->moveDistance(7_in);
-    intake.moveVelocity(-200);
+    intake->moveVelocity(-200);
 
     ccont->moveDistance(3_in);
-    intake.moveVelocity(-200);
+    intake->moveVelocity(-200);
     lift->setTarget(lift->getTarget() - (18.1123 * 1.5));
     pros::delay(1200);
     lift->waitUntilSettled();
@@ -223,7 +221,7 @@ void four_floor_small() {
     ccont->moveDistance(15_in);
     ccont->turnAngle(90_deg);
 
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     for (int i = 0; i < 4; i++) {
         lift->setTarget(-108);
         lift->waitUntilSettled();
@@ -241,7 +239,7 @@ void four_floor_small() {
 void simple_four_floor() {
     lift->setTarget(-(5.5 * 18.1123));
     ccont->moveDistance(17.15_in);
-    intake.moveVelocity(200);
+    intake->moveVelocity(200);
     lift->setTarget(0);
     lift->waitUntilSettled();
     lift->setTarget(-(5.5 * 18.1123));
@@ -287,55 +285,53 @@ void init_autonomous() {
             .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
             .build());
 
+    intake = std::make_unique<okapi::MotorGroup>(MotorGroup({ static_cast<int8_t>(leftintake_port), static_cast<int8_t>(rightintake_port) }));
+
     lift->flipDisable(true);
+    std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
+    configManager->register_auton("near small", near_small);
+    configManager->register_auton("colour tile", colour_tile);
+    configManager->register_auton("colour tile three pnt", colour_tile_3_point);
+    configManager->register_auton("do nothing", do_nothing);
+    configManager->register_auton("four stack grab", four_stack);
+    configManager->register_auton("four floor small", four_floor_small);
+    configManager->register_auton("four floor simple", simple_four_floor);
+    configManager->register_auton("four stack only", four_stack_only);
 
-    configManager.register_auton("near small", near_small);
-    configManager.register_auton("colour tile", colour_tile);
-    configManager.register_auton("colour tile three pnt", colour_tile_3_point);
-    configManager.register_auton("do nothing", do_nothing);
-    configManager.register_auton("four stack grab", four_stack);
-    configManager.register_auton("four floor small", four_floor_small);
-    configManager.register_auton("four floor simple", simple_four_floor);
-    configManager.register_auton("four stack only", four_stack_only);
-
-    configManager.register_auton("Move 15", move_15);
+    configManager->register_auton("Move 15", move_15);
 }
 
 void autonomous() {
 
+    PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
+    PIDTuning angleTuning = PIDTuning(0, 0, 0);
+    PIDTuning turnTuning = PIDTuning(0.002, 0, 0);
+    PIDTuning strafeTuning = PIDTuning(0, 0, 0);
+    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
+    okapi::MotorGroup leftSide(
+        { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+    okapi::MotorGroup rightSide(
+        { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
+    okapi::Motor strafeMotor(11);
 
-  PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
-  PIDTuning angleTuning = PIDTuning(0, 0, 0);
-  PIDTuning turnTuning = PIDTuning(0.002, 0, 0);
-  PIDTuning strafeTuning = PIDTuning(0, 0, 0);
-  PIDTuning hypotTuning = PIDTuning(0, 0, 0);
-  okapi::MotorGroup leftSide(
-      { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
-  okapi::MotorGroup rightSide(
-      { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
-  okapi::Motor strafeMotor(11);
+    std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
+        ChassisControllerHDrive(
+            straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
+            leftSide, rightSide, strafeMotor,
+            okapi::AbstractMotor::gearset::green,
+            okapi::AbstractMotor::gearset::green,
+            { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
 
-
-
-
-  std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
-      ChassisControllerHDrive(
-          straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
-          leftSide, rightSide, strafeMotor,
-          okapi::AbstractMotor::gearset::green,
-          okapi::AbstractMotor::gearset::green,
-          { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
-
-  cc->start_task();
-  cc->driveStraight(5 * okapi::inch);
-  cc->turnAngle(90 * okapi::degree);
-  cc->waitUntilSettled();
-  /*
-    if (configManager.auton_routines.size() > configManager.selected_auton) {
+    cc->start_task();
+    cc->driveStraight(5 * okapi::inch);
+    cc->turnAngle(90 * okapi::degree);
+    cc->waitUntilSettled();
+    /*
+    if (configManager->auton_routines.size() > configManager->selected_auton) {
 
         //pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
 
-        auton_routine routine = configManager.auton_routines[configManager.selected_auton];
+        auton_routine routine = configManager->auton_routines[configManager->selected_auton];
         lift->flipDisable(false);
         routine(); // nullptr could happen :o
         lift->flipDisable(true);

@@ -9,10 +9,16 @@ extern int left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
 extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
+
 void lift_stack(int cubes);
 
 double major_positions[4] = { 0, 250, 500, 750 };
 //double minor_positions[4] = {0.0,0.05,0.1,0.1};
+
+std::shared_ptr<Arm> Arm::get() {
+    static std::shared_ptr<Arm> instance(new Arm);
+    return instance;
+}
 
 Arm::Arm() {
     peripherals->leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);

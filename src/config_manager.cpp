@@ -3,6 +3,11 @@
 #include <iostream>
 #include <iterator>
 
+std::shared_ptr<ConfigManager> ConfigManager::get() {
+    static std::shared_ptr<ConfigManager> instance(new ConfigManager);
+    return instance;
+}
+
 ConfigManager::ConfigManager() {
     load_config();
 };

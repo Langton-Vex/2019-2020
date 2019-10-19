@@ -89,9 +89,8 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
 void ChassisControllerHDrive::strafe(okapi::QLength distance){};
 void ChassisControllerHDrive::strafeAsync(okapi::QLength distance){};
 
-
-void ChassisControllerHDrive::tune(){
-  /*
+void ChassisControllerHDrive::tune() {
+    /*
   std::shared_ptr<okapi::MotorGroup> leftShared = std::move(leftSide);
   std::shared_ptr<okapi::MotorGroup> rightShared = std::move(rightSide);
 
@@ -201,8 +200,8 @@ void ChassisControllerHDrive::step() {
     }
     // Speed limits that are updated every loop, awesome!
 
-    printf("distance: %f, angle: %f, turn: %f\n",distance_forward,angleChange,turnChange);
-    leftSide->moveVelocity(std::min((int)round(leftVelocity),maxVelocity));
+    printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);
+    leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
     rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
 };
 

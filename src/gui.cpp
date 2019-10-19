@@ -1,9 +1,14 @@
 #include "main.h"
 
-extern ConfigManager configManager;
-
 const auto HOR_RES = 480;
 const auto VER_RES = 240;
+
+std::shared_ptr<GUI> GUI::get() {
+    static std::shared_ptr<GUI> instance(new GUI);
+    return instance;
+}
+
+GUI::GUI() {}
 
 void GUI::gui_build() {
     lv_theme_set_current(th);
@@ -51,15 +56,16 @@ void GUI::build_main(lv_obj_t* parent) {
     lv_obj_align(auton_select, NULL, LV_ALIGN_OUT_RIGHT_MID, HOR_RES / 2, 0);
 
     std::string routines_str;
-    for (int i = 0; i < configManager.autonomous_names.size(); i++) {
+    std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
+    for (int i = 0; i < configManager->autonomous_names.size(); i++) {
         if (i > 0)
-            routines_str.append("\n" + configManager.autonomous_names[i]);
+            routines_str.append("\n" + configManager->autonomous_names[i]);
         else
-            routines_str.append(configManager.autonomous_names[i]);
+            routines_str.append(configManager->autonomous_names[i]);
     }
     lv_roller_set_options(auton_select, routines_str.c_str());
 
-    lv_roller_set_selected(auton_select, configManager.selected_auton, false);
+    lv_roller_set_selected(auton_select, configManager->selected_auton, false);
     lv_roller_set_visible_row_count(auton_select, 3);
 
     lv_obj_t* auton_select_label = lv_label_create(h, NULL);
@@ -104,7 +110,7 @@ void GUI::build_main(lv_obj_t* parent) {
     lv_obj_t* side = lv_sw_create(h, NULL);
     lv_sw_set_action(side, cb_side);
 
-    if (configManager.selected_team == 1)
+    if (configManager->selected_team == 1)
         lv_sw_off(side);
     else
         lv_sw_on(side);
@@ -216,17 +222,19 @@ void GUI::build_diagnostics(lv_obj_t* parent) {
 }
 
 lv_res_t GUI::cb_auton_select(lv_obj_t* auton_select) {
-    configManager.select_auton(lv_roller_get_selected(auton_select));
+    std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
+    configManager->select_auton(lv_roller_get_selected(auton_select));
 
     return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
 }
 
 lv_res_t GUI::cb_side(lv_obj_t* side) {
     bool switch_state = lv_sw_get_state(side); // false is blue, true is red
+    std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
     if (switch_state)
-        configManager.select_team(-1);
+        configManager->select_team(-1);
     else
-        configManager.select_team(1);
+        configManager->select_team(1);
 
     return LV_RES_OK; /*Return OK if the drop down list is not deleted*/
 }

@@ -2,7 +2,10 @@
 #include "math.h"
 #include "stdexcept"
 
-extern std::unique_ptr<Arm> arm;
+std::shared_ptr<Chassis> Chassis::get() {
+    static std::shared_ptr<Chassis> instance(new Chassis);
+    return instance;
+}
 
 Chassis::Chassis() {
     pros::motor_gearset_e_t motor_gearset = peripherals->left_mtr.get_gearing();
@@ -32,6 +35,7 @@ void Chassis::user_control() {
 }
 
 double Chassis::power_mult_calc() {
+    std::shared_ptr<Arm> arm = Arm::get();
     double power_mult = (arm->height_per < 0.5) ? (1.0 - arm->height_per) : 0.5;
     return power_mult;
 }

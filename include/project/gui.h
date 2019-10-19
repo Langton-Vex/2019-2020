@@ -5,6 +5,8 @@
 
 class GUI {
 public:
+    static std::shared_ptr<GUI> get();
+
     void gui_build();
     static void build_main(lv_obj_t* parent);
     void build_diagnostics(lv_obj_t* parent);
@@ -17,6 +19,7 @@ public:
     lv_obj_t* claw_temp_guage;
 
 protected:
+    GUI();
     int state;
     lv_theme_t* th = lv_theme_alien_init(210, &lv_font_dejavu_20);
 

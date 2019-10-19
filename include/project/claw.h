@@ -7,13 +7,14 @@ struct Peripherals_t;
 
 class Claw {
 public:
-    Claw();
+    static std::shared_ptr<Claw> get();
     void user_control();
     void set(int power);
 
     int power = 0;
 
 protected:
+    Claw();
     //Peripherals_t peripherals;
 };
 #endif

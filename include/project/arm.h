@@ -7,7 +7,8 @@ struct Peripherals_t;
 
 class Arm {
 public:
-    Arm();
+    static std::shared_ptr<Arm> get();
+
     void user_control();
     void set(int power);
     void set_pos(double position);
@@ -20,6 +21,7 @@ public:
     double height_per;
 
 protected:
+    Arm();
     //Peripherals_t peripherals;
     double current_goal_height;
 };

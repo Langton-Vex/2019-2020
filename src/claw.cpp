@@ -1,8 +1,10 @@
 
 #include "main.h"
 
-#define OPEN_POS 200
-#define CLOSE_POS -200
+std::shared_ptr<Claw> Claw::get() {
+    static std::shared_ptr<Claw> instance(new Claw);
+    return instance;
+}
 
 Claw::Claw() {
     peripherals->leftintake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);

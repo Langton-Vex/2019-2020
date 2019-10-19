@@ -6,7 +6,8 @@ struct Peripherals_t;
 
 class Chassis {
 public:
-    Chassis();
+    static std::shared_ptr<Chassis> get();
+
     void user_control();
     void set(int power, int turn);
     void move_forward(double distance, int velocity);
@@ -20,6 +21,7 @@ public:
     int motor_speed;
 
 protected:
+    Chassis();
     //Peripherals_t peripherals;
 
     bool slowmode = false;

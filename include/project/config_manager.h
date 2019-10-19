@@ -7,13 +7,14 @@ typedef void (*auton_routine)();
 
 class ConfigManager {
 public:
+    static std::shared_ptr<ConfigManager> get();
+
     std::vector<std::string> autonomous_names;
     std::vector<auton_routine> auton_routines;
 
     int selected_auton = 0; // Keep it safe from nullptr hopefully
     int selected_team = 1; // Turns negative on red side
 
-    ConfigManager();
     void register_auton(std::string name, auton_routine routine);
     void select_auton(int id);
     void select_team(int team);
@@ -22,6 +23,8 @@ public:
     void load_config();
 
 protected:
+    ConfigManager();
+
     std::string save_filepath = "/usd/comp_config.cfg";
 };
 
