@@ -157,13 +157,13 @@ void ChassisControllerHDrive::tune() {
     std::shared_ptr<ChassisControllerHDrive> ct(this);
 
     auto StraightTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 720,
+        ct, ct, 1 * okapi::minute, 1,
         0, 0, 0, 0.001, 0.001, 0.001);
     auto AngleTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 1 * okapi::minute, 0,
         0, 0, 0, 0.001, 0.001, 0.001);
     auto TurnTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 360,
+        ct, ct, 1 * okapi::minute, 1,
         0, 0, 0, 0.001, 0.001, 0.001);
 
     tuningMode = TuningMode::TuneStraight;
@@ -207,13 +207,13 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
     double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
 
     if (tuningMode == TuningMode::TuneStraight) {
-        double angleOut = anglePID->step(angleChange);
+        //double angleOut = anglePID->step(angleChange);
 
-        leftVelocity = (double)straightGearset->internalGearset * (ivalue - angleOut);
-        rightVelocity = (double)straightGearset->internalGearset * (ivalue + angleOut);
+        leftVelocity = (double)straightGearset->internalGearset * ivalue;
+        rightVelocity = (double)straightGearset->internalGearset * ivalue;
     }
     if (tuningMode == TuningMode::TuneTurn) {
-        double turnOut = turnPID->step(turnChange);
+        //double turnOut = turnPID->step(turnChange);
 
         leftVelocity = (double)straightGearset->internalGearset * ivalue;
         rightVelocity = (double)straightGearset->internalGearset * ivalue * -1.0;
@@ -223,8 +223,8 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
         rightVelocity = (double)straightGearset->internalGearset * (ivalue);
     }
 
-    leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
-    rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
+    leftSide->moveVelocity(-1.0 * std::min((int)round(leftVelocity), maxVelocity));
+    rightSide->moveVelocity(-1.0 * std::min((int)round(rightVelocity), maxVelocity));
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {
