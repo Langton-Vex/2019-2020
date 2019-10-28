@@ -77,34 +77,15 @@ void opcontrol() {
     cc->waitUntilSettled();
     */
 
+  //cc->start_task();
+  //cc->driveStraight(5 * okapi::inch);
+  //cc->turnAngle(90 * okapi::degree);
+
+
+  //cc->waitUntilSettled();
+  cc->tune();
+
     /*
-  std::unique_ptr<ChassisController> cc = std::make_unique<ChassisController>(
-      ChassisController(
-          straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
-          leftSide, rightSide, strafeMotor,
-          okapi::AbstractMotor::gearset::green,
-          okapi::AbstractMotor::gearset::green,
-          { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
-
-  PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
-  PIDTuning angleTuning = PIDTuning(0, 0, 0);
-  PIDTuning turnTuning = PIDTuning(0.001, 0, 0);
-  PIDTuning strafeTuning = PIDTuning(0, 0, 0);
-  PIDTuning hypotTuning = PIDTuning(0, 0, 0);
-  okapi::MotorGroup leftSide(
-      { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
-  okapi::MotorGroup rightSide(
-      { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
-  okapi::Motor strafeMotor(11);
-
-
-  cc->start_task();
-  cc->driveStraight(5 * okapi::inch);
-  cc->turnAngle(90 * okapi::degree);
-
-
-  cc->waitUntilSettled();
-  */
     std::shared_ptr<Chassis> chassis = Chassis::get();
     std::shared_ptr<Arm> arm = Arm::get();
     std::shared_ptr<Claw> claw = Claw::get();
@@ -120,4 +101,5 @@ void opcontrol() {
 
         pros::delay(20);
     }
+    */
 }
