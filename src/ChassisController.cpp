@@ -38,13 +38,13 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     rightSide = std::make_unique<okapi::MotorGroup>(irightSide);
     strafeMotor = std::make_unique<okapi::Motor>(istrafe);
 
-    timeUtil = std::make_unique<okapi::TimeUtil>(okapi::TimeUtilFactory::create());
+    timeUtil = std::make_unique<okapi::TimeUtil>(okapi::TimeUtilFactory::createDefault());
     settledUtil = timeUtil->getSettledUtil();
 
     model = std::make_unique<okapi::SkidSteerModel>(leftSide, rightSide,
         leftSide->getEncoder(), rightSide->getEncoder(), maxVelocity, maxVoltage);
 
-    odom = std::make_unique<okapi::Odometry>(okapi::TimeUtilFactory::create(),
+    odom = std::make_unique<okapi::Odometry>(okapi::TimeUtilFactory::createDefault(),
         std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), *scales);
 
     reset();
@@ -223,8 +223,8 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
         rightVelocity = (double)straightGearset->internalGearset * (ivalue);
     }
 
-    leftSide->moveVelocity(-1.0 * std::min((int)round(leftVelocity), maxVelocity));
-    rightSide->moveVelocity(-1.0 * std::min((int)round(rightVelocity), maxVelocity));
+    leftSide->moveVelocity(-1 * std::min((int)round(leftVelocity), maxVelocity));
+    rightSide->moveVelocity(-1 * std::min((int)round(rightVelocity), maxVelocity));
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {

@@ -27,8 +27,9 @@ std::unique_ptr<Peripherals_t> peripherals;
 void init_autonomous(); // uh oh global space
 
 void initialize() {
+    std::cerr << "Intializing" << std::endl;
     pros::delay(100);
-    fprintf(stderr, "Initializing");
+
     std::shared_ptr<okapi::AsyncPositionController<double, double>>
         lift_controller = okapi::AsyncPosControllerBuilder()
                               .withMotor({ leftarm_port, -rightarm_port })

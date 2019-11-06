@@ -49,7 +49,7 @@ void set_temperature(void* param) {
 }
 
 void opcontrol() {
-
+    /*
     pros::Task temp_task(set_temperature, nullptr, "temp_task");
     pros::delay(20);
     PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
@@ -70,8 +70,8 @@ void opcontrol() {
             okapi::AbstractMotor::gearset::green,
             okapi::AbstractMotor::gearset::green,
             { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
-
-    cc->driveStraightAsync(10 * okapi::inch);
+    */
+    //cc->driveStraightAsync(10 * okapi::inch);
     /*
     cc->start_task();
     cc->waitUntilSettled();
@@ -83,9 +83,9 @@ void opcontrol() {
 
 
   //cc->waitUntilSettled();
-  cc->tune();
+  //cc->tune();
 
-    /*
+    pros::Task temp_task(set_temperature, nullptr, "temp_task");
     std::shared_ptr<Chassis> chassis = Chassis::get();
     std::shared_ptr<Arm> arm = Arm::get();
     std::shared_ptr<Claw> claw = Claw::get();
@@ -101,5 +101,5 @@ void opcontrol() {
 
         pros::delay(20);
     }
-    */
+
 }

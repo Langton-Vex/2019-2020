@@ -302,7 +302,7 @@ void init_autonomous() {
 }
 
 void autonomous() {
-
+    std::cerr << "Autons" << std::endl;
     PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
     PIDTuning turnTuning = PIDTuning(0.002, 0, 0);
