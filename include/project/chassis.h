@@ -9,7 +9,7 @@ public:
     static std::shared_ptr<Chassis> get();
 
     void user_control();
-    void set(int power, int turn);
+    void set(int power, int turn, int strafe);
     void move_forward(double distance, int velocity);
     void point_turn(double angle, int velocity);
 

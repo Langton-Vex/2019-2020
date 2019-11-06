@@ -17,7 +17,7 @@
  */
 
 extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
-    leftarm_port, rightarm_port, leftintake_port, rightintake_port;
+    leftarm_port, rightarm_port, intake_port, strafe_port;
 
 void set_temperature(void* param) {
 
@@ -38,7 +38,7 @@ void set_temperature(void* param) {
 
         double arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
 
-        double claw_temp = (peripherals->leftintake_mtr.get_temperature() + peripherals->rightintake_mtr.get_temperature()) / 2;
+        double claw_temp = (peripherals->intake_mtr.get_temperature());
 
         lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);
         lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);

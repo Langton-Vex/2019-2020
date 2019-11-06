@@ -8,9 +8,7 @@ std::shared_ptr<ConfigManager> ConfigManager::get() {
     return instance;
 }
 
-ConfigManager::ConfigManager() {
-    load_config();
-};
+ConfigManager::ConfigManager(){};
 
 void ConfigManager::save_config() {
     printf("Saving config");

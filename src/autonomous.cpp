@@ -12,14 +12,14 @@ using namespace okapi;
  */
 
 extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
-    leftarm_port, rightarm_port, leftintake_port, rightintake_port;
+    leftarm_port, rightarm_port, intake_port, strafe_port;
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
 std::shared_ptr<okapi::ChassisController> ccont;
 
-std::shared_ptr<MotorGroup> intake;
+std::shared_ptr<Motor> intake;
 
 extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
@@ -284,7 +284,7 @@ void init_autonomous() {
                 .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
                 .build();
 
-    intake = std::make_unique<okapi::MotorGroup>(MotorGroup({ leftintake_port, rightintake_port }));
+    intake = std::make_unique<okapi::Motor>(intake_port);
 
     lift->flipDisable(true);
     auto configManager = ConfigManager::get();
@@ -313,7 +313,8 @@ void autonomous() {
         { right_port, righttwo_port });
     okapi::Motor strafeMotor(16);
 
-    std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
+    // std::unique_ptr<ChassisControllerHDrive>
+    auto cc = std::make_unique<ChassisControllerHDrive>(
         ChassisControllerHDrive(
             straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
             leftSide, rightSide, strafeMotor,

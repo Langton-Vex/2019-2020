@@ -7,8 +7,7 @@ std::shared_ptr<Claw> Claw::get() {
 }
 
 Claw::Claw() {
-    peripherals->leftintake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);
-    peripherals->rightintake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);
+    peripherals->intake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);
 }
 
 void Claw::user_control() {
@@ -30,7 +29,6 @@ void Claw::user_control() {
 }
 
 void Claw::set(int power) {
-    peripherals->leftintake_mtr.move(power);
-    peripherals->rightintake_mtr.move(power);
+    peripherals->intake_mtr.move(power);
     //peripherals->claw_mtr.move_absolute(position,127);
 }
