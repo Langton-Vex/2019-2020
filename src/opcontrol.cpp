@@ -16,7 +16,7 @@
  * task, not resume it from where it left off.
  */
 
-extern int left_port, right_port, lefttwo_port, righttwo_port,
+extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
 void set_temperature(void* param) {
@@ -58,9 +58,9 @@ void opcontrol() {
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
-        { static_cast<int8_t>(-left_port), static_cast<int8_t>(-lefttwo_port) });
+        {-left_port,-lefttwo_port });
     okapi::MotorGroup rightSide(
-        { static_cast<int8_t>(-right_port), static_cast<int8_t>(-righttwo_port) });
+        {-right_port,-righttwo_port});
     okapi::Motor strafeMotor(11);
 
     std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(

@@ -7,14 +7,14 @@
  * to keep execution time for this mode under a few seconds.
  */
 
-extern const int left_port = 20;
-extern const int right_port = 17;
-extern const int lefttwo_port = 19;
-extern const int righttwo_port = 18;
-extern const int leftintake_port = 3;
-extern const int rightintake_port = 5;
-extern const int leftarm_port = 1;
-extern const int rightarm_port = 2;
+ extern const int8_t left_port = 20;
+ extern const int8_t right_port = 17;
+ extern const int8_t lefttwo_port = 19;
+ extern const int8_t righttwo_port = 18;
+ extern const int8_t leftintake_port = 3;
+ extern const int8_t rightintake_port = 5;
+ extern const int8_t leftarm_port = 1;
+ extern const int8_t rightarm_port = 2;
 
 std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
@@ -27,17 +27,17 @@ std::unique_ptr<Peripherals_t> peripherals;
 void init_autonomous(); // uh oh global space
 
 void initialize() {
-    std::cerr << "Intializing" << std::endl;
     pros::delay(100);
-
+    fprintf(stderr, "Initializing");
     std::shared_ptr<okapi::AsyncPositionController<double, double>>
         lift_controller = okapi::AsyncPosControllerBuilder()
                               .withMotor({ leftarm_port, -rightarm_port })
                               .build();
-    lift = std::static_pointer_cast<okapi::AsyncPosIntegratedController>(lift_controller);
+    lift = std::dynamic_pointer_cast<okapi::AsyncPosIntegratedController>(lift_controller);
 
-    peripherals = std::make_unique<Peripherals_t>(Peripherals_t(left_port,
-        right_port, lefttwo_port, righttwo_port, leftintake_port, rightintake_port, leftarm_port, rightarm_port));
+    peripherals = std::make_unique<Peripherals_t>(left_port,right_port,
+      lefttwo_port, righttwo_port, leftintake_port, rightintake_port,
+      leftarm_port, rightarm_port);
 
     pros::delay(20);
     lift->flipDisable(true);

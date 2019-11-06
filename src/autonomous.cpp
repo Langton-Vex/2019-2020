@@ -11,13 +11,13 @@ using namespace okapi;
  * from where it left off.
  */
 
-extern int left_port, right_port, lefttwo_port, righttwo_port,
+extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
-std::shared_ptr<okapi::ChassisControllerIntegrated> ccont;
+std::shared_ptr<okapi::ChassisController> ccont;
 
 std::shared_ptr<MotorGroup> intake;
 
@@ -43,12 +43,12 @@ void near_small() {
 // Starts pointing towards singular cube one tile left of large goal zone
 void colour_tile() {
 
-    ccont->setMaxVelocity(150);
+    ccont->getModel()->setMaxVelocity(150);
     int side = ConfigManager::get()->selected_team;
     lift->setMaxVelocity(200);
 
     lift->setTarget(-148);
-    ccont->setMaxVelocity(100);
+    ccont->getModel()->setMaxVelocity(100);
     ccont->moveDistanceAsync(11.2 * inch);
     lift->waitUntilSettled();
     ccont->waitUntilSettled();
@@ -75,7 +75,7 @@ void colour_tile() {
     lift_stack(2);
 
     lift->setMaxVelocity(100);
-    ccont->setMaxVelocity(100);
+    ccont->getModel()->setMaxVelocity(100);
     ccont->moveDistance(-17 * inch);
     lift->setTarget(0);
     lift->waitUntilSettled();
@@ -83,12 +83,12 @@ void colour_tile() {
 
 void colour_tile_3_point() {
 
-    ccont->setMaxVelocity(150);
+    ccont->getModel()->setMaxVelocity(150);
     int side = ConfigManager::get()->selected_team;
     lift->setMaxVelocity(200);
 
     lift->setTarget(-108);
-    ccont->setMaxVelocity(100);
+    ccont->getModel()->setMaxVelocity(100);
     ccont->moveDistanceAsync(11.5 * inch);
     ccont->waitUntilSettled();
     lift->setMaxVelocity(100);
@@ -127,7 +127,7 @@ void colour_tile_3_point() {
     lift_stack(3);
 
     lift->setMaxVelocity(100);
-    ccont->setMaxVelocity(75);
+    ccont->getModel()->setMaxVelocity(75);
     ccont->moveDistance(-17 * inch);
     lift->setTarget(0);
     lift->waitUntilSettled();
@@ -145,18 +145,18 @@ void four_stack() {
 
     lift->setTarget(-(24.7 * 18.1123));
     lift->waitUntilSettled();
-    ccont->setMaxVelocity(75);
+    ccont->getModel()->setMaxVelocity(75);
     ccont->moveDistance(7_in);
     intake->moveVelocity(-200);
     lift->setTarget(lift->getTarget() - (18.1123 * 4));
     pros::delay(1200);
     lift->waitUntilSettled();
     intake->moveVelocity(0);
-    ccont->setMaxVelocity(25);
+    ccont->getModel()->setMaxVelocity(25);
     ccont->moveDistance(-6_in);
     lift->setTarget(0);
     lift->waitUntilSettled();
-    ccont->setMaxVelocity(150);
+    ccont->getModel()->setMaxVelocity(150);
 
     ccont->turnAngle(90_deg * side);
     ccont->moveDistance(13_in);
@@ -182,7 +182,7 @@ void four_stack_only() {
     ccont->moveDistance(22 * inch);
     lift->setTarget(-(18 * 18.1123));
     lift->waitUntilSettled();
-    ccont->setMaxVelocity(75);
+    ccont->getModel()->setMaxVelocity(75);
     ccont->moveDistance(5_in);
     intake->moveVelocity(200);
     lift->setTarget(0);
@@ -199,7 +199,7 @@ void four_floor_small() {
     ccont->moveDistance(-5.5 * inch);
 
     lift->setTarget(-(24.7 * 18.1123));
-    ccont->setMaxVelocity(75);
+    ccont->getModel()->setMaxVelocity(75);
     ccont->turnAngle(90_deg);
     lift->waitUntilSettled();
     ccont->moveDistance(7_in);
@@ -213,7 +213,7 @@ void four_floor_small() {
     ccont->moveDistance(-7_in);
     lift->setTarget(0);
     lift->waitUntilSettled();
-    ccont->setMaxVelocity(150);
+    ccont->getModel()->setMaxVelocity(150);
     ccont->moveDistance(-13_in);
     ccont->turnAngle(90_deg);
     ccont->moveDistance(4_in);
@@ -269,7 +269,7 @@ void auton_safety(void* param) {
         if (max_speed > 150)
             max_speed = 150;
         chassis.modify_profiled_velocity(max_speed);
-        ccont->setMaxVelocity(max_speed);
+        ccont->getModel()->setMaxVelocity(max_speed);
 
         pros::delay(20);
     }
@@ -277,18 +277,17 @@ void auton_safety(void* param) {
 
 void init_autonomous() {
 
-    ccont = std::static_pointer_cast<okapi::ChassisControllerIntegrated>(
-        ChassisControllerBuilder()
-            .withMotors({ static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) },
-                { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) })
+    ccont = ChassisControllerBuilder()
+            .withMotors({left_port,lefttwo_port},
+                {right_port,righttwo_port})
             .withGearset(AbstractMotor::gearset::green)
             .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
-            .build());
+            .build();
 
-    intake = std::make_unique<okapi::MotorGroup>(MotorGroup({ static_cast<int8_t>(leftintake_port), static_cast<int8_t>(rightintake_port) }));
+    intake = std::make_unique<okapi::MotorGroup>(MotorGroup({leftintake_port,rightintake_port }));
 
     lift->flipDisable(true);
-    std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
+    auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("colour tile", colour_tile);
     configManager->register_auton("colour tile three pnt", colour_tile_3_point);
@@ -302,17 +301,17 @@ void init_autonomous() {
 }
 
 void autonomous() {
-    std::cerr << "Autons" << std::endl;
+
     PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
     PIDTuning turnTuning = PIDTuning(0.002, 0, 0);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
-        { static_cast<int8_t>(left_port), static_cast<int8_t>(lefttwo_port) });
+        {left_port, lefttwo_port });
     okapi::MotorGroup rightSide(
-        { static_cast<int8_t>(right_port), static_cast<int8_t>(righttwo_port) });
-    okapi::Motor strafeMotor(11);
+        {right_port,righttwo_port});
+    okapi::Motor strafeMotor(16);
 
     std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
         ChassisControllerHDrive(
