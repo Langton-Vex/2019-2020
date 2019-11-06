@@ -27,9 +27,9 @@ void Chassis::user_control() {
     int current_intake = peripherals->master_controller.get_digital(DIGITAL_L2);
     int current_eject = peripherals->master_controller.get_digital(DIGITAL_L1);
     if (current_intake)
-        strafe = -200;
+        strafe = -127;
     else if (current_eject)
-        strafe = 200;
+        strafe = 127;
     else
         strafe = 0;
 
@@ -78,7 +78,7 @@ void Chassis::set(int power, int turn, int strafe) {
     peripherals->lefttwo_mtr.move_velocity(left);
     peripherals->righttwo_mtr.move_velocity(right);
 
-    peripherals->strafe_mtr.move_velocity(strafe);
+    peripherals->strafe_mtr.move(strafe);
 
     std::string left_v = std::to_string(peripherals->left_mtr.get_actual_velocity());
     std::string right_v = std::to_string(peripherals->right_mtr.get_actual_velocity());
