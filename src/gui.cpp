@@ -8,7 +8,7 @@ std::shared_ptr<GUI> GUI::get() {
     return instance;
 }
 
-GUI::GUI() {};
+GUI::GUI(){};
 
 void GUI::gui_build() {
     lv_theme_set_current(th);

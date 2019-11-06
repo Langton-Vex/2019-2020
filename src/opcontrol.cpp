@@ -77,13 +77,12 @@ void opcontrol() {
     cc->waitUntilSettled();
     */
 
-  //cc->start_task();
-  //cc->driveStraight(5 * okapi::inch);
-  //cc->turnAngle(90 * okapi::degree);
+    //cc->start_task();
+    //cc->driveStraight(5 * okapi::inch);
+    //cc->turnAngle(90 * okapi::degree);
 
-
-  //cc->waitUntilSettled();
-  //cc->tune();
+    //cc->waitUntilSettled();
+    //cc->tune();
 
     pros::Task temp_task(set_temperature, nullptr, "temp_task");
     std::shared_ptr<Chassis> chassis = Chassis::get();
@@ -101,5 +100,4 @@ void opcontrol() {
 
         pros::delay(20);
     }
-
 }

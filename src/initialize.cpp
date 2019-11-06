@@ -7,14 +7,14 @@
  * to keep execution time for this mode under a few seconds.
  */
 
- extern const int8_t left_port = 20;
- extern const int8_t right_port = 17;
- extern const int8_t lefttwo_port = 19;
- extern const int8_t righttwo_port = 18;
- extern const int8_t leftintake_port = 3;
- extern const int8_t rightintake_port = 5;
- extern const int8_t leftarm_port = 1;
- extern const int8_t rightarm_port = 2;
+extern const int8_t left_port = 20;
+extern const int8_t right_port = 17;
+extern const int8_t lefttwo_port = 19;
+extern const int8_t righttwo_port = 18;
+extern const int8_t leftintake_port = 3;
+extern const int8_t rightintake_port = 5;
+extern const int8_t leftarm_port = 1;
+extern const int8_t rightarm_port = 2;
 
 std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
@@ -35,9 +35,9 @@ void initialize() {
                               .build();
     lift = std::dynamic_pointer_cast<okapi::AsyncPosIntegratedController>(lift_controller);
 
-    peripherals = std::make_unique<Peripherals_t>(left_port,right_port,
-      lefttwo_port, righttwo_port, leftintake_port, rightintake_port,
-      leftarm_port, rightarm_port);
+    peripherals = std::make_unique<Peripherals_t>(left_port, right_port,
+        lefttwo_port, righttwo_port, leftintake_port, rightintake_port,
+        leftarm_port, rightarm_port);
 
     pros::delay(20);
     lift->flipDisable(true);

@@ -278,13 +278,13 @@ void auton_safety(void* param) {
 void init_autonomous() {
 
     ccont = ChassisControllerBuilder()
-            .withMotors({left_port,lefttwo_port},
-                {right_port,righttwo_port})
-            .withGearset(AbstractMotor::gearset::green)
-            .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
-            .build();
+                .withMotors({ left_port, lefttwo_port },
+                    { right_port, righttwo_port })
+                .withGearset(AbstractMotor::gearset::green)
+                .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
+                .build();
 
-    intake = std::make_unique<okapi::MotorGroup>(MotorGroup({leftintake_port,rightintake_port }));
+    intake = std::make_unique<okapi::MotorGroup>(MotorGroup({ leftintake_port, rightintake_port }));
 
     lift->flipDisable(true);
     auto configManager = ConfigManager::get();
@@ -308,9 +308,9 @@ void autonomous() {
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
-        {left_port, lefttwo_port });
+        { left_port, lefttwo_port });
     okapi::MotorGroup rightSide(
-        {right_port,righttwo_port});
+        { right_port, righttwo_port });
     okapi::Motor strafeMotor(16);
 
     std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
