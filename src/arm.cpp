@@ -82,7 +82,7 @@ void Arm::user_control() {
 
     //double power_mult = 1;
     power = power /* * power_mult*/;
-    if (power > 5 || power < 5) {
+    if (abs(power) > 15) {
         if (!lift->isDisabled())
             lift->flipDisable(true);
 
