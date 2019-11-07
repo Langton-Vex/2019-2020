@@ -23,12 +23,12 @@ void set_temperature(void* param) {
 
     std::shared_ptr<GUI> gui = GUI::get();
     std::uint32_t now = pros::millis();
-    peripherals->master_controller.clear();
-    pros::delay(150);
+    peripherals->master_controller.set_text(0,0,"");
+    pros::delay(50);
     while (true) {
-        std::string temp = std::to_string((int)peripherals->leftarm_mtr.get_temperature());
-        temp.append(" celcius");
-        peripherals->master_controller.set_text(0, 1, temp.c_str());
+        std::string temp = "Arm: ";
+        temp.append(std::to_string((int)peripherals->leftarm_mtr.get_temperature()));
+        peripherals->master_controller.set_text(0,0, temp.c_str());
 
         std::string arm_pos_string = "Arm: ";
         arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));

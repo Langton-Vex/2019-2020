@@ -29,6 +29,8 @@ void init_autonomous(); // uh oh global space
 void initialize() {
     std::cerr << "Intializing" << std::endl;
     pros::delay(100);
+    peripherals->master_controller.set_text(0, 0, "");
+    pros::delay(50);
     ConfigManager::get()->load_config();
     // std::shared_ptr<okapi::AsyncPositionController<double, double>>
     auto lift_controller = okapi::AsyncPosControllerBuilder()
