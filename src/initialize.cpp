@@ -32,7 +32,7 @@ void initialize() {
     ConfigManager::get()->load_config();
     // std::shared_ptr<okapi::AsyncPositionController<double, double>>
     auto lift_controller = okapi::AsyncPosControllerBuilder()
-                               .withMotor({ leftarm_port, -rightarm_port })
+                               .withMotor({ leftarm_port, rightarm_port })
                                .build();
     lift = std::dynamic_pointer_cast<okapi::AsyncPosIntegratedController>(lift_controller);
 

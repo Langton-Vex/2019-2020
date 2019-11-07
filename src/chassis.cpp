@@ -24,8 +24,8 @@ void Chassis::user_control() {
 
     int strafe;
 
-    int current_intake = peripherals->master_controller.get_digital(DIGITAL_L2);
-    int current_eject = peripherals->master_controller.get_digital(DIGITAL_L1);
+    int current_intake = peripherals->master_controller.get_digital(DIGITAL_R2);
+    int current_eject = peripherals->master_controller.get_digital(DIGITAL_R1);
     if (current_intake)
         strafe = -127;
     else if (current_eject)
@@ -33,7 +33,7 @@ void Chassis::user_control() {
     else
         strafe = 0;
 
-    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_R1);
+    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_X);
     if (slowmode_button == 1)
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
