@@ -1,8 +1,8 @@
 
 
 #include "main.h"
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -39,8 +39,8 @@ void set_temperature(void* param) {
 
         double leftarm_pwr = peripherals->leftarm_mtr.get_power();
         double rightarm_pwr = peripherals->rightarm_mtr.get_power();
-        double smallest_arm_pwr = std::min(leftarm_pwr,rightarm_pwr);
-        double normalised_imbalance = (leftarm_pwr/smallest_arm_pwr) - (rightarm_pwr/smallest_arm_pwr);
+        double smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
+        double normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
 
         temp.append(std::to_string((int)arm_temp));
         std::stringstream stream;

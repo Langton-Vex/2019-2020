@@ -314,19 +314,18 @@ void autonomous() {
     okapi::Motor strafeMotor(16);
 
     // std::unique_ptr<ChassisControllerHDrive>
-    auto cc = std::make_unique<ChassisControllerHDrive>(
-        ChassisControllerHDrive(
+    ChassisControllerHDrive cc(
             straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
             leftSide, rightSide, strafeMotor,
             okapi::AbstractMotor::gearset::green,
             okapi::AbstractMotor::gearset::green,
             { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
-                okapi::imev5GreenTPR }));
+                okapi::imev5GreenTPR });
 
-    cc->start_task();
-    cc->driveStraight(5 * okapi::inch);
-    cc->turnAngle(90 * okapi::degree);
-    cc->waitUntilSettled();
+    cc.start_task();
+    cc.driveStraight(5 * okapi::inch);
+    cc.turnAngle(90 * okapi::degree);
+    cc.waitUntilSettled();
     /*
     if (configManager->auton_routines.size() > configManager->selected_auton) {
 

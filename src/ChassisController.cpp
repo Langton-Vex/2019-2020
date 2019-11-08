@@ -52,11 +52,13 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     disable_controllers();
 };
 
-/*
+
 ChassisControllerHDrive::~ChassisControllerHDrive() {
     disable_controllers();
+    stop_task();
+    // smart pointers should be automatically destroyed
 };
-*/
+
 
 void ChassisControllerHDrive::reset() {
     leftSideStart = leftSide->getPosition();
@@ -353,8 +355,10 @@ void ChassisControllerHDrive::start_task() {
     }
 };
 void ChassisControllerHDrive::stop_task() {
-    task->remove();
-    while (task->get_state() != pros::E_TASK_STATE_DELETED)
-        pros::delay(20);
-    task.reset();
+    if (task){
+      task->remove();
+      while (task->get_state() != pros::E_TASK_STATE_DELETED)
+          pros::delay(20);
+      task.reset();
+    }
 };

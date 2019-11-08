@@ -20,7 +20,7 @@ public:
         okapi::AbstractMotor::GearsetRatioPair istraightGearset,
         okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
         okapi::ChassisScales iscales);
-    //~ChassisController();
+    ~ChassisControllerHDrive();
     /* TODO: Make this controller use okapi's models
                            For cross robot compatability*/
 
