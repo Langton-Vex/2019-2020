@@ -1,7 +1,8 @@
 
 
 #include "main.h"
-
+#include <sstream>
+#include <iomanip>
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -23,23 +24,33 @@ void set_temperature(void* param) {
 
     std::shared_ptr<GUI> gui = GUI::get();
     std::uint32_t now = pros::millis();
-    peripherals->master_controller.set_text(0,0,"");
+    peripherals->master_controller.set_text(0, 0, "");
     pros::delay(50);
     while (true) {
         std::string temp = "Arm: ";
-        temp.append(std::to_string((int)peripherals->leftarm_mtr.get_temperature()));
-        peripherals->master_controller.set_text(0,0, temp.c_str());
-
         std::string arm_pos_string = "Arm: ";
+        std::string lift_imbalance_str = "Imbalance to the left: ";
+
         arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
 
-        gui->set_line(0, arm_pos_string);
-
         double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
-
         double arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
-
         double claw_temp = (peripherals->intake_mtr.get_temperature());
+
+        double leftarm_pwr = peripherals->leftarm_mtr.get_power();
+        double rightarm_pwr = peripherals->rightarm_mtr.get_power();
+        double smallest_arm_pwr = std::min(leftarm_pwr,rightarm_pwr);
+        double normalised_imbalance = (leftarm_pwr/smallest_arm_pwr) - (rightarm_pwr/smallest_arm_pwr);
+
+        temp.append(std::to_string((int)arm_temp));
+        std::stringstream stream;
+        stream << lift_imbalance_str << std::fixed << std::setprecision(2) << normalised_imbalance;
+        lift_imbalance_str = stream.str();
+
+        peripherals->master_controller.set_text(0, 0, temp.c_str());
+
+        gui->set_line(0, arm_pos_string);
+        gui->set_line(1, lift_imbalance_str);
 
         lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);
         lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);
