@@ -26,6 +26,7 @@ void set_temperature(void* param) {
     std::uint32_t now = pros::millis();
     peripherals->master_controller.set_text(0, 0, "");
     pros::delay(50);
+
     while (true) {
         std::string temp = "Arm: ";
         std::string arm_pos_string = "Arm: ";
@@ -56,7 +57,7 @@ void set_temperature(void* param) {
         lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);
         lv_gauge_set_value(gui->claw_temp_guage, 0, claw_temp);
 
-        pros::delay(123);
+        pros::delay(50);
     }
 }
 
