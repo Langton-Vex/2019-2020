@@ -302,9 +302,9 @@ void init_autonomous() {
 
 void autonomous() {
 
-    PIDTuning straightTuning = PIDTuning(0.001, 0.0, 0);
+    PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
-    PIDTuning turnTuning = PIDTuning(0.002, 0, 0);
+    PIDTuning turnTuning = PIDTuning(0.004, 0, 0);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
@@ -319,16 +319,16 @@ void autonomous() {
             leftSide, rightSide, strafeMotor,
             okapi::AbstractMotor::gearset::green,
             okapi::AbstractMotor::gearset::green,
-            { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
+            { { okapi::inch * 4.3, okapi::millimeter * 370, 150 * okapi::millimeter, okapi::inch * 4.3 },
                 okapi::imev5GreenTPR });
 
-    /*
     cc.start_task();
-    cc.driveStraight(5 * okapi::inch);
+    //cc.driveStraight(12 * okapi::inch);
     cc.turnAngle(90 * okapi::degree);
     cc.waitUntilSettled();
-    */
-    cc.tune();
+
+    //cc.start_task();
+    //cc.tune();
     /*
     if (configManager->auton_routines.size() > configManager->selected_auton) {
 

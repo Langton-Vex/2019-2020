@@ -39,6 +39,7 @@ public:
     static void trampoline(void* param);
 
     void asyncThread();
+    bool task_running = false;
 
     // I don't like weird constructors OK
 

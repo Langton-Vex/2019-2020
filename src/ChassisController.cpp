@@ -159,8 +159,8 @@ void ChassisControllerHDrive::tune() {
     std::shared_ptr<ChassisControllerHDrive> ct(this);
 
     auto StraightTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 1,
-        0, 0, 0, 0.001, 0.001, 0.001);
+        ct, ct, 1 * okapi::minute, 1000,
+        0, 0, 0,  0.001,  0,  0.001);
     auto AngleTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 1 * okapi::minute, 0,
         0, 0, 0, 0.001, 0.001, 0.001);
@@ -188,6 +188,7 @@ void ChassisControllerHDrive::tune() {
 }
 
 double ChassisControllerHDrive::controllerGet() {
+  fprintf(stderr,"stuff: %f\n",((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0);
     switch (tuningMode) {
     case TuningMode::TuneStraight:
         return ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
@@ -203,10 +204,6 @@ double ChassisControllerHDrive::controllerGet() {
 void ChassisControllerHDrive::controllerSet(double ivalue) {
     double leftVelocity = 0;
     double rightVelocity = 0;
-
-    double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
-    double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
-    double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
 
     if (tuningMode == TuningMode::TuneStraight) {
         //double angleOut = anglePID->step(angleChange);
@@ -224,9 +221,9 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
         leftVelocity = (double)straightGearset->internalGearset * (-ivalue);
         rightVelocity = (double)straightGearset->internalGearset * (ivalue);
     }
-
-    leftSide->moveVelocity(-1 * std::min((int)round(leftVelocity), maxVelocity));
-    rightSide->moveVelocity(-1 * std::min((int)round(rightVelocity), maxVelocity));
+    fprintf(stderr,"out: %d", std::min((int)round(leftVelocity), maxVelocity));
+    leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
+    rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {
@@ -253,6 +250,7 @@ bool ChassisControllerHDrive::waitUntilDistanceSettled() {
             return false;
         pros::delay(2);
     }
+    if ((mode.find(ControllerMode::straight) != mode.end()))
     mode.erase(ControllerMode::straight);
     return true;
 };
@@ -262,6 +260,7 @@ bool ChassisControllerHDrive::waitUntilTurnSettled() {
             return false;
         pros::delay(2);
     }
+    if ((mode.find(ControllerMode::turn) != mode.end()))
     mode.erase(ControllerMode::turn);
     return true;
 };
@@ -271,6 +270,7 @@ bool ChassisControllerHDrive::waitUntilStrafeSettled() {
             return false;
         pros::delay(2);
     }
+    if ((mode.find(ControllerMode::strafe) != mode.end()))
     mode.erase(ControllerMode::strafe);
     return true;
 };
@@ -341,14 +341,16 @@ void ChassisControllerHDrive::trampoline(void* param) {
 }
 
 void ChassisControllerHDrive::asyncThread() {
-    while (true) {
+    while (task_running) {
         this->step();
         pros::delay(this->asyncUpdateDelay);
+
     }
 }
 
 void ChassisControllerHDrive::start_task() {
     if (!task) {
+        task_running = true;
         task = std::make_unique<pros::Task>(pros::Task(trampoline, this,
             TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
             "Chassis Controller Async Task"));
@@ -356,6 +358,8 @@ void ChassisControllerHDrive::start_task() {
 };
 void ChassisControllerHDrive::stop_task() {
     if (task){
+      task_running = false;
+      pros::delay(this->asyncUpdateDelay);
       task->remove();
       while (task->get_state() != pros::E_TASK_STATE_DELETED)
           pros::delay(20);
