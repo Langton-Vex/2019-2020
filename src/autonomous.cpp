@@ -302,9 +302,9 @@ void init_autonomous() {
 
 void autonomous() {
 
-    PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
+    PIDTuning straightTuning = PIDTuning(0.003, 0.0, 0);
     PIDTuning angleTuning = PIDTuning(0, 0, 0);
-    PIDTuning turnTuning = PIDTuning(0.004, 0, 0);
+    PIDTuning turnTuning = PIDTuning(0.003, 0, 0);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
@@ -315,12 +315,12 @@ void autonomous() {
 
     // std::unique_ptr<ChassisControllerHDrive>
     ChassisControllerHDrive cc(
-            straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
-            leftSide, rightSide, strafeMotor,
-            okapi::AbstractMotor::gearset::green,
-            okapi::AbstractMotor::gearset::green,
-            { { okapi::inch * 4.3, okapi::millimeter * 370, 150 * okapi::millimeter, okapi::inch * 4.3 },
-                okapi::imev5GreenTPR });
+        straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
+        leftSide, rightSide, strafeMotor,
+        okapi::AbstractMotor::gearset::green,
+        okapi::AbstractMotor::gearset::green,
+        { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
+            okapi::imev5GreenTPR });
 
     cc.start_task();
     //cc.driveStraight(12 * okapi::inch);

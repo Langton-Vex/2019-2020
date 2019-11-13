@@ -25,7 +25,7 @@ public:
                            For cross robot compatability*/
 
     okapi::QAcceleration max_acceleration; // TODO: implement
-    std::unordered_set<ControllerMode> mode;
+    std::vector<ControllerMode> mode;
     TuningMode tuningMode;
     std::unique_ptr<pros::Task> task;
     int asyncUpdateDelay = 20;
