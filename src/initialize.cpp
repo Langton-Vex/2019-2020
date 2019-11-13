@@ -41,7 +41,7 @@ void initialize() {
         lefttwo_port, righttwo_port, intake_port, strafe_port,
         leftarm_port, rightarm_port);
 
-    peripherals->master_controller.set_text(0, 0, "");
+    peripherals->master_controller.print(0, 0, "\0");
     pros::delay(20);
     lift->flipDisable(true);
     init_autonomous();

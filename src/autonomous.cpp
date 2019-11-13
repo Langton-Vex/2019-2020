@@ -322,10 +322,13 @@ void autonomous() {
             { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
                 okapi::imev5GreenTPR });
 
+    /*
     cc.start_task();
     cc.driveStraight(5 * okapi::inch);
     cc.turnAngle(90 * okapi::degree);
     cc.waitUntilSettled();
+    */
+    cc.tune();
     /*
     if (configManager->auton_routines.size() > configManager->selected_auton) {
 

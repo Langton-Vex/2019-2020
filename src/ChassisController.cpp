@@ -303,8 +303,8 @@ void ChassisControllerHDrive::step() {
         double straightOut = straightPID->step(distance_forward);
         double angleOut = anglePID->step(angleChange);
 
-        leftVelocity += (double)straightGearset->internalGearset * (straightOut - angleOut);
-        rightVelocity += (double)straightGearset->internalGearset * (straightOut + angleOut);
+        leftVelocity += (double)straightGearset->internalGearset * (straightOut + angleOut);
+        rightVelocity += (double)straightGearset->internalGearset * (straightOut - angleOut);
 
         //printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
     }

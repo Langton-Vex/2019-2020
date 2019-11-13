@@ -20,45 +20,38 @@
 extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, intake_port, strafe_port;
 
-void set_temperature(void* param) {
+void set_temperature() {
 
-    std::shared_ptr<GUI> gui = GUI::get();
-    std::uint32_t now = pros::millis();
-    peripherals->master_controller.set_text(0, 0, "");
-    pros::delay(50);
+  std::shared_ptr<GUI> gui = GUI::get();
 
-    while (true) {
-        std::string temp = "Arm: ";
-        std::string arm_pos_string = "Arm: ";
-        std::string lift_imbalance_str = "Imbalance to the left: ";
+  std::string temp = "Arm: ";
+  std::string arm_pos_string = "Arm: ";
+  std::string lift_imbalance_str = "Imbalance to the left: ";
 
-        arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
+  arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
 
-        double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
-        double arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
-        double claw_temp = (peripherals->intake_mtr.get_temperature());
+  double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
+  double arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
+  double claw_temp = (peripherals->intake_mtr.get_temperature());
 
-        double leftarm_pwr = peripherals->leftarm_mtr.get_power();
-        double rightarm_pwr = peripherals->rightarm_mtr.get_power();
-        double smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
-        double normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
+  double leftarm_pwr = peripherals->leftarm_mtr.get_power();
+  double rightarm_pwr = peripherals->rightarm_mtr.get_power();
+  double smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
+  double normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
 
-        temp.append(std::to_string((int)arm_temp));
-        std::stringstream stream;
-        stream << lift_imbalance_str << std::fixed << std::setprecision(2) << normalised_imbalance;
-        lift_imbalance_str = stream.str();
+  temp.append(std::to_string((int)arm_temp));
+  std::stringstream stream;
+  stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;
+  lift_imbalance_str = stream.str();
 
-        peripherals->master_controller.set_text(0, 0, temp.c_str());
+  peripherals->master_controller.set_text(0, 0, temp.c_str());
 
-        gui->set_line(0, arm_pos_string);
-        gui->set_line(1, lift_imbalance_str);
+  gui->set_line(0, arm_pos_string);
+  gui->set_line(1, lift_imbalance_str);
 
-        lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);
-        lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);
-        lv_gauge_set_value(gui->claw_temp_guage, 0, claw_temp);
-
-        pros::delay(50);
-    }
+  lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);
+  lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);
+  lv_gauge_set_value(gui->claw_temp_guage, 0, claw_temp);
 }
 
 void opcontrol() {
@@ -97,11 +90,12 @@ void opcontrol() {
     //cc->waitUntilSettled();
     //cc->tune();
 
-    pros::Task temp_task(set_temperature, nullptr, "temp_task");
+    //pros::Task temp_task(set_temperature, nullptr, "temp_task");
     std::shared_ptr<Chassis> chassis = Chassis::get();
     std::shared_ptr<Arm> arm = Arm::get();
     std::shared_ptr<Claw> claw = Claw::get();
 
+    int it = 50;
     while (true) {
         //lv_ta_add_text(GUI::get()->console_box,std::to_string(pros::millis()).c_str());
         //cc->step();
@@ -110,6 +104,10 @@ void opcontrol() {
         arm->user_control();
         chassis->user_control();
         claw->user_control();
+
+        it--;
+        if (it == 49) set_temperature();
+        if (it == 0) it = 50;
 
         pros::delay(20);
     }

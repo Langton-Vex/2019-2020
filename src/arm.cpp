@@ -2,6 +2,10 @@
 #include <sstream>
 
 const double max_height = -850;
+const int pot_min = 1642;
+const char pot_port = 'A';
+
+pros::ADIAnalogIn pot(pot_port);
 
 using namespace okapi;
 
