@@ -157,16 +157,16 @@ void ChassisControllerHDrive::tune() {
     std::shared_ptr<ChassisControllerHDrive> ct(this);
     //P,P, I, I, D, D
     auto StraightTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 1000,
+        ct, ct, 10 * okapi::second, 1000,
         0, 0.001, 0, 0, 0, 0.001);
     auto AngleTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 0,
+        ct, ct, 10 * okapi::second, 0,
         0, 0.001, 0, 0, 0, 0.001);
     auto TurnTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 1,
+        ct, ct, 10 * okapi::second, 1,
         0, 0.001, 0, 0, 0, 0.001);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 1 * okapi::minute, 1,
+        ct, ct, 30 * okapi::second, 1,
         0, 0.001, 0, 0, 0, 0.001);
 
     tuningMode = TuningMode::TuneStraight;
@@ -241,7 +241,7 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {
-    std::remove_if(mode.begin(), mode.end(), [this](ControllerMode a) {
+    std::remove_if(mode.begin(), mode.end(), [&,this](ControllerMode a) {
         if (a == ControllerMode::straight)
             return waitUntilDistanceSettled();
         if (a == ControllerMode::turn)
@@ -255,7 +255,7 @@ void ChassisControllerHDrive::waitUntilSettled() {
 };
 
 bool ChassisControllerHDrive::waitUntilDistanceSettled() {
-    while (!straightPID->isSettled() || !turnPID->isSettled()) { // Boolean logic is weird
+    while (!straightPID->isSettled() || !anglePID->isSettled()) { // Boolean logic is weird
         pros::delay(2);
     }
     return true;
