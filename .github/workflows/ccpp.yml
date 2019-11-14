@@ -18,13 +18,5 @@ jobs:
       run: arm-none-eabi-gcc --version 
     - name: make 
       run: make 
-  lint:
-    name: clang-format Code Formatter
-    runs-on: ubuntu-latest
-    steps:
-    - name: Clang Code Formatter
-      uses: antoinealb/clang-format-action@clang9
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
   
