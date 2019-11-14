@@ -241,7 +241,7 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {
-    std::remove_if(mode.begin(), mode.end(), [&,this](ControllerMode a) {
+    std::remove_if(mode.begin(), mode.end(), [&, this](ControllerMode a) {
         if (a == ControllerMode::straight)
             return waitUntilDistanceSettled();
         if (a == ControllerMode::turn)
