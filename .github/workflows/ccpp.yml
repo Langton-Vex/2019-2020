@@ -10,7 +10,10 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: download toolchain
-      run: sudo apt-get install gcc-arm-none-eabi
+      run: |
+        sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
+        sudo apt-get update
+        sudo apt-get install gcc-arm-embedded
     - name: test gcc
       run: arm-none-eabi-gcc --version 
     - name: make 
