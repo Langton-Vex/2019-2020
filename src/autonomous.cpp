@@ -325,7 +325,7 @@ void autonomous() {
     cc.start_task();
     //cc.driveStraight(12 * okapi::inch);
     cc.turnAngle(90 * okapi::degree);
-    cc.waitUntilSettled();
+    //cc.waitUntilSettled();
 
     //cc.start_task();
     //cc.tune();

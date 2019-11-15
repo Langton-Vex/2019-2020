@@ -241,21 +241,23 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {
-    std::remove_if(mode.begin(), mode.end(), [this](ControllerMode a) {
-        if (a == ControllerMode::straight){
-            fprintf(stderr,"waiting for straight");
-            return waitUntilDistanceSettled();
-          }
-        if (a == ControllerMode::turn){
-            fprintf(stderr,"waiting for turn");
-            return waitUntilTurnSettled();
-          }
-        if (a == ControllerMode::strafe){
-            fprintf(stderr,"waiting for strafe");
-            return waitUntilStrafeSettled();
-          }
-        return false; // What to do here?
-    });
+    if (mode.size() > 0) {
+        std::remove_if(mode.begin(), mode.end(), [this](ControllerMode a) {
+            if (a == ControllerMode::straight) {
+                fprintf(stderr, "waiting for straight");
+                return waitUntilDistanceSettled();
+            }
+            if (a == ControllerMode::turn) {
+                fprintf(stderr, "waiting for turn");
+                return waitUntilTurnSettled();
+            }
+            if (a == ControllerMode::strafe) {
+                fprintf(stderr, "waiting for strafe");
+                return waitUntilStrafeSettled();
+            }
+            return false; // What to do here?
+        });
+    }
     // finally:
     disable_controllers();
 };
