@@ -5,7 +5,7 @@
         "target": "v5",
         "templates": {
             "kernel": {
-                "location": "C:\\Users\\Joshua\\AppData\\Roaming\\PROS\\templates\\kernel@3.2.0",
+                "location": "C:\\Users\\Administrator\\AppData\\Roaming\\PROS\\templates\\kernel@3.2.0",
                 "metadata": {
                     "cold_addr": "58720256",
                     "cold_output": "bin/cold.package.bin",
@@ -149,7 +149,7 @@
                 "version": "3.2.0"
             },
             "okapilib": {
-                "location": "C:\\Users\\Joshua\\AppData\\Roaming\\PROS\\templates\\okapilib@4.0.0-RC8",
+                "location": "C:\\Users\\Administrator\\AppData\\Roaming\\PROS\\templates\\okapilib@4.0.0-RC8",
                 "metadata": {
                     "origin": "local"
                 },
@@ -285,7 +285,7 @@
         },
         "upload_options": {
             "compress_bin": true,
-            "description": "Created with PROS",
+            "description": "Literally epic epic",
             "remote_name": "PROS test",
             "slot": 1
         }
