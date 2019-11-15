@@ -39,12 +39,11 @@ void set_temperature() {
     double smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
     double normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
 
-    temp.append(std::to_string((int)arm_temp));
     std::stringstream stream;
     stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;
     lift_imbalance_str = stream.str();
 
-    peripherals->master_controller.set_text(0, 0, temp.c_str());
+    peripherals->master_controller.print(0, 0, "A:%d;C:%d", (int)arm_temp, (int)chassis_temp);
 
     gui->set_line(0, arm_pos_string);
     gui->set_line(1, lift_imbalance_str);
