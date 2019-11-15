@@ -157,17 +157,17 @@ void ChassisControllerHDrive::tune() {
     std::shared_ptr<ChassisControllerHDrive> ct(this);
     //P,P, I, I, D, D
     auto StraightTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 10 * okapi::second, 1000,
-        0, 0.001, 0, 0, 0, 0.001);
+        ct, ct, 10 * okapi::second, 5000,
+        0.0005, 0.003, 0, 0, 0, 0.0005);
     auto AngleTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 10 * okapi::second, 0,
-        0, 0.001, 0, 0, 0, 0.001);
+        0.0005, 0.001, 0, 0, 0, 0.001);
     auto TurnTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 10 * okapi::second, 1,
-        0, 0.001, 0, 0, 0, 0.001);
+        ct, ct, 10 * okapi::second, 5000,
+        0.0005, 0.003, 0, 0, 0, 0.001);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 30 * okapi::second, 1,
-        0, 0.001, 0, 0, 0, 0.001);
+        ct, ct, 30 * okapi::second, 5000,
+        0.0005, 0.003, 0, 0, 0, 0.001);
 
     tuningMode = TuningMode::TuneStraight;
     okapi::PIDTuner::Output straightTune = StraightTuner->autotune();

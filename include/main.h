@@ -60,8 +60,6 @@
  * button press in opcontrol() for testing purposes).
  */
 
-#include <memory>
-#include <unordered_set>
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,6 +73,8 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
+#include <memory>
+#include <unordered_set>
 /**
  * You can add C++-only headers here
  */
