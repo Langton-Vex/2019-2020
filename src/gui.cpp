@@ -125,6 +125,16 @@ void GUI::build_main(lv_obj_t* parent) {
     lv_label_set_long_mode(side_label, LV_LABEL_LONG_EXPAND);
     lv_label_set_text(side_label, "Team\ncolour");
     lv_obj_align(side_label, side, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+    /*
+    lv_obj_t* goto_start = lv_btn_create(h, NULL);
+    lv_btnm_set_action(goto_start, goto_start_cb);
+    lv_obj_align(goto_start, side, LV_ALIGN_OUT_LEFT_MID, -50, 0);
+
+    lv_obj_t* goto_start_label = lv_label_create(h, NULL);
+    lv_label_set_long_mode(goto_start_label, LV_LABEL_LONG_EXPAND);
+    lv_label_set_text(goto_start_label, "Goto\nStart");
+    lv_obj_align(goto_start_label, goto_start, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+    */
 }
 
 void GUI::build_console(lv_obj_t* parent) {
