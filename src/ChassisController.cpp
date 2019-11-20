@@ -1,6 +1,22 @@
 #include "main.h"
 #include <vector>
 
+/* TODO:
+   * Probably need to split this class into multiple files, because it's getting huge
+   * Get the PID control working obviously.
+   * Get odom working, and well, probably with tracking wheels if we can.
+   * Add motion profiling? (oh god)
+   * clean up some of the code.
+   * Double check logic so that it all works as expected.
+*/
+
+/* Remember with this controller that if you are doing two movements
+ * Consecutively, you must WaitUntilSettled between them or it will try to move
+ * To an absolute position!
+ * This can't be fixed between now and the next competition lol, not sure how
+ * I would even fix this
+ * Just make sure that you don't do anything to complicated
+ */
 ChassisControllerHDrive::ChassisControllerHDrive(
     PIDTuning straightTuning, PIDTuning angleTuning,
     PIDTuning turnTuning, PIDTuning strafeTuning,
@@ -83,6 +99,7 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     //disable_controllers();
     straightPID->flipDisable(false);
     anglePID->flipDisable(false);
+    mode.push_back(ControllerMode::straight);
 
     reset();
     mode.push_back(ControllerMode::straight);
@@ -98,7 +115,6 @@ void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
 void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     //disable_controllers();
     turnPID->flipDisable(false);
-    reset();
     mode.push_back(ControllerMode::turn);
 
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
@@ -111,7 +127,6 @@ void ChassisControllerHDrive::strafe(okapi::QLength distance) {
 void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
     //disable_controllers();
     strafePID->flipDisable(false);
-    reset();
     mode.push_back(ControllerMode::strafe);
 
     strafePID->setTarget(
@@ -272,7 +287,7 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {
-    if (mode.size() > 0) {
+    if (!mode.empty()) {
         std::remove_if(mode.begin(), mode.end(), [this](ControllerMode a) {
             if (a == ControllerMode::straight) {
                 fprintf(stderr, "waiting for straight");
@@ -298,18 +313,22 @@ bool ChassisControllerHDrive::waitUntilDistanceSettled() {
     while (!straightPID->isSettled() || !anglePID->isSettled()) { // Boolean logic is weird
         pros::delay(2);
     }
+    straightPID->flipDisable(true);
+    anglePID->flipDisable(true);
     return true;
 };
 bool ChassisControllerHDrive::waitUntilTurnSettled() {
     while (!turnPID->isSettled()) {
         pros::delay(2);
     }
+    turnPID->flipDisable(true);
     return true;
 };
 bool ChassisControllerHDrive::waitUntilStrafeSettled() {
     while (!strafePID->isSettled()) {
         pros::delay(2);
     }
+    strafePID->flipDisable(true);
     return true;
 };
 
