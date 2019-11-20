@@ -1,7 +1,5 @@
 #include "main.h"
 
-extern Chassis chassis;
-
 // The autonomous framework that is a godsend
 using namespace okapi;
 
@@ -18,8 +16,8 @@ const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 
 std::shared_ptr<okapi::ChassisController> ccont;
-
 std::shared_ptr<Motor> intake;
+std::shared_ptr<ChassisControllerHDrive> cc;
 
 extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
@@ -28,7 +26,7 @@ void lift_stack(int cubes) {
     lift->setTarget(-108);
     intake->moveVelocity(-200);
     pros::delay(1500);
-    lift->setTarget(lift->getTarget() + -(18.45 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
+    lift->setTarget(lift->getTarget() + (18.45 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
     lift->waitUntilSettled(); // Perfect stacking speeds from 4 inches up
     intake->moveVelocity(0);
     lift->setMaxVelocity(100);
@@ -40,240 +38,61 @@ void near_small() {
     ccont->moveDistance(-18_in);
 }
 
-// Starts pointing towards singular cube one tile left of large goal zone
-void colour_tile() {
-
-    ccont->getModel()->setMaxVelocity(150);
-    int side = ConfigManager::get()->selected_team;
-    lift->setMaxVelocity(200);
-
-    lift->setTarget(-148);
-    ccont->getModel()->setMaxVelocity(100);
-    ccont->moveDistanceAsync(11.2 * inch);
-    lift->waitUntilSettled();
-    ccont->waitUntilSettled();
-    lift->setMaxVelocity(100);
-    //ccont->turnAngle(-110_deg);
-    //ccont->moveDistance(5_in);
-
-    intake->moveVelocity(200);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    lift->setTarget(-100);
-    pros::delay(1000);
-    //pros::delay(500); // TODO: This defo needs changing
-    //intake->moveVelocity(0);
-    //lift->setTarget(-200);
-    //lift->waitUntilSettled();
-
-    ccont->moveDistance(-7.5 * inch);
-    intake->moveVelocity(0);
-    ccont->turnAngle(100_deg * side);
-    ccont->moveDistance(38_in);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    lift_stack(2);
-
-    lift->setMaxVelocity(100);
-    ccont->getModel()->setMaxVelocity(100);
-    ccont->moveDistance(-17 * inch);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-}
-
-void colour_tile_3_point() {
-
-    ccont->getModel()->setMaxVelocity(150);
-    int side = ConfigManager::get()->selected_team;
-    lift->setMaxVelocity(200);
-
-    lift->setTarget(-108);
-    ccont->getModel()->setMaxVelocity(100);
-    ccont->moveDistanceAsync(11.5 * inch);
-    ccont->waitUntilSettled();
-    lift->setMaxVelocity(100);
-    //ccont->turnAngle(-110_deg);
-    //ccont->moveDistance(5_in);
-
-    intake->moveVelocity(200);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    lift->setTarget(-100);
-    pros::delay(1000);
-    //pros::delay(500); // TODO: This defo needs changing
-    //intake->moveVelocity(0);
-    //lift->setTarget(-200);
-    //lift->waitUntilSettled();
-
-    ccont->moveDistance(3.5 * inch);
-    ccont->turnAngle(90_deg * side);
-    lift->setMaxVelocity(200);
-    lift->setTarget(-148);
-    ccont->moveDistance(19 * inch);
-    lift->setMaxVelocity(100);
-
-    intake->moveVelocity(200);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    pros::delay(750);
-    //lift->setTarget(-100);
-
-    ccont->moveDistance(3 * inch);
-    ccont->turnAngle(55_deg * side);
-    ccont->moveDistance(20_in);
-
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    lift_stack(3);
-
-    lift->setMaxVelocity(100);
-    ccont->getModel()->setMaxVelocity(75);
-    ccont->moveDistance(-17 * inch);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-}
-
-/* This starts with the left side of the robot in line with the middle of
-cube to the right of the medium sized tower */
-void four_stack() {
-    int side = ConfigManager::get()->selected_team;
-    lift->setMaxVelocity(100);
-
-    ccont->moveDistance(20_in);
-    ccont->moveDistance(-5.5 * inch);
-    ccont->turnAngle(-90_deg * side);
-
-    lift->setTarget(-(24.7 * 18.1123));
-    lift->waitUntilSettled();
-    ccont->getModel()->setMaxVelocity(75);
-    ccont->moveDistance(7_in);
-    intake->moveVelocity(-200);
-    lift->setTarget(lift->getTarget() - (18.1123 * 4));
-    pros::delay(1200);
-    lift->waitUntilSettled();
-    intake->moveVelocity(0);
-    ccont->getModel()->setMaxVelocity(25);
-    ccont->moveDistance(-6_in);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    ccont->getModel()->setMaxVelocity(150);
-
-    ccont->turnAngle(90_deg * side);
-    ccont->moveDistance(13_in);
-    ccont->turnAngle(90_deg * side);
-    ccont->moveDistance(12.5 * inch);
-    lift->setTarget(-(18 * 18.1123));
-    ccont->turnAngle(-90_deg * side);
-    ccont->moveDistance(6_in);
-    lift->waitUntilSettled();
-    intake->moveVelocity(200);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    ccont->turnAngle(90_deg * side);
-    ccont->moveDistance(32_in);
-    ccont->turnAngle(80_deg * side);
-    ccont->moveDistance(20_in);
-}
-
-void four_stack_only() {
-    int side = ConfigManager::get()->selected_team;
-    lift->setMaxVelocity(100);
-
-    ccont->moveDistance(22 * inch);
-    lift->setTarget(-(18 * 18.1123));
-    lift->waitUntilSettled();
-    ccont->getModel()->setMaxVelocity(75);
-    ccont->moveDistance(5_in);
-    intake->moveVelocity(200);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    ccont->turnAngle(90_deg * side);
-    ccont->moveDistance(32_in);
-    ccont->turnAngle(80_deg * side);
-    ccont->moveDistance(32_in);
-}
-/* This autonomous starts with the right side of the robot lined up with the
-   middle of the left mid tower cube */
-void four_floor_small() {
-    ccont->moveDistance(20_in);
-    ccont->moveDistance(-5.5 * inch);
-
-    lift->setTarget(-(24.7 * 18.1123));
-    ccont->getModel()->setMaxVelocity(75);
-    ccont->turnAngle(90_deg);
-    lift->waitUntilSettled();
-    ccont->moveDistance(7_in);
-    intake->moveVelocity(-200);
-
-    ccont->moveDistance(3_in);
-    intake->moveVelocity(-200);
-    lift->setTarget(lift->getTarget() - (18.1123 * 1.5));
-    pros::delay(1200);
-    lift->waitUntilSettled();
-    ccont->moveDistance(-7_in);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    ccont->getModel()->setMaxVelocity(150);
-    ccont->moveDistance(-13_in);
-    ccont->turnAngle(90_deg);
-    ccont->moveDistance(4_in);
-    ccont->turnAngle(90_deg);
-    ccont->moveDistance(15_in);
-    ccont->turnAngle(90_deg);
-
-    intake->moveVelocity(200);
-    for (int i = 0; i < 4; i++) {
-        lift->setTarget(-108);
-        lift->waitUntilSettled();
-        ccont->moveDistance(5.5 * inch);
-        lift->setTarget(0);
-        pros::delay(1200);
-    }
-
-    ccont->moveDistance(-35_in);
-    ccont->turnAngle(-100_deg);
-    ccont->moveDistance(14_in);
-}
-
-//  starts in line with the 4 floor cubes
-void simple_four_floor() {
-    lift->setTarget(-(5.5 * 18.1123));
-    ccont->moveDistance(17.15_in);
-    intake->moveVelocity(200);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    lift->setTarget(-(5.5 * 18.1123));
-    ccont->moveDistance(5.5_in);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    ccont->moveDistance(-3_in);
-    ccont->turnAngle(-135_deg);
-    lift->setTarget(-(28.5 * 18.1123));
-    lift_stack(3);
-}
 void do_nothing() {
     pros::delay(5000);
 };
 
 void move_15() {
-    lift->setTarget(-800);
+    lift->setTarget(800);
     ccont->moveDistance(15_in);
     ccont->moveDistance(-15_in);
 }
 
-void auton_safety(void* param) {
-    while (true) {
-        double power_mult = chassis.power_mult_calc();
-        //printf("power mult: %f\n",power_mult);
-        int max_speed = 150 * round(power_mult);
-        if (max_speed > 150)
-            max_speed = 150;
-        chassis.modify_profiled_velocity(max_speed);
-        ccont->getModel()->setMaxVelocity(max_speed);
+void three_cubes(){
+    auto i = Claw::get();
+    int side = ConfigManager::get()->selected_team;
 
-        pros::delay(20);
-    }
+    // Pick up preload
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    i->set(-127);
+    //intake->moveVelocity(-200);
+    pros::delay(1000); // make this some kinda distance based.
+
+    // drive to first cube and pickup
+    lift->setTarget(18.45 * 5.5); // TODO: make pot based!!
+    cc->driveStraight(31.5 * okapi::centimeter);
+    lift->setTarget(0);
+    pros::delay(200);
+    i->set(127);
+    lift->waitUntilSettled();
+    i->set(-127);
+    pros::delay(500);
+
+    // move arm up, drive to second cube
+    lift->setTarget(18.45 * 5.5);
+    cc->turnAngle(90*okapi::degree);
+    cc->driveStraight(22 * okapi::centimeter);
+
+    // Pickup second cube
+    lift->setTarget(0);
+    pros::delay(200);
+    i->set(127);
+    lift->waitUntilSettled();
+    i->set(-127);
+    pros::delay(500);
+
+    // Drive to scoring zone, place cubes, move out of the way a bit
+    lift->setTarget(18.45 * 5.5);
+    cc->turnAngle(25*okapi::degree);
+    cc->driveStraight(53*okapi::centimeter);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    i->set(127);
+    lift->setTarget(18.45 * 5.5);
+    lift->waitUntilSettled();
 }
+
 
 void init_autonomous() {
 
@@ -289,18 +108,29 @@ void init_autonomous() {
     lift->flipDisable(true);
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
-    configManager->register_auton("colour tile", colour_tile);
-    configManager->register_auton("colour tile three pnt", colour_tile_3_point);
     configManager->register_auton("do nothing", do_nothing);
-    configManager->register_auton("four stack grab", four_stack);
-    configManager->register_auton("four floor small", four_floor_small);
-    configManager->register_auton("four floor simple", simple_four_floor);
-    configManager->register_auton("four stack only", four_stack_only);
+
+    configManager->register_auton("three cubes", three_cubes);
 
     configManager->register_auton("Move 15", move_15);
 }
 
+void auton_cleanup(void* param){
+  pros::c::task_notify_take(true, TIMEOUT_MAX);
+
+  lift->flipDisable(true);
+  if (cc){
+    cc->stop_task();
+    cc->reset();
+  }
+}
+
 void autonomous() {
+    auto our_cleanup_task = pros::Task(auton_cleanup, NULL, TASK_PRIORITY_DEFAULT,
+                              TASK_STACK_DEPTH_DEFAULT, "Auton cleanup");
+
+    pros::c::task_notify_when_deleting(CURRENT_TASK, our_cleanup_task,0,
+                              pros::E_NOTIFY_ACTION_NONE);
 
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
@@ -311,75 +141,34 @@ void autonomous() {
         { left_port, lefttwo_port });
     okapi::MotorGroup rightSide(
         { right_port, righttwo_port });
-    okapi::Motor strafeMotor(16);
+    okapi::Motor strafeMotor(strafe_port);
 
     // std::unique_ptr<ChassisControllerHDrive>
-    ChassisControllerHDrive cc(
-        straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
-        leftSide, rightSide, strafeMotor,
-        okapi::AbstractMotor::gearset::green,
-        okapi::AbstractMotor::gearset::green,
-        { { okapi::inch * 4.125, 15.1 * okapi::inch, 0 * okapi::millimeter, okapi::inch * 4.125 },
-            okapi::imev5GreenTPR });
+    cc = std::make_unique<ChassisControllerHDrive>(
+        straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning, // Tunings
+        leftSide, rightSide, strafeMotor, // left mtr, right mtr, strafe mtr
+        okapi::AbstractMotor::gearset::green, // swerve steer gearset
+        okapi::AbstractMotor::gearset::green, // strafe gearset
+        okapi::ChassisScales(
+          {{ okapi::inch * 4.125, 15.1 * okapi::inch,  // wheel diam, wheelbase diam
+          0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+            okapi::imev5GreenTPR })
+        );
 
-    /*
-    cc.start_task();
-    cc.driveStraight(24 * okapi::inch);
-    //pros::delay(5000);
-    cc.turnAngle(180 * okapi::degree);
-    cc.driveStraight(24 * okapi::inch);
-    cc.turnAngle(180 * okapi::degree);
-    cc.stop_task();
-    //cc.waitUntilSettled();
-    */
-    cc.start_task();
     //cc.tune();
-    /*
-    intake->moveVelocity(200);
-    pros::delay(500);
-    lift->setTarget(lift->getTarget() + -(18.45 * 5.5 * 1));
-    cc.driveStraight(19 * okapi::centimeter);
-    lift->waitUntilSettled();
-    intake->moveVelocity(-200);
-    pros::delay(250);
-    */
-    auto i = Claw::get();
-    lift->setTarget(0);
-    i->set(200);
-    pros::delay(1000);
-    //lift->setTarget(lift->getTarget() + -(18.45 * 5.5 * 1));
-    lift->setTarget(-10000);
-    lift->waitUntilSettled();
-    cc.driveStraight(31.5 * okapi::centimeter);
-    cc.turnAngle(90*okapi::degree);
-    cc.driveStraight(22 * okapi::centimeter);
-    lift->setTarget(0);
-    i->set(-200);
-    lift->waitUntilSettled();
-    i->set(200);
-    pros::delay(500);
-    cc.turnAngle(25*okapi::degree);
-    cc.driveStraight(55*okapi::centimeter);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
 
-    //std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
-    /*
+    // Run your standard auton
+    std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
+
     if (configManager->auton_routines.size() > configManager->selected_auton) {
-
-        //pros::Task auton_task(auton_safety, nullptr, "autonsafety_task");
-
         auton_routine routine = configManager->auton_routines[configManager->selected_auton];
+        cc->start_task();
         lift->flipDisable(false);
-        routine(); // nullptr could happen :o
+        routine(); // nullptr could happen, lets hope it doesn't :o
         lift->flipDisable(true);
+        cc->stop_task();
         //auton_task.remove();
     } else {
         printf("Selected auton is greater than amount of autons");
     }
-    */
-
-/*
-
-*/
 }

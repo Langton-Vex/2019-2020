@@ -8,6 +8,9 @@
    * Add motion profiling? (oh god)
    * clean up some of the code.
    * Double check logic so that it all works as expected.
+   * Take the tuner function and make it a lot more flexible, i.e if it were in
+     A cold package / library, make each element toggleable, ranges tweakable, etc.
+     Current solution of updating tuning function is a little hacky.
 */
 
 /* Remember with this controller that if you are doing two movements

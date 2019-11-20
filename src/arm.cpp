@@ -43,15 +43,17 @@ void Arm::user_control() {
     //int block_down = peripherals->master_controller.get_digital_new_press(DIGITAL_R2);
 
     bool tare = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
-    bool stack = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
+    //bool stack = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
 
     if (tare) {
         peripherals->leftarm_mtr.tare_position();
         peripherals->rightarm_mtr.tare_position();
     }
+    /*
     if (stack) {
         lift_stack(4);
     }
+    */
     /*
     if (arm_up && (current_major_position <= 3)) {
         current_major_position++;
@@ -100,8 +102,8 @@ void Arm::user_control() {
 
 void Arm::set(int power) {
     //if (abs(power) < 10) power = 5;
-    peripherals->leftarm_mtr.move(-power);
-    peripherals->rightarm_mtr.move(-power);
+    peripherals->leftarm_mtr.move(power);
+    peripherals->rightarm_mtr.move(power);
 }
 void Arm::set_pos(double position) {
     /*
@@ -114,6 +116,6 @@ void Arm::set_pos(double position) {
       peripherals->rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
       }
     */
-    peripherals->leftarm_mtr.move_absolute(-position, 63);
-    peripherals->rightarm_mtr.move_absolute(-position, 63);
+    peripherals->leftarm_mtr.move_absolute(position, 63);
+    peripherals->rightarm_mtr.move_absolute(position, 63);
 }
