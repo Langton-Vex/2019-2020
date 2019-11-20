@@ -18,6 +18,9 @@ const auto CHASSIS_WIDTH = 370_mm;
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
 std::shared_ptr<ChassisControllerHDrive> cc;
+pros::Mutex cc_mutex;
+// This mutex is not actually used for the controller, rather the shared_ptr
+// We  don't want two threads trying to set/reset this pointer!
 
 extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
@@ -115,18 +118,22 @@ void init_autonomous() {
     configManager->register_auton("Move 15", move_15);
 }
 
-void auton_cleanup(void* param){
-  pros::c::task_notify_take(true, TIMEOUT_MAX);
-
+void auton_cleanup(){
   lift->flipDisable(true);
+  cc_mutex.take(TIMEOUT_MAX);
   if (cc){
     cc->stop_task();
     cc->reset();
   }
+  cc_mutex.give();
+}
+void auton_cleanup_task(void* param){
+  pros::c::task_notify_take(true, TIMEOUT_MAX);
+  auton_cleanup();
 }
 
 void autonomous() {
-    auto our_cleanup_task = pros::Task(auton_cleanup, NULL, TASK_PRIORITY_DEFAULT,
+    auto our_cleanup_task = pros::Task(auton_cleanup_task, NULL, TASK_PRIORITY_DEFAULT,
                               TASK_STACK_DEPTH_DEFAULT, "Auton cleanup");
 
     pros::c::task_notify_when_deleting(CURRENT_TASK, our_cleanup_task,0,
@@ -171,4 +178,5 @@ void autonomous() {
     } else {
         printf("Selected auton is greater than amount of autons");
     }
+    auton_cleanup();
 }
