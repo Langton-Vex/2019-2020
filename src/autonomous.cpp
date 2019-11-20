@@ -302,9 +302,9 @@ void init_autonomous() {
 
 void autonomous() {
 
-    PIDTuning straightTuning = PIDTuning(0.003, 0.0, 0);
-    PIDTuning angleTuning = PIDTuning(0, 0, 0);
-    PIDTuning turnTuning = PIDTuning(0.003, 0, 0);
+    PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
+    PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
+    PIDTuning turnTuning = PIDTuning(0.002680, 0, 0.000089);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
@@ -322,13 +322,16 @@ void autonomous() {
         { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
             okapi::imev5GreenTPR });
 
-    //cc.start_task();
-    //cc.driveStraight(12 * okapi::inch);
-    //cc.turnAngle(90 * okapi::degree);
+    cc.start_task();
+    cc.driveStraight(24 * okapi::inch);
+    cc.stop_task();
+    //pros::delay(5000);
+    cc.turnAngle(90 * okapi::degree);
     //cc.waitUntilSettled();
 
     //cc.start_task();
-    cc.tune();
+    //cc.tune();
+    //std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
     /*
     if (configManager->auton_routines.size() > configManager->selected_auton) {
 
@@ -342,6 +345,7 @@ void autonomous() {
     } else {
         printf("Selected auton is greater than amount of autons");
     }
-
     */
+
+
 }
