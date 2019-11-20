@@ -1,0 +1,1 @@
+py -m pros.cli.main %*

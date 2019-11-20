@@ -191,8 +191,8 @@ void ChassisControllerHDrive::tune() {
         ct, ct, 4 * okapi::second, 0,
         0.0005, 0.001, 0, 0, 0, 0.0001);
     auto TurnTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 4 * okapi::second, 3500,
-        0.0005, 0.003, 0, 0, 0, 0.0001);
+        ct, ct, 8 * okapi::second, 1035,
+        0.0005, 0.004, 0, 0, 0, 0.00005);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 7 * okapi::second, 3000,
         0.002, 0.004, 0, 0, 0, 0.0001);
@@ -210,27 +210,33 @@ void ChassisControllerHDrive::tune() {
     okapi::PIDTuner::Output angleTune = AngleTuner->autotune();
     std::string angleValue = TuningToString(angleTune);
     printf("angle value: %s\n", angleValue.c_str());
-
+    */
     printf("turn tuning\n");
     tuningMode = TuningMode::TuneTurn;
     okapi::PIDTuner::Output turnTune = TurnTuner->autotune();
     std::string turnValue = TuningToString(turnTune);
     printf("turn value: %s\n", turnValue.c_str());
 
-    */
+    TurnTuner = okapi::PIDTunerFactory::createPtr(
+        ct, ct, 8 * okapi::second, 1035,
+        0.0005, 0.004, 0, 0, 0, 0.0001);
+    TurnTuner->autotune();
+    /*
     printf("strafe tuning\n");
     tuningMode = TuningMode::TuneStrafe;
     okapi::PIDTuner::Output strafeTune = StrafeTuner->autotune();
     std::string strafeValue = TuningToString(strafeTune);
     printf("strafe value: %s\n", strafeValue.c_str());
+    */
 
     std::shared_ptr<GUI> gui = GUI::get();
+    gui->add_line(turnValue);
     /*
     gui->add_line(straightValue);
     gui->add_line(angleValue);
     gui->add_line(turnValue);
-    */
     gui->add_line(strafeValue);
+    */
 
 
     //model.reset();
@@ -355,7 +361,9 @@ void ChassisControllerHDrive::step() {
     double leftVelocity = 0;
     double rightVelocity = 0;
     double strafeVelocity = 0;
-    printf("\n%d\n", mode[0]);
+    std::shared_ptr<Chassis> chassis = Chassis::get();
+    maxVelocity = chassis->motor_speed * chassis->power_mult_calc();
+
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
         double angleOut = anglePID->step(angleChange);

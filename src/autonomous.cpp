@@ -319,18 +319,21 @@ void autonomous() {
         leftSide, rightSide, strafeMotor,
         okapi::AbstractMotor::gearset::green,
         okapi::AbstractMotor::gearset::green,
-        { { okapi::inch * 4.3, okapi::millimeter * 370, 0 * okapi::millimeter, okapi::inch * 4.3 },
+        { { okapi::inch * 4.125, 15.1 * okapi::inch, 0 * okapi::millimeter, okapi::inch * 4.125 },
             okapi::imev5GreenTPR });
 
+    /*
     cc.start_task();
     cc.driveStraight(24 * okapi::inch);
-    cc.stop_task();
     //pros::delay(5000);
-    cc.turnAngle(90 * okapi::degree);
+    cc.turnAngle(180 * okapi::degree);
+    cc.driveStraight(24 * okapi::inch);
+    cc.turnAngle(180 * okapi::degree);
+    cc.stop_task();
     //cc.waitUntilSettled();
-
+    */
     //cc.start_task();
-    //cc.tune();
+    cc.tune();
     //std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
     /*
     if (configManager->auton_routines.size() > configManager->selected_auton) {
@@ -347,5 +350,7 @@ void autonomous() {
     }
     */
 
+/*
 
+*/
 }
