@@ -409,7 +409,7 @@ void ChassisControllerHDrive::trampoline(void* param) {
 void ChassisControllerHDrive::asyncThread() {
     while (task_running) {
         this->step();
-        pros::delay(this->asyncUpdateDelay);
+        pros::delay(10);
     }
 }
 

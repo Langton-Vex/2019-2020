@@ -304,7 +304,7 @@ void autonomous() {
 
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
-    PIDTuning turnTuning = PIDTuning(0.002680, 0, 0.000089);
+    PIDTuning turnTuning = PIDTuning(0.002304, 0, 0.000033);
     PIDTuning strafeTuning = PIDTuning(0, 0, 0);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
@@ -332,8 +332,37 @@ void autonomous() {
     cc.stop_task();
     //cc.waitUntilSettled();
     */
-    //cc.start_task();
-    cc.tune();
+    cc.start_task();
+    //cc.tune();
+    /*
+    intake->moveVelocity(200);
+    pros::delay(500);
+    lift->setTarget(lift->getTarget() + -(18.45 * 5.5 * 1));
+    cc.driveStraight(19 * okapi::centimeter);
+    lift->waitUntilSettled();
+    intake->moveVelocity(-200);
+    pros::delay(250);
+    */
+    auto i = Claw::get();
+    lift->setTarget(0);
+    i->set(200);
+    pros::delay(1000);
+    //lift->setTarget(lift->getTarget() + -(18.45 * 5.5 * 1));
+    lift->setTarget(-10000);
+    lift->waitUntilSettled();
+    cc.driveStraight(31.5 * okapi::centimeter);
+    cc.turnAngle(90*okapi::degree);
+    cc.driveStraight(22 * okapi::centimeter);
+    lift->setTarget(0);
+    i->set(-200);
+    lift->waitUntilSettled();
+    i->set(200);
+    pros::delay(500);
+    cc.turnAngle(25*okapi::degree);
+    cc.driveStraight(55*okapi::centimeter);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+
     //std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
     /*
     if (configManager->auton_routines.size() > configManager->selected_auton) {
