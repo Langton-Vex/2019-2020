@@ -51,35 +51,117 @@ void move_15() {
     ccont->moveDistance(-15_in);
 }
 
+void small_four_cubes(){
+  auto i = Claw::get();
+  int side = ConfigManager::get()->selected_team;
+
+  // Pick up preload
+  i->set(-127);
+  //intake->moveVelocity(-200);
+  pros::delay(500); // make this some kinda distance based.
+
+  lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
+  lift->waitUntilSettled();
+  cc->driveStraight(36 * okapi::centimeter);
+  i->set(127);
+  cc->driveStraight(-3 * okapi::centimeter);
+
+  lift->setTarget(0);
+  pros::delay(100);
+  i->set(127);
+  lift->waitUntilSettled();
+  i->set(-127);
+  pros::delay(500);
+  // Drive to scoring zone, place cubes, move out of the way a bit
+  lift->setTarget(18.45 * 6.7);
+  lift->waitUntilSettled();
+  cc->driveStraight(6.7 * okapi::inch);
+
+  lift->setTarget(0);
+  pros::delay(100);
+  i->set(127);
+  lift->waitUntilSettled();
+  lift->setTarget(0);
+  lift->waitUntilSettled();
+  i->set(-127);
+  pros::delay(500);
+  // Drive to scoring zone, place cubes, move out of the way a bit
+  lift->setTarget(18.45 * 5.5);
+  cc->turnAngle(-139 * okapi::degree);
+  cc->driveStraight(54 * okapi::centimeter);
+  lift->setTarget(0);
+  lift->waitUntilSettled();
+  i->set(127);
+  lift->setTarget(18.45 * 5.5);
+  lift->waitUntilSettled();
+
+}
+
+void two_cubes(){
+  auto i = Claw::get();
+  int side = ConfigManager::get()->selected_team;
+
+  // Pick up preload
+  i->set(-127);
+  //intake->moveVelocity(-200);
+  pros::delay(500); // make this some kinda distance based.
+
+  // drive to first cube and pickup
+  lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
+  lift->waitUntilSettled();
+  cc->driveStraight(24 * okapi::centimeter);
+  i->set(127);
+  cc->driveStraight(-5 * okapi::centimeter);
+  lift->setTarget(0);
+
+  lift->waitUntilSettled();
+  i->set(-127);
+  pros::delay(600);
+  lift->setTarget(18.45 * 5.5);
+  lift->waitUntilSettled();
+
+  cc->turnAngle(102*okapi::degree * side);
+  cc->driveStraight(84*okapi::centimeter);
+  lift->setTarget(0);
+  lift->waitUntilSettled();
+  i->set(127);
+  lift->setTarget(18.45 * 5.5);
+  lift->waitUntilSettled();
+
+}
+
 void three_cubes(){
     auto i = Claw::get();
     int side = ConfigManager::get()->selected_team;
 
     // Pick up preload
-    lift->setTarget(0);
-    lift->waitUntilSettled();
     i->set(-127);
     //intake->moveVelocity(-200);
-    pros::delay(1000); // make this some kinda distance based.
+    pros::delay(500); // make this some kinda distance based.
 
     // drive to first cube and pickup
-    lift->setTarget(18.45 * 5.5); // TODO: make pot based!!
-    cc->driveStraight(31.5 * okapi::centimeter);
-    lift->setTarget(0);
-    pros::delay(200);
+    lift->setTarget(18.45 * 6.6); // TODO: make pot based!!
+    lift->waitUntilSettled();
+    cc->driveStraight(21 * okapi::centimeter);
     i->set(127);
+    cc->driveStraight(-5 * okapi::centimeter);
+    lift->setTarget(0);
+
     lift->waitUntilSettled();
     i->set(-127);
-    pros::delay(500);
+    pros::delay(600);
 
     // move arm up, drive to second cube
-    lift->setTarget(18.45 * 5.5);
-    cc->turnAngle(90*okapi::degree);
-    cc->driveStraight(22 * okapi::centimeter);
+
+    cc->driveStraight(14 * okapi::inch);
+    lift->setTarget(18.45 * 8.2);
+    lift->waitUntilSettled();
+    cc->turnAngle(90*okapi::degree * side);
+    cc->driveStraight(32 * okapi::centimeter);
 
     // Pickup second cube
     lift->setTarget(0);
-    pros::delay(200);
+    pros::delay(100);
     i->set(127);
     lift->waitUntilSettled();
     i->set(-127);
@@ -87,7 +169,7 @@ void three_cubes(){
 
     // Drive to scoring zone, place cubes, move out of the way a bit
     lift->setTarget(18.45 * 5.5);
-    cc->turnAngle(25*okapi::degree);
+    cc->turnAngle(40*okapi::degree * side);
     cc->driveStraight(53*okapi::centimeter);
     lift->setTarget(0);
     lift->waitUntilSettled();
@@ -114,6 +196,8 @@ void init_autonomous() {
     configManager->register_auton("do nothing", do_nothing);
 
     configManager->register_auton("three cubes", three_cubes);
+    configManager->register_auton("two cubes", two_cubes);
+    configManager->register_auton("small_four_cubes", small_four_cubes);
 
     configManager->register_auton("Move 15", move_15);
 }
@@ -180,3 +264,22 @@ void autonomous() {
     }
     auton_cleanup();
 }
+
+/*
+blue small side - be lined up with the 4 long tihng of cubes
+  grip the pre-load
+  forward(distance to cubes...)
+  armUp(height of one cube)
+  forward(length of cube)
+  armUn-Grab
+  repeat 4 times:
+    armDown(height of one cubes)
+    armGrab
+    armUp(height of one cube)
+    fowrard(length of one cube)
+    armUn-Grab
+  backwards(one tile)w
+  turnLeft(135Deg)
+  forward(34 inches)
+  armUn-Grab
+  */

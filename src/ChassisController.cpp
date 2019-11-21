@@ -365,7 +365,7 @@ void ChassisControllerHDrive::step() {
     double rightVelocity = 0;
     double strafeVelocity = 0;
     std::shared_ptr<Chassis> chassis = Chassis::get();
-    maxVelocity = chassis->motor_speed * chassis->power_mult_calc();
+    maxVelocity = 150 * chassis->power_mult_calc();
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);

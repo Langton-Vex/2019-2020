@@ -33,7 +33,7 @@ public:
     std::unique_ptr<okapi::Odometry> odom;
     std::shared_ptr<okapi::SkidSteerModel> model;
 
-    int maxVelocity = 200;
+    int maxVelocity = 150;
     double maxVoltage = 12.0;
 
     static void trampoline(void* param);
