@@ -51,86 +51,84 @@ void move_15() {
     ccont->moveDistance(-15_in);
 }
 
-void small_four_cubes(){
-  auto i = Claw::get();
-  int side = ConfigManager::get()->selected_team;
+void small_four_cubes() {
+    auto i = Claw::get();
+    int side = ConfigManager::get()->selected_team;
 
-  // Pick up preload
-  i->set(-127);
-  //intake->moveVelocity(-200);
-  pros::delay(500); // make this some kinda distance based.
+    // Pick up preload
+    i->set(-127);
+    //intake->moveVelocity(-200);
+    pros::delay(500); // make this some kinda distance based.
 
-  lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
-  lift->waitUntilSettled();
-  cc->driveStraight(36 * okapi::centimeter);
-  i->set(127);
-  cc->driveStraight(-3 * okapi::centimeter);
+    lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
+    lift->waitUntilSettled();
+    cc->driveStraight(36 * okapi::centimeter);
+    i->set(127);
+    cc->driveStraight(-3 * okapi::centimeter);
 
-  lift->setTarget(0);
-  pros::delay(100);
-  i->set(127);
-  lift->waitUntilSettled();
-  i->set(-127);
-  pros::delay(500);
-  // Drive to scoring zone, place cubes, move out of the way a bit
-  lift->setTarget(18.45 * 6.7);
-  lift->waitUntilSettled();
-  cc->driveStraight(6.7 * okapi::inch);
+    lift->setTarget(0);
+    pros::delay(100);
+    i->set(127);
+    lift->waitUntilSettled();
+    i->set(-127);
+    pros::delay(500);
+    // Drive to scoring zone, place cubes, move out of the way a bit
+    lift->setTarget(18.45 * 6.7);
+    lift->waitUntilSettled();
+    cc->driveStraight(6.7 * okapi::inch);
 
-  lift->setTarget(0);
-  pros::delay(100);
-  i->set(127);
-  lift->waitUntilSettled();
-  lift->setTarget(0);
-  lift->waitUntilSettled();
-  i->set(-127);
-  pros::delay(500);
-  // Drive to scoring zone, place cubes, move out of the way a bit
-  lift->setTarget(18.45 * 5.5);
-  cc->turnAngle(-139 * okapi::degree);
-  cc->driveStraight(54 * okapi::centimeter);
-  lift->setTarget(0);
-  lift->waitUntilSettled();
-  i->set(127);
-  lift->setTarget(18.45 * 5.5);
-  lift->waitUntilSettled();
-
+    lift->setTarget(0);
+    pros::delay(100);
+    i->set(127);
+    lift->waitUntilSettled();
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    i->set(-127);
+    pros::delay(500);
+    // Drive to scoring zone, place cubes, move out of the way a bit
+    lift->setTarget(18.45 * 5.5);
+    cc->turnAngle(-139 * okapi::degree);
+    cc->driveStraight(54 * okapi::centimeter);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    i->set(127);
+    lift->setTarget(18.45 * 5.5);
+    lift->waitUntilSettled();
 }
 
-void two_cubes(){
-  auto i = Claw::get();
-  int side = ConfigManager::get()->selected_team;
+void two_cubes() {
+    auto i = Claw::get();
+    int side = ConfigManager::get()->selected_team;
 
-  // Pick up preload
-  i->set(-127);
-  //intake->moveVelocity(-200);
-  pros::delay(500); // make this some kinda distance based.
+    // Pick up preload
+    i->set(-127);
+    //intake->moveVelocity(-200);
+    pros::delay(500); // make this some kinda distance based.
 
-  // drive to first cube and pickup
-  lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
-  lift->waitUntilSettled();
-  cc->driveStraight(24 * okapi::centimeter);
-  i->set(127);
-  cc->driveStraight(-5 * okapi::centimeter);
-  lift->setTarget(0);
+    // drive to first cube and pickup
+    lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
+    lift->waitUntilSettled();
+    cc->driveStraight(24 * okapi::centimeter);
+    i->set(127);
+    cc->driveStraight(-5 * okapi::centimeter);
+    lift->setTarget(0);
 
-  lift->waitUntilSettled();
-  i->set(-127);
-  pros::delay(600);
-  lift->setTarget(18.45 * 5.5);
-  lift->waitUntilSettled();
+    lift->waitUntilSettled();
+    i->set(-127);
+    pros::delay(600);
+    lift->setTarget(18.45 * 5.5);
+    lift->waitUntilSettled();
 
-  cc->turnAngle(102*okapi::degree * side);
-  cc->driveStraight(84*okapi::centimeter);
-  lift->setTarget(0);
-  lift->waitUntilSettled();
-  i->set(127);
-  lift->setTarget(18.45 * 5.5);
-  lift->waitUntilSettled();
-
+    cc->turnAngle(102 * okapi::degree * side);
+    cc->driveStraight(84 * okapi::centimeter);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    i->set(127);
+    lift->setTarget(18.45 * 5.5);
+    lift->waitUntilSettled();
 }
 
-void three_cubes(){
+void three_cubes() {
     auto i = Claw::get();
     int side = ConfigManager::get()->selected_team;
 
@@ -156,7 +154,7 @@ void three_cubes(){
     cc->driveStraight(14 * okapi::inch);
     lift->setTarget(18.45 * 8.2);
     lift->waitUntilSettled();
-    cc->turnAngle(90*okapi::degree * side);
+    cc->turnAngle(90 * okapi::degree * side);
     cc->driveStraight(32 * okapi::centimeter);
 
     // Pickup second cube
@@ -169,15 +167,14 @@ void three_cubes(){
 
     // Drive to scoring zone, place cubes, move out of the way a bit
     lift->setTarget(18.45 * 5.5);
-    cc->turnAngle(40*okapi::degree * side);
-    cc->driveStraight(53*okapi::centimeter);
+    cc->turnAngle(40 * okapi::degree * side);
+    cc->driveStraight(53 * okapi::centimeter);
     lift->setTarget(0);
     lift->waitUntilSettled();
     i->set(127);
     lift->setTarget(18.45 * 5.5);
     lift->waitUntilSettled();
 }
-
 
 void init_autonomous() {
 
@@ -202,26 +199,26 @@ void init_autonomous() {
     configManager->register_auton("Move 15", move_15);
 }
 
-void auton_cleanup(){
-  lift->flipDisable(true);
-  cc_mutex.take(TIMEOUT_MAX);
-  if (cc){
-    cc->stop_task();
-    cc->reset();
-  }
-  cc_mutex.give();
+void auton_cleanup() {
+    lift->flipDisable(true);
+    cc_mutex.take(TIMEOUT_MAX);
+    if (cc) {
+        cc->stop_task();
+        cc->reset();
+    }
+    cc_mutex.give();
 }
-void auton_cleanup_task(void* param){
-  pros::c::task_notify_take(true, TIMEOUT_MAX);
-  auton_cleanup();
+void auton_cleanup_task(void* param) {
+    pros::c::task_notify_take(true, TIMEOUT_MAX);
+    auton_cleanup();
 }
 
 void autonomous() {
     auto our_cleanup_task = pros::Task(auton_cleanup_task, NULL, TASK_PRIORITY_DEFAULT,
-                              TASK_STACK_DEPTH_DEFAULT, "Auton cleanup");
+        TASK_STACK_DEPTH_DEFAULT, "Auton cleanup");
 
-    pros::c::task_notify_when_deleting(CURRENT_TASK, our_cleanup_task,0,
-                              pros::E_NOTIFY_ACTION_NONE);
+    pros::c::task_notify_when_deleting(CURRENT_TASK, our_cleanup_task, 0,
+        pros::E_NOTIFY_ACTION_NONE);
 
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
@@ -241,10 +238,9 @@ void autonomous() {
         okapi::AbstractMotor::gearset::green, // swerve steer gearset
         okapi::AbstractMotor::gearset::green, // strafe gearset
         okapi::ChassisScales(
-          {{ okapi::inch * 4.125, 15.1 * okapi::inch,  // wheel diam, wheelbase diam
-          0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
-            okapi::imev5GreenTPR })
-        );
+            { { okapi::inch * 4.125, 15.1 * okapi::inch, // wheel diam, wheelbase diam
+                  0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+                okapi::imev5GreenTPR }));
 
     //cc.tune();
 

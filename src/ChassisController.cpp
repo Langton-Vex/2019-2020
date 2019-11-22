@@ -1,6 +1,10 @@
 #include "main.h"
 #include <vector>
 
+// Now achieving triple level commenting, this whole controller needs works, please
+// remember to take the robot home over Christmas and work on this garbage fire of
+// A chassis controller and turn it into something beautiful with odom and motion profiling
+
 /* TODO:
    * Probably need to split this class into multiple files, because it's getting huge
    * Get the PID control working obviously.
@@ -11,6 +15,10 @@
    * Take the tuner function and make it a lot more flexible, i.e if it were in
      A cold package / library, make each element toggleable, ranges tweakable, etc.
      Current solution of updating tuning function is a little hacky.
+   * Ok so we can solve the DR4B shifts weight problem in two ways:
+      * Motion profiling, or a velocity controller (?) will eventually do anyway.
+      * limit acceleration by looping and solving (final velocity)2 - (initial velocity)2 = 2 × acceleration × distance
+        for distance, are we above / below / about to cross the boundary? We can start slowing then.
 */
 
 /* Remember with this controller that if you are doing two movements
@@ -177,12 +185,11 @@ void ChassisControllerHDrive::tune() {
     //std::shared_ptr<okapi::Motor> strafeShared = std::move(strafeMotor);
 
     okapi::Logger::setDefaultLogger(
-    std::make_shared<okapi::Logger>(
-        okapi::TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
-        "/ser/sout", // Output to the PROS terminal
-        okapi::Logger::LogLevel::info // Show errors and warnings
-    )
-);
+        std::make_shared<okapi::Logger>(
+            okapi::TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
+            "/ser/sout", // Output to the PROS terminal
+            okapi::Logger::LogLevel::info // Show errors and warnings
+            ));
 
     std::shared_ptr<ChassisControllerHDrive> ct(this);
     //P,P, I, I, D, D
@@ -241,7 +248,6 @@ void ChassisControllerHDrive::tune() {
     gui->add_line(strafeValue);
     */
 
-
     //model.reset();
 }
 
@@ -276,7 +282,6 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
 
         leftVelocity = (double)straightGearset->internalGearset * ivalue;
         rightVelocity = (double)straightGearset->internalGearset * ivalue * -1.0;
-
     }
     if (tuningMode == TuningMode::TuneAngle) {
         leftVelocity = (double)straightGearset->internalGearset * (ivalue);
@@ -286,7 +291,6 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
     }
     if (tuningMode == TuningMode::TuneStrafe) {
         strafeVelocity = (double)strafeGearset->internalGearset * ivalue;
-
     }
     //fprintf(stderr, "out: %d", std::min((int)round(leftVelocity), maxVelocity));
 
@@ -370,7 +374,7 @@ void ChassisControllerHDrive::step() {
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
         double angleOut = anglePID->step(angleChange);
-        printf("%f straight error, %f angle error\n",straightPID->getError(), anglePID->getError());
+        printf("%f straight error, %f angle error\n", straightPID->getError(), anglePID->getError());
         leftVelocity += (double)straightGearset->internalGearset * (straightOut + angleOut);
         rightVelocity += (double)straightGearset->internalGearset * (straightOut - angleOut);
 
@@ -379,7 +383,7 @@ void ChassisControllerHDrive::step() {
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::turn) != mode.end()) {
         double turnOut = turnPID->step(turnChange);
-        printf("%f turn error\n",turnPID->getError());
+        printf("%f turn error\n", turnPID->getError());
         leftVelocity += (double)straightGearset->internalGearset * turnOut;
         rightVelocity += (double)straightGearset->internalGearset * turnOut * -1.0;
     }
