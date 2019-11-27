@@ -46,9 +46,8 @@ void do_nothing() {
 };
 
 void move_15() {
-    lift->setTarget(800);
-    ccont->moveDistance(15_in);
-    ccont->moveDistance(-15_in);
+    cc->driveStraight(18_in);
+    cc->driveStraight(-18_in);
 }
 
 void small_four_cubes() {
@@ -106,21 +105,22 @@ void two_cubes() {
     pros::delay(500); // make this some kinda distance based.
 
     // drive to first cube and pickup
+    cc->driveStraight(3*okapi::centimeter);
     lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
     lift->waitUntilSettled();
-    cc->driveStraight(24 * okapi::centimeter);
+    cc->driveStraight(17.5 * okapi::centimeter);
     i->set(127);
     cc->driveStraight(-5 * okapi::centimeter);
     lift->setTarget(0);
-
     lift->waitUntilSettled();
+    pros::delay(500);
     i->set(-127);
-    pros::delay(600);
+    pros::delay(650);
     lift->setTarget(18.45 * 5.5);
     lift->waitUntilSettled();
 
     cc->turnAngle(102 * okapi::degree * side);
-    cc->driveStraight(84 * okapi::centimeter);
+    cc->driveStraight(87 * okapi::centimeter);
     lift->setTarget(0);
     lift->waitUntilSettled();
     i->set(127);
