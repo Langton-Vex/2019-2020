@@ -176,6 +176,34 @@ void three_cubes() {
     lift->waitUntilSettled();
 }
 
+void vision_test(){
+  pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
+
+  auto straightPID = okapi::IterativeControllerFactory::posPID(0.01890,0.000000,0.00019);
+  auto turnPID = okapi::IterativeControllerFactory::posPID(0.02680,0.000000,0.00089);
+  auto strafePID = okapi::IterativeControllerFactory::posPID(0.03680,0.000000,0.00119);
+  double leftVelocity, rightVelocity, strafeVelocity;
+
+  okapi::MotorGroup leftSide(
+      { left_port, lefttwo_port });
+  okapi::MotorGroup rightSide(
+      { right_port, righttwo_port });
+  okapi::Motor strafeMotor(strafe_port);
+
+  while (true){
+    double straightOut = straightPID.step(40 - camera.get_by_size(0).height);
+    double turnOut = turnPID.step(camera.get_by_size(0).width - camera.get_by_size(0).height);
+    double strafeOut = turnPID.step(camera.get_by_size(0).x_middle_coord);
+    leftVelocity += 200 * (straightOut+turnOut);
+    rightVelocity += 200 * (straightOut-turnOut);
+    strafeVelocity = 200 * strafeOut;
+    leftSide.moveVelocity(leftVelocity);
+    rightSide.moveVelocity(rightVelocity);
+    strafeMotor.moveVelocity(strafeVelocity);
+    pros::delay(10);
+  }
+}
+
 void init_autonomous() {
 
     ccont = ChassisControllerBuilder()
@@ -191,6 +219,7 @@ void init_autonomous() {
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
+    configManager->register_auton("vision test", vision_test);
 
     configManager->register_auton("three cubes", three_cubes);
     configManager->register_auton("two cubes", two_cubes);
