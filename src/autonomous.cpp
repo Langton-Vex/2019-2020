@@ -178,8 +178,10 @@ void three_cubes() {
 
 void vision_test(){
   pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
+  //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
+  //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-  auto straightPID = okapi::IterativeControllerFactory::posPID(0.01890,0.000000,0.00019);
+  auto straightPID = okapi::IterativeControllerFactory::posPID(0.00990,0.000000,0.00019);
   auto turnPID = okapi::IterativeControllerFactory::posPID(0.02680,0.000000,0.00089);
   auto strafePID = okapi::IterativeControllerFactory::posPID(0.03680,0.000000,0.00119);
   double leftVelocity, rightVelocity, strafeVelocity;
@@ -189,17 +191,27 @@ void vision_test(){
   okapi::MotorGroup rightSide(
       { right_port, righttwo_port });
   okapi::Motor strafeMotor(strafe_port);
-
+  std::shared_ptr<GUI> gui = GUI::get();
   while (true){
-    double straightOut = straightPID.step(40 - camera.get_by_size(0).height);
-    double turnOut = turnPID.step(camera.get_by_size(0).width - camera.get_by_size(0).height);
-    double strafeOut = turnPID.step(camera.get_by_size(0).x_middle_coord);
-    leftVelocity += 200 * (straightOut+turnOut);
-    rightVelocity += 200 * (straightOut-turnOut);
-    strafeVelocity = 200 * strafeOut;
-    leftSide.moveVelocity(leftVelocity);
-    rightSide.moveVelocity(rightVelocity);
-    strafeMotor.moveVelocity(strafeVelocity);
+    pros::vision_object_s_t rtn = camera.get_by_size(0);
+    double straightOut = straightPID.step(-126 - rtn.height);
+    fprintf(stderr, "%f",straightOut);
+    //double turnOut = turnPID.step(camera.get_by_size(0).width - camera.get_by_size(0).height);
+    //double strafeOut = turnPID.step(camera.get_by_size(0).x_middle_coord);
+    double turnOut = 0;
+    double strafeOut = 0;
+    leftVelocity = 200.0 * (straightOut+turnOut);
+    rightVelocity = 200.0 * (straightOut-turnOut);
+    strafeVelocity = 200.0 * strafeOut;
+
+    peripherals->left_mtr.move_velocity((int)leftVelocity);
+    peripherals->right_mtr.move_velocity((int)rightVelocity);
+    peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
+    peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
+    peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
+
+    gui->set_line(0, std::to_string((int)leftVelocity));
+
     pros::delay(10);
   }
 }
@@ -278,11 +290,11 @@ void autonomous() {
 
     if (configManager->auton_routines.size() > configManager->selected_auton) {
         auton_routine routine = configManager->auton_routines[configManager->selected_auton];
-        cc->start_task();
+        //cc->start_task();
         lift->flipDisable(false);
         routine(); // nullptr could happen, lets hope it doesn't :o
         lift->flipDisable(true);
-        cc->stop_task();
+        //cc->stop_task();
         //auton_task.remove();
     } else {
         printf("Selected auton is greater than amount of autons");
