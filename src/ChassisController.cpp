@@ -359,6 +359,8 @@ void ChassisControllerHDrive::setMaxVelocity(int speed) {
 
 void ChassisControllerHDrive::step() {
     odom->step();
+    okapi::OdomState state = odom->getState();
+    fprintf(stderr, "%f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
 
     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));

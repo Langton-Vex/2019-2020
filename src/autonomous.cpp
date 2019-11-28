@@ -42,7 +42,10 @@ void near_small() {
 }
 
 void do_nothing() {
-    pros::delay(5000);
+  //while(true)
+  //  pros::delay(100);
+  cc->driveStraight(20_cm);
+  //cc->turnAngle(-90_deg);
 };
 
 void move_15() {
@@ -181,9 +184,9 @@ void vision_test(){
   //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
   //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-  auto straightPID = okapi::IterativeControllerFactory::posPID(0.00990,0.000000,0.00019);
-  auto turnPID = okapi::IterativeControllerFactory::posPID(0.02680,0.000000,0.00089);
-  auto strafePID = okapi::IterativeControllerFactory::posPID(0.03680,0.000000,0.00119);
+  auto straightPID = okapi::IterativeControllerFactory::posPID(0.0040,0.000000,0.0);
+  auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200,0.000000,0.00089);
+  auto strafePID = okapi::IterativeControllerFactory::posPID(0.006,0.000000,0.0);
   double leftVelocity, rightVelocity, strafeVelocity;
 
   okapi::MotorGroup leftSide(
@@ -194,14 +197,13 @@ void vision_test(){
   std::shared_ptr<GUI> gui = GUI::get();
   while (true){
     pros::vision_object_s_t rtn = camera.get_by_size(0);
-    double straightOut = straightPID.step(-126 - rtn.height);
+    double straightOut = straightPID.step(130 - rtn.height);
     fprintf(stderr, "%f",straightOut);
-    //double turnOut = turnPID.step(camera.get_by_size(0).width - camera.get_by_size(0).height);
-    //double strafeOut = turnPID.step(camera.get_by_size(0).x_middle_coord);
-    double turnOut = 0;
-    double strafeOut = 0;
-    leftVelocity = 200.0 * (straightOut+turnOut);
-    rightVelocity = 200.0 * (straightOut-turnOut);
+    double turnOut = turnPID.step(camera.get_by_size(0).width - camera.get_by_size(0).height);
+    double strafeOut = turnPID.step(camera.get_by_size(0).x_middle_coord);
+    //double turnOut = 0;
+    leftVelocity = -200.0 * (straightOut+turnOut);
+    rightVelocity = -200.0 * (straightOut-turnOut);
     strafeVelocity = 200.0 * strafeOut;
 
     peripherals->left_mtr.move_velocity((int)leftVelocity);
@@ -231,7 +233,7 @@ void init_autonomous() {
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
-    configManager->register_auton("vision test", vision_test);
+    //configManager->register_auton("vision test", vision_test);
 
     configManager->register_auton("three cubes", three_cubes);
     configManager->register_auton("two cubes", two_cubes);
@@ -290,7 +292,7 @@ void autonomous() {
 
     if (configManager->auton_routines.size() > configManager->selected_auton) {
         auton_routine routine = configManager->auton_routines[configManager->selected_auton];
-        //cc->start_task();
+        cc->start_task();
         lift->flipDisable(false);
         routine(); // nullptr could happen, lets hope it doesn't :o
         lift->flipDisable(true);
