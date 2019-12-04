@@ -42,10 +42,8 @@ void near_small() {
 }
 
 void do_nothing() {
-  //while(true)
-  //  pros::delay(100);
-  cc->driveStraight(20_cm);
-  //cc->turnAngle(-90_deg);
+  while(true)
+    pros::delay(100);
 };
 
 void move_15() {
@@ -180,6 +178,8 @@ void three_cubes() {
 }
 
 void vision_test(){
+  cc->driveVector(100_cm, 100_cm);
+  return;
   pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
   //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
   //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
@@ -197,23 +197,24 @@ void vision_test(){
   std::shared_ptr<GUI> gui = GUI::get();
   while (true){
     pros::vision_object_s_t rtn = camera.get_by_size(0);
-    double straightOut = straightPID.step(130 - rtn.height);
-    fprintf(stderr, "%f",straightOut);
-    double turnOut = turnPID.step(camera.get_by_size(0).width - camera.get_by_size(0).height);
-    double strafeOut = turnPID.step(camera.get_by_size(0).x_middle_coord);
-    //double turnOut = 0;
-    leftVelocity = -200.0 * (straightOut+turnOut);
-    rightVelocity = -200.0 * (straightOut-turnOut);
-    strafeVelocity = 200.0 * strafeOut;
+    if (rtn.width != 0){
+      double straightOut = straightPID.step(130 - rtn.width);
+      fprintf(stderr, "%f",straightOut);
+      //double turnOut = turnPID.step(rtn.width - rtn.height);
+      double strafeOut = turnPID.step(rtn.x_middle_coord);
+      //double turnOut = 0;
+      leftVelocity = -200.0 * straightOut;
+      rightVelocity = -200.0 * straightOut;
+      strafeVelocity = 200.0 * strafeOut;
 
-    peripherals->left_mtr.move_velocity((int)leftVelocity);
-    peripherals->right_mtr.move_velocity((int)rightVelocity);
-    peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
-    peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
-    peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
+      peripherals->left_mtr.move_velocity((int)leftVelocity);
+      peripherals->right_mtr.move_velocity((int)rightVelocity);
+      peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
+      peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
+      peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
 
-    gui->set_line(0, std::to_string((int)leftVelocity));
-
+      gui->set_line(0, std::to_string((int)leftVelocity));
+    }
     pros::delay(10);
   }
 }
@@ -233,7 +234,7 @@ void init_autonomous() {
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
-    //configManager->register_auton("vision test", vision_test);
+    configManager->register_auton("vision test", vision_test);
 
     configManager->register_auton("three cubes", three_cubes);
     configManager->register_auton("two cubes", two_cubes);
@@ -257,6 +258,7 @@ void auton_cleanup_task(void* param) {
 }
 
 void autonomous() {
+    pros::delay(150); // Counter ADI garbage
     auto our_cleanup_task = pros::Task(auton_cleanup_task, NULL, TASK_PRIORITY_DEFAULT,
         TASK_STACK_DEPTH_DEFAULT, "Auton cleanup");
 
@@ -266,7 +268,7 @@ void autonomous() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.002304, 0, 0.000033);
-    PIDTuning strafeTuning = PIDTuning(0, 0, 0);
+    PIDTuning strafeTuning = PIDTuning(0.002304, 0, 0.000013);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
         { left_port, lefttwo_port });
@@ -282,10 +284,10 @@ void autonomous() {
         okapi::AbstractMotor::gearset::green, // strafe gearset
         okapi::ChassisScales(
             { { okapi::inch * 4.125, 15.1 * okapi::inch, // wheel diam, wheelbase diam
-                  0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+                  1 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
                 okapi::imev5GreenTPR }));
 
-    //cc.tune();
+    //cc->tune();
 
     // Run your standard auton
     std::shared_ptr<ConfigManager> configManager = ConfigManager::get();

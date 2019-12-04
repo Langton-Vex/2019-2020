@@ -138,8 +138,10 @@ void ChassisControllerHDrive::strafe(okapi::QLength distance) {
 void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
     //disable_controllers();
     strafePID->flipDisable(false);
-    mode.push_back(ControllerMode::strafe);
+    anglePID->flipDisable(false);
 
+    mode.push_back(ControllerMode::strafe);
+    anglePID->setTarget(0);
     strafePID->setTarget(
         distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
 };
@@ -220,7 +222,7 @@ void ChassisControllerHDrive::tune() {
     okapi::PIDTuner::Output angleTune = AngleTuner->autotune();
     std::string angleValue = TuningToString(angleTune);
     printf("angle value: %s\n", angleValue.c_str());
-    */
+
     printf("turn tuning\n");
     tuningMode = TuningMode::TuneTurn;
     okapi::PIDTuner::Output turnTune = TurnTuner->autotune();
@@ -231,16 +233,23 @@ void ChassisControllerHDrive::tune() {
         ct, ct, 8 * okapi::second, 1035,
         0.0005, 0.004, 0, 0, 0, 0.0001);
     TurnTuner->autotune();
-    /*
+    */
+
     printf("strafe tuning\n");
     tuningMode = TuningMode::TuneStrafe;
     okapi::PIDTuner::Output strafeTune = StrafeTuner->autotune();
     std::string strafeValue = TuningToString(strafeTune);
     printf("strafe value: %s\n", strafeValue.c_str());
-    */
+
+    pros::delay(10000);
+    auto s = okapi::PIDTunerFactory::createPtr(
+        ct, ct, 7 * okapi::second, 3000,
+        0.002, 0.004, 0, 0, 0, 0.0001);
+    okapi::PIDTuner::Output t = StrafeTuner->autotune();
+
 
     std::shared_ptr<GUI> gui = GUI::get();
-    gui->add_line(turnValue);
+    gui->add_line(strafeValue);
     /*
     gui->add_line(straightValue);
     gui->add_line(angleValue);
@@ -338,10 +347,11 @@ bool ChassisControllerHDrive::waitUntilTurnSettled() {
     return true;
 };
 bool ChassisControllerHDrive::waitUntilStrafeSettled() {
-    while (!strafePID->isSettled()) {
+    while (!strafePID->isSettled()  || !anglePID->isSettled()) {
         pros::delay(2);
     }
     strafePID->flipDisable(true);
+    anglePID->flipDisable(true);
     return true;
 };
 
@@ -360,7 +370,7 @@ void ChassisControllerHDrive::setMaxVelocity(int speed) {
 void ChassisControllerHDrive::step() {
     odom->step();
     okapi::OdomState state = odom->getState();
-    fprintf(stderr, "%f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
+    fprintf(stderr, "odom: %f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
 
     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
@@ -391,7 +401,7 @@ void ChassisControllerHDrive::step() {
     }
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::strafe) != mode.end()) {
-        double strafeOut = strafePID->step(turnChange);
+        double strafeOut = strafePID->step(strafeChange);
 
         strafeVelocity += (double)strafeGearset->internalGearset * strafeOut;
     }

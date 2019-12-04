@@ -24,8 +24,8 @@ void Chassis::user_control() {
 
     int strafe;
 
-    int current_intake = peripherals->master_controller.get_digital(DIGITAL_R2);
-    int current_eject = peripherals->master_controller.get_digital(DIGITAL_R1);
+    int current_intake = peripherals->master_controller.get_digital(DIGITAL_RIGHT);
+    int current_eject = peripherals->master_controller.get_digital(DIGITAL_Y);
     if (current_intake)
         strafe = -127;
     else if (current_eject)
