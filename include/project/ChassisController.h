@@ -30,8 +30,8 @@ public:
     std::unique_ptr<pros::Task> task;
     int asyncUpdateDelay = 20;
 
-    std::unique_ptr<okapi::Odometry> odom;
-    std::shared_ptr<okapi::SkidSteerModel> model;
+    std::unique_ptr<okapi::ThreeEncoderOdometry> odom;
+    std::shared_ptr<okapi::ThreeEncoderSkidSteerModel> model;
 
     int maxVelocity = 150;
     double maxVoltage = 12.0;
@@ -81,6 +81,7 @@ public:
     bool waitUntilDistanceSettled();
     bool waitUntilTurnSettled();
     bool waitUntilStrafeSettled();
+    bool waitUntilAngleSettled();
 
     void waitUntilTravelled(okapi::QLength distance);
 

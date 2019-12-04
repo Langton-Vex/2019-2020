@@ -4,6 +4,7 @@ enum class ControllerMode {
     none,
     straight,
     turn,
-    strafe
+    strafe,
+    angle
 };
 #endif

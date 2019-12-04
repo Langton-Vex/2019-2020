@@ -68,10 +68,11 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     timeUtil = std::make_unique<okapi::TimeUtil>(okapi::TimeUtilFactory::createDefault());
     settledUtil = timeUtil->getSettledUtil();
 
-    model = std::make_unique<okapi::SkidSteerModel>(leftSide, rightSide,
-        leftSide->getEncoder(), rightSide->getEncoder(), maxVelocity, maxVoltage);
+    model = std::make_unique<okapi::ThreeEncoderSkidSteerModel>(leftSide, rightSide,
+        leftSide->getEncoder(),strafeMotor->getEncoder() ,rightSide->getEncoder(),
+        maxVelocity, maxVoltage);
 
-    odom = std::make_unique<okapi::Odometry>(okapi::TimeUtilFactory::createDefault(),
+    odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
         std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), *scales);
 
     reset();
@@ -110,10 +111,9 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     //disable_controllers();
     straightPID->flipDisable(false);
     anglePID->flipDisable(false);
-    mode.push_back(ControllerMode::straight);
-
     reset();
     mode.push_back(ControllerMode::straight);
+    mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
     straightPID->setTarget(
         distance.convert(okapi::meter) * scales->straight * straightGearset->ratio);
@@ -141,6 +141,7 @@ void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
     anglePID->flipDisable(false);
 
     mode.push_back(ControllerMode::strafe);
+    mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
     strafePID->setTarget(
         distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
@@ -332,13 +333,21 @@ void ChassisControllerHDrive::waitUntilSettled() {
 };
 
 bool ChassisControllerHDrive::waitUntilDistanceSettled() {
-    while (!straightPID->isSettled() || !anglePID->isSettled()) { // Boolean logic is weird
+    while (!straightPID->isSettled()) {
         pros::delay(2);
     }
     straightPID->flipDisable(true);
+    return true;
+};
+
+bool ChassisControllerHDrive::waitUntilAngleSettled() {
+    while (!anglePID->isSettled()) {
+        pros::delay(2);
+    }
     anglePID->flipDisable(true);
     return true;
 };
+
 bool ChassisControllerHDrive::waitUntilTurnSettled() {
     while (!turnPID->isSettled()) {
         pros::delay(2);
@@ -347,11 +356,10 @@ bool ChassisControllerHDrive::waitUntilTurnSettled() {
     return true;
 };
 bool ChassisControllerHDrive::waitUntilStrafeSettled() {
-    while (!strafePID->isSettled()  || !anglePID->isSettled()) {
+    while (!strafePID->isSettled()) {
         pros::delay(2);
     }
     strafePID->flipDisable(true);
-    anglePID->flipDisable(true);
     return true;
 };
 
@@ -385,10 +393,10 @@ void ChassisControllerHDrive::step() {
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
-        double angleOut = anglePID->step(angleChange);
+
         printf("%f straight error, %f angle error\n", straightPID->getError(), anglePID->getError());
-        leftVelocity += (double)straightGearset->internalGearset * (straightOut + angleOut);
-        rightVelocity += (double)straightGearset->internalGearset * (straightOut - angleOut);
+        leftVelocity += (double)straightGearset->internalGearset * straightOut;
+        rightVelocity += (double)straightGearset->internalGearset * straightOut;
 
         //printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
     }
@@ -405,6 +413,14 @@ void ChassisControllerHDrive::step() {
 
         strafeVelocity += (double)strafeGearset->internalGearset * strafeOut;
     }
+
+    if (std::find(mode.begin(), mode.end(), ControllerMode::angle) != mode.end()) {
+        double angleOut = anglePID->step(angleChange);
+
+        leftVelocity += (double)straightGearset->internalGearset * angleOut;
+        leftVelocity -=(double)straightGearset->internalGearset * angleOut;
+    }
+
     // Speed limits that are updated every loop, awesome!
 
     //printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);

@@ -178,7 +178,8 @@ void three_cubes() {
 }
 
 void vision_test(){
-  cc->driveVector(100_cm, 100_cm);
+  cc->driveStraight(50_cm);
+  cc->strafe(50_cm);
   return;
   pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
   //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
@@ -186,7 +187,7 @@ void vision_test(){
 
   auto straightPID = okapi::IterativeControllerFactory::posPID(0.0040,0.000000,0.0);
   auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200,0.000000,0.00089);
-  auto strafePID = okapi::IterativeControllerFactory::posPID(0.006,0.000000,0.0);
+  auto strafePID = okapi::IterativeControllerFactory::posPID(0.005,0.000000,0.0);
   double leftVelocity, rightVelocity, strafeVelocity;
 
   okapi::MotorGroup leftSide(
@@ -195,6 +196,7 @@ void vision_test(){
       { right_port, righttwo_port });
   okapi::Motor strafeMotor(strafe_port);
   std::shared_ptr<GUI> gui = GUI::get();
+  cc->stop_task();
   while (true){
     pros::vision_object_s_t rtn = camera.get_by_size(0);
     if (rtn.width != 0){
