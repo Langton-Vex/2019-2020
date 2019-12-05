@@ -178,16 +178,31 @@ void three_cubes() {
 }
 
 void vision_test(){
-  cc->driveStraight(50_cm);
-  cc->strafe(50_cm);
+  //cc->driveStraight(20_cm);
+  //cc->strafe(20_cm);
+  //cc->turnAngle(90_deg);
+
+  cc->stop_task();
+  /*
+  auto profileController = AsyncMotionProfileControllerBuilder()
+                           .withLimits({0.5, 0.75, 1})
+                           .withOutput(ccont)
+                           .buildMotionProfileController();
+  profileController->generatePath({{0_ft, 0_ft, 0_deg}, {3_ft, -3_ft, -90_deg}}, "A");
+  profileController->setTarget("A");
+  profileController->waitUntilSettled();
+
+
+  while (true) pros::delay(100);
   return;
+  */
   pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
   //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
   //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-  auto straightPID = okapi::IterativeControllerFactory::posPID(0.0040,0.000000,0.0);
+  auto straightPID = okapi::IterativeControllerFactory::posPID(0.0050,0.000000,0.0);
   auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200,0.000000,0.00089);
-  auto strafePID = okapi::IterativeControllerFactory::posPID(0.005,0.000000,0.0);
+  auto strafePID = okapi::IterativeControllerFactory::posPID(0.003,0.000000,0.00089);
   double leftVelocity, rightVelocity, strafeVelocity;
 
   okapi::MotorGroup leftSide(
@@ -199,7 +214,7 @@ void vision_test(){
   cc->stop_task();
   while (true){
     pros::vision_object_s_t rtn = camera.get_by_size(0);
-    if (rtn.width != 0){
+    if (rtn.width > 30){
       double straightOut = straightPID.step(130 - rtn.width);
       fprintf(stderr, "%f",straightOut);
       //double turnOut = turnPID.step(rtn.width - rtn.height);

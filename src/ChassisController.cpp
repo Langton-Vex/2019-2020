@@ -37,6 +37,8 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
     okapi::ChassisScales iscales) {
 
+    pros::delay(100); // Just a good idea
+
     // Here be a wall of constructors
     straightPID = std::make_unique<okapi::IterativePosPIDController>(
         okapi::IterativeControllerFactory::posPID(

@@ -42,7 +42,7 @@ void Arm::user_control() {
     //int block_up = peripherals->master_controller.get_digital_new_press(DIGITAL_R1);
     //int block_down = peripherals->master_controller.get_digital_new_press(DIGITAL_R2);
 
-    bool tare = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
+    bool tare = peripherals->master_controller.get_digital_new_press(DIGITAL_X);
     //bool stack = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
 
     if (tare) {

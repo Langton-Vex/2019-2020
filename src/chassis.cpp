@@ -33,7 +33,7 @@ void Chassis::user_control() {
     else
         strafe = 0;
 
-    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_X);
+    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
     if (slowmode_button == 1)
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
@@ -43,9 +43,9 @@ void Chassis::user_control() {
     power = power * power_mult;
     turn = turn * power_mult;
 
-    slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_Y);
-    power_mult = (slowmode) ? 0.5 : power_mult;
-    strafe = strafe * power_mult;
+    //slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_Y);
+    //power_mult = (slowmode) ? 0.5 : power_mult;
+    //strafe = strafe * power_mult;
     this->set(power, turn, strafe);
 }
 
