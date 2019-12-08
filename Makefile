@@ -4,6 +4,7 @@
 CEXTS:=c
 ASMEXTS:=s S
 CXXEXTS:=cpp c++ cc
+HXXEXTS:=h hpp
 
 # probably shouldn't modify these, but you may need them below
 ROOT=.
@@ -22,6 +23,9 @@ USE_PACKAGE:=1
 # Add libraries you do not wish to include in the cold image here
 # EXCLUDE_COLD_LIBRARIES:= $(FWDIR)/your_library.a
 EXCLUDE_COLD_LIBRARIES:= 
+
+# Precompiled headers go here
+PRECOMPILED_HEADERS:=$(INCDIR)/main.h
 
 # Set this to 1 to add additional rules to compile your project as a PROS library template
 IS_LIBRARY:=0
