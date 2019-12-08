@@ -28,12 +28,14 @@ public:
     std::vector<ControllerMode> mode;
     TuningMode tuningMode;
     std::unique_ptr<pros::Task> task;
-    int asyncUpdateDelay = 20;
+    int asyncUpdateDelay = 10;
 
     std::unique_ptr<okapi::ThreeEncoderOdometry> odom;
     std::shared_ptr<okapi::ThreeEncoderSkidSteerModel> model;
 
+    int maxAccel = 75;
     int maxVelocity = 150;
+    int currentMaxVelocity = 0;
     double maxVoltage = 12.0;
 
     static void trampoline(void* param);
@@ -67,6 +69,12 @@ public:
 
     void strafe(okapi::QLength distance);
     void strafeAsync(okapi::QLength distance);
+
+    void driveToPoint(okapi::Point point);
+    void driveToPointAsync(okapi::Point point);
+
+    void lookToPoint(okapi::Point point);
+    void lookToPointAsync(okapi::Point point);
 
     void driveVector(okapi::QLength straight, okapi::QLength strafe);
     void driveVectorAsync(okapi::QLength straight, okapi::QLength strafe);

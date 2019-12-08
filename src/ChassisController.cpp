@@ -71,7 +71,7 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     settledUtil = timeUtil->getSettledUtil();
 
     model = std::make_unique<okapi::ThreeEncoderSkidSteerModel>(leftSide, rightSide,
-        leftSide->getEncoder(),strafeMotor->getEncoder() ,rightSide->getEncoder(),
+        leftSide->getEncoder(), strafeMotor->getEncoder(), rightSide->getEncoder(),
         maxVelocity, maxVoltage);
 
     odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
@@ -97,6 +97,8 @@ void ChassisControllerHDrive::reset() {
     leftSide->moveVelocity(0);
     rightSide->moveVelocity(0);
     strafeMotor->moveVelocity(0);
+
+    currentMaxVelocity = 0;
 
     straightPID->reset();
     anglePID->reset();
@@ -149,10 +151,36 @@ void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
         distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
 };
 
+void ChassisControllerHDrive::driveToPoint(okapi::Point point) {
+    driveToPointAsync(point);
+    waitUntilSettled();
+};
+
+void ChassisControllerHDrive::driveToPointAsync(okapi::Point point) {
+    auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
+        point.inFT(okapi::StateMode::FRAME_TRANSFORMATION), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+
+    turnAngle(angle);
+    driveStraight(length);
+};
+
 void ChassisControllerHDrive::driveVector(okapi::QLength straight, okapi::QLength strafe) {
     driveVectorAsync(straight, strafe);
     waitUntilSettled();
 };
+
+void ChassisControllerHDrive::lookToPoint(okapi::Point point) {
+    lookToPointAsync(point);
+    waitUntilSettled();
+};
+
+void ChassisControllerHDrive::lookToPointAsync(okapi::Point point) {
+    auto angle = okapi::OdomMath::computeAngleToPoint(
+        point.inFT(okapi::StateMode::FRAME_TRANSFORMATION), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+
+    turnAngle(angle);
+};
+
 void ChassisControllerHDrive::driveVectorAsync(okapi::QLength straight, okapi::QLength strafe) {
     driveStraightAsync(straight);
     strafeAsync(strafe);
@@ -249,7 +277,6 @@ void ChassisControllerHDrive::tune() {
         ct, ct, 7 * okapi::second, 3000,
         0.002, 0.004, 0, 0, 0, 0.0001);
     okapi::PIDTuner::Output t = StrafeTuner->autotune();
-
 
     std::shared_ptr<GUI> gui = GUI::get();
     gui->add_line(strafeValue);
@@ -391,7 +418,11 @@ void ChassisControllerHDrive::step() {
     double rightVelocity = 0;
     double strafeVelocity = 0;
     std::shared_ptr<Chassis> chassis = Chassis::get();
-    maxVelocity = 150 * chassis->power_mult_calc();
+    if (mode.size() > 0) {
+        currentMaxVelocity += maxAccel * asyncUpdateDelay * 0.001;
+        currentMaxVelocity = std::min(currentMaxVelocity, maxVelocity);
+        currentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
+    }
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
@@ -420,15 +451,15 @@ void ChassisControllerHDrive::step() {
         double angleOut = anglePID->step(angleChange);
 
         leftVelocity += (double)straightGearset->internalGearset * angleOut;
-        leftVelocity -=(double)straightGearset->internalGearset * angleOut;
+        leftVelocity -= (double)straightGearset->internalGearset * angleOut;
     }
 
     // Speed limits that are updated every loop, awesome!
 
     //printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);
-    leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
-    rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
-    strafeMotor->moveVelocity(std::min((int)round(strafeVelocity), maxVelocity));
+    leftSide->moveVelocity(std::min((int)round(leftVelocity), currentMaxVelocity));
+    rightSide->moveVelocity(std::min((int)round(rightVelocity), currentMaxVelocity));
+    strafeMotor->moveVelocity(std::min((int)round(strafeVelocity), currentMaxVelocity));
 };
 
 void ChassisControllerHDrive::trampoline(void* param) {
@@ -446,7 +477,7 @@ void ChassisControllerHDrive::trampoline(void* param) {
 void ChassisControllerHDrive::asyncThread() {
     while (task_running) {
         this->step();
-        pros::delay(10);
+        pros::delay(asyncUpdateDelay);
     }
 }
 

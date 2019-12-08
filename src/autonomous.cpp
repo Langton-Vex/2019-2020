@@ -42,8 +42,8 @@ void near_small() {
 }
 
 void do_nothing() {
-  while(true)
-    pros::delay(100);
+    while (true)
+        pros::delay(100);
 };
 
 void move_15() {
@@ -106,7 +106,7 @@ void two_cubes() {
     pros::delay(500); // make this some kinda distance based.
 
     // drive to first cube and pickup
-    cc->driveStraight(3*okapi::centimeter);
+    cc->driveStraight(3 * okapi::centimeter);
     lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
     lift->waitUntilSettled();
     cc->driveStraight(17.5 * okapi::centimeter);
@@ -177,13 +177,13 @@ void three_cubes() {
     lift->waitUntilSettled();
 }
 
-void vision_test(){
-  //cc->driveStraight(20_cm);
-  //cc->strafe(20_cm);
-  //cc->turnAngle(90_deg);
+void vision_test() {
+    //cc->driveStraight(20_cm);
+    //cc->strafe(20_cm);
+    //cc->turnAngle(90_deg);
 
-  cc->stop_task();
-  /*
+    cc->stop_task();
+    /*
   auto profileController = AsyncMotionProfileControllerBuilder()
                            .withLimits({0.5, 0.75, 1})
                            .withOutput(ccont)
@@ -196,44 +196,44 @@ void vision_test(){
   while (true) pros::delay(100);
   return;
   */
-  pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
-  //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
-  //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
+    pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
+    //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
+    //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-  auto straightPID = okapi::IterativeControllerFactory::posPID(0.0050,0.000000,0.0);
-  auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200,0.000000,0.00089);
-  auto strafePID = okapi::IterativeControllerFactory::posPID(0.003,0.000000,0.00089);
-  double leftVelocity, rightVelocity, strafeVelocity;
+    auto straightPID = okapi::IterativeControllerFactory::posPID(0.0050, 0.000000, 0.0);
+    auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200, 0.000000, 0.00089);
+    auto strafePID = okapi::IterativeControllerFactory::posPID(0.003, 0.000000, 0.00089);
+    double leftVelocity, rightVelocity, strafeVelocity;
 
-  okapi::MotorGroup leftSide(
-      { left_port, lefttwo_port });
-  okapi::MotorGroup rightSide(
-      { right_port, righttwo_port });
-  okapi::Motor strafeMotor(strafe_port);
-  std::shared_ptr<GUI> gui = GUI::get();
-  cc->stop_task();
-  while (true){
-    pros::vision_object_s_t rtn = camera.get_by_size(0);
-    if (rtn.width > 30){
-      double straightOut = straightPID.step(130 - rtn.width);
-      fprintf(stderr, "%f",straightOut);
-      //double turnOut = turnPID.step(rtn.width - rtn.height);
-      double strafeOut = turnPID.step(rtn.x_middle_coord);
-      //double turnOut = 0;
-      leftVelocity = -200.0 * straightOut;
-      rightVelocity = -200.0 * straightOut;
-      strafeVelocity = 200.0 * strafeOut;
+    okapi::MotorGroup leftSide(
+        { left_port, lefttwo_port });
+    okapi::MotorGroup rightSide(
+        { right_port, righttwo_port });
+    okapi::Motor strafeMotor(strafe_port);
+    std::shared_ptr<GUI> gui = GUI::get();
+    cc->stop_task();
+    while (true) {
+        pros::vision_object_s_t rtn = camera.get_by_size(0);
+        if (rtn.width > 30) {
+            double straightOut = straightPID.step(130 - rtn.width);
+            fprintf(stderr, "%f", straightOut);
+            //double turnOut = turnPID.step(rtn.width - rtn.height);
+            double strafeOut = turnPID.step(rtn.x_middle_coord);
+            //double turnOut = 0;
+            leftVelocity = -200.0 * straightOut;
+            rightVelocity = -200.0 * straightOut;
+            strafeVelocity = 200.0 * strafeOut;
 
-      peripherals->left_mtr.move_velocity((int)leftVelocity);
-      peripherals->right_mtr.move_velocity((int)rightVelocity);
-      peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
-      peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
-      peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
+            peripherals->left_mtr.move_velocity((int)leftVelocity);
+            peripherals->right_mtr.move_velocity((int)rightVelocity);
+            peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
+            peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
+            peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
 
-      gui->set_line(0, std::to_string((int)leftVelocity));
+            gui->set_line(0, std::to_string((int)leftVelocity));
+        }
+        pros::delay(10);
     }
-    pros::delay(10);
-  }
 }
 
 void init_autonomous() {
