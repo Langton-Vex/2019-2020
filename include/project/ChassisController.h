@@ -33,9 +33,9 @@ public:
     std::unique_ptr<okapi::ThreeEncoderOdometry> odom;
     std::shared_ptr<okapi::ThreeEncoderSkidSteerModel> model;
 
-    int maxAccel = 75;
+    int maxAccel = 150;
     int maxVelocity = 150;
-    int currentMaxVelocity = 0;
+    double currentMaxVelocity = 0.0;
     double maxVoltage = 12.0;
 
     static void trampoline(void* param);

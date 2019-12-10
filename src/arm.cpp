@@ -5,7 +5,7 @@ const double max_height = -850;
 const int pot_min = 1642;
 const char pot_port = 'A';
 
-pros::ADIAnalogIn pot(pot_port);
+pros::ADIAnalogIn arm_pot(pot_port);
 
 using namespace okapi;
 
@@ -15,9 +15,6 @@ extern int left_port, right_port, lefttwo_port, righttwo_port,
 extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
 
 void lift_stack(int cubes);
-
-double major_positions[4] = { 0, 250, 500, 750 };
-//double minor_positions[4] = {0.0,0.05,0.1,0.1};
 
 std::shared_ptr<Arm> Arm::get() {
     static std::shared_ptr<Arm> instance(new Arm);
@@ -36,12 +33,6 @@ Arm::Arm() {
 
 void Arm::user_control() {
     int power = peripherals->master_controller.get_analog(ANALOG_LEFT_Y);
-
-    //bool arm_up = peripherals->master_controller.get_digital_new_press(DIGITAL_UP);
-    //bool arm_down = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
-    //int block_up = peripherals->master_controller.get_digital_new_press(DIGITAL_R1);
-    //int block_down = peripherals->master_controller.get_digital_new_press(DIGITAL_R2);
-
     bool tare = peripherals->master_controller.get_digital_new_press(DIGITAL_X);
     //bool stack = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
 
@@ -49,30 +40,6 @@ void Arm::user_control() {
         peripherals->leftarm_mtr.tare_position();
         peripherals->rightarm_mtr.tare_position();
     }
-    /*
-    if (stack) {
-        lift_stack(4);
-    }
-    */
-    /*
-    if (arm_up && (current_major_position <= 3)) {
-        current_major_position++;
-    } else if (arm_down && (current_major_position > 0)) {
-        current_major_position--;
-    }
-    */
-    /*
-      if (block_up && (current_minor_position <= 3)){
-        current_minor_position++;
-      }
-      else if (block_down&&(current_minor_position > 0)){
-        current_minor_position--;
-      }
-      */
-    //user_pos_modifier += (double)power * sensitivity;
-    double final_height = major_positions[current_major_position] /* +
-                    minor_positions[current_minor_position]*/
-        ;
 
     height_per = abs(peripherals->leftarm_mtr.get_position()) / abs(max_height);
 
@@ -106,16 +73,6 @@ void Arm::set(int power) {
     peripherals->rightarm_mtr.move(power);
 }
 void Arm::set_pos(double position) {
-    /*
-    if (position < 0.1) {
-      peripherals->leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-      peripherals->rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    }
-    else{
-      peripherals->leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      peripherals->rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      }
-    */
     peripherals->leftarm_mtr.move_absolute(position, 63);
     peripherals->rightarm_mtr.move_absolute(position, 63);
 }

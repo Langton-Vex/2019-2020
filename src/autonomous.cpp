@@ -177,12 +177,35 @@ void three_cubes() {
     lift->waitUntilSettled();
 }
 
+extern pros::ADIAnalogIn arm_pot;
+
+void pot_lookup(){
+    cc->stop_task();
+    lift->flipDisable(true);
+    fprintf(stderr, "starting");
+    std::ofstream save_file("/usd/yeet.csv", std::ofstream::out | std::ofstream::trunc);
+    save_file.clear();
+    peripherals->leftarm_mtr.move_velocity(30);
+    peripherals->rightarm_mtr.move_velocity(30);
+    for(int i = 0; i < 500; i++) {
+      save_file << peripherals->leftarm_mtr.get_position() << ",";
+      save_file << arm_pot.get_value() << "\n";
+      pros::delay(10);
+    }
+    save_file.close();
+    fprintf(stderr, "stopped");
+};
+
 void vision_test() {
-    //cc->driveStraight(20_cm);
+    fprintf(stderr, "waiting for yeet");
+    //cc->driveStraight(50_cm);
+    cc->turnAngle(180_deg);
+    //cc->driveStraight(50_cm);
+    //cc->turnAngle(180_deg);
     //cc->strafe(20_cm);
     //cc->turnAngle(90_deg);
-
-    cc->stop_task();
+    //return;
+    //cc->stop_task();
     /*
   auto profileController = AsyncMotionProfileControllerBuilder()
                            .withLimits({0.5, 0.75, 1})
@@ -192,10 +215,10 @@ void vision_test() {
   profileController->setTarget("A");
   profileController->waitUntilSettled();
 
-
+  */
   while (true) pros::delay(100);
   return;
-  */
+
     pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
@@ -258,6 +281,7 @@ void init_autonomous() {
     configManager->register_auton("small_four_cubes", small_four_cubes);
 
     configManager->register_auton("Move 15", move_15);
+    configManager->register_auton("potentiomenter test",pot_lookup);
 }
 
 void auton_cleanup() {
@@ -315,7 +339,7 @@ void autonomous() {
         lift->flipDisable(false);
         routine(); // nullptr could happen, lets hope it doesn't :o
         lift->flipDisable(true);
-        //cc->stop_task();
+        cc->stop_task();
         //auton_task.remove();
     } else {
         printf("Selected auton is greater than amount of autons");

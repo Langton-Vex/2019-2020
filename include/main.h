@@ -79,6 +79,9 @@ void opcontrol(void);
 #ifdef __cplusplus
 #include <memory>
 #include <unordered_set>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 /**
  * You can add C++-only headers here
  */

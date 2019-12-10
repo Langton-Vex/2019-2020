@@ -98,7 +98,7 @@ void ChassisControllerHDrive::reset() {
     rightSide->moveVelocity(0);
     strafeMotor->moveVelocity(0);
 
-    currentMaxVelocity = 0;
+    currentMaxVelocity = 0.0;
 
     straightPID->reset();
     anglePID->reset();
@@ -419,9 +419,10 @@ void ChassisControllerHDrive::step() {
     double strafeVelocity = 0;
     std::shared_ptr<Chassis> chassis = Chassis::get();
     if (mode.size() > 0) {
-        currentMaxVelocity += maxAccel * asyncUpdateDelay * 0.001;
-        currentMaxVelocity = std::min(currentMaxVelocity, maxVelocity);
-        currentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
+        currentMaxVelocity = currentMaxVelocity + (double)maxAccel * (double)asyncUpdateDelay * 0.001;
+        fprintf(stderr, "yeeer %f\n", currentMaxVelocity);
+        //currentMaxVelocity = (double)std::min(currentMaxVelocity, (double)maxVelocity);
+        //urrentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
     }
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
@@ -438,7 +439,7 @@ void ChassisControllerHDrive::step() {
         double turnOut = turnPID->step(turnChange);
         printf("%f turn error\n", turnPID->getError());
         leftVelocity += (double)straightGearset->internalGearset * turnOut;
-        rightVelocity += (double)straightGearset->internalGearset * turnOut * -1.0;
+        rightVelocity -= (double)straightGearset->internalGearset * turnOut;
     }
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::strafe) != mode.end()) {
@@ -457,9 +458,10 @@ void ChassisControllerHDrive::step() {
     // Speed limits that are updated every loop, awesome!
 
     //printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);
-    leftSide->moveVelocity(std::min((int)round(leftVelocity), currentMaxVelocity));
-    rightSide->moveVelocity(std::min((int)round(rightVelocity), currentMaxVelocity));
-    strafeMotor->moveVelocity(std::min((int)round(strafeVelocity), currentMaxVelocity));
+    // TODO: Please deal with this mess!!
+    leftSide->moveVelocity((int)std::min(leftVelocity, std::copysign(currentMaxVelocity,leftVelocity) ));
+    rightSide->moveVelocity((int)std::min(rightVelocity, std::copysign(currentMaxVelocity,rightVelocity) ));
+    strafeMotor->moveVelocity((int)std::min(strafeVelocity, std::copysign(currentMaxVelocity,strafeVelocity) ));
 };
 
 void ChassisControllerHDrive::trampoline(void* param) {
