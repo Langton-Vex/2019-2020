@@ -85,6 +85,9 @@ public:
     void diagToPointAndTurn(okapi::Point point, okapi::QAngle angle);
     void diagToPointAndTurnAsync(okapi::Point point, okapi::QAngle angle);
 
+    void enableTurn(okapi::QAngle angle);
+    void changeTurn(okapi::QAngle angle);
+
     void waitUntilSettled();
     bool waitUntilDistanceSettled();
     bool waitUntilTurnSettled();

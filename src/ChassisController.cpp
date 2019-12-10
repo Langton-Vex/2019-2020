@@ -135,6 +135,17 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
+void ChassisControllerHDrive::enableTurn(okapi::QAngle angle){
+    turnPID->flipDisable(false);
+    mode.push_back(ControllerMode::turn);
+
+    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+};
+
+void ChassisControllerHDrive::changeTurn(okapi::QAngle angle){
+    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+};
+
 void ChassisControllerHDrive::strafe(okapi::QLength distance) {
     strafeAsync(distance);
     waitUntilSettled();
@@ -159,7 +170,7 @@ void ChassisControllerHDrive::driveToPoint(okapi::Point point) {
 void ChassisControllerHDrive::driveToPointAsync(okapi::Point point) {
     auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
         point.inFT(okapi::StateMode::FRAME_TRANSFORMATION), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
-
+        
     turnAngle(angle);
     driveStraight(length);
 };
@@ -419,11 +430,11 @@ void ChassisControllerHDrive::step() {
     double strafeVelocity = 0;
     std::shared_ptr<Chassis> chassis = Chassis::get();
     if (mode.size() > 0) {
-        currentMaxVelocity = currentMaxVelocity + (double)maxAccel * (double)asyncUpdateDelay * 0.001;
-        fprintf(stderr, "yeeer %f\n", currentMaxVelocity);
-        //currentMaxVelocity = (double)std::min(currentMaxVelocity, (double)maxVelocity);
-        //urrentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
+        currentMaxVelocity += (double)maxAccel * (double)asyncUpdateDelay * 0.001;
+        currentMaxVelocity = (double)std::min(currentMaxVelocity, (double)maxVelocity);
+        //currentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
     }
+    fprintf(stderr, "hobgoblin: %f\n",(double)maxAccel * (double)asyncUpdateDelay * 0.001);
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
@@ -458,10 +469,17 @@ void ChassisControllerHDrive::step() {
     // Speed limits that are updated every loop, awesome!
 
     //printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);
-    // TODO: Please deal with this mess!!
-    leftSide->moveVelocity((int)std::min(leftVelocity, std::copysign(currentMaxVelocity,leftVelocity) ));
-    rightSide->moveVelocity((int)std::min(rightVelocity, std::copysign(currentMaxVelocity,rightVelocity) ));
-    strafeMotor->moveVelocity((int)std::min(strafeVelocity, std::copysign(currentMaxVelocity,strafeVelocity) ));
+    if (leftVelocity >= 0) leftVelocity = std::min(leftVelocity, currentMaxVelocity);
+    else leftVelocity = std::max(leftVelocity, -currentMaxVelocity);
+    if (rightVelocity >= 0) rightVelocity = std::min(rightVelocity, currentMaxVelocity);
+    else rightVelocity = std::max(rightVelocity, -currentMaxVelocity);
+
+    if (strafeVelocity >= 0) strafeVelocity = std::min(strafeVelocity, currentMaxVelocity);
+    else strafeVelocity = std::max(strafeVelocity, -currentMaxVelocity);
+
+    leftSide->moveVelocity((int)leftVelocity);
+    rightSide->moveVelocity((int)rightVelocity);
+    strafeMotor->moveVelocity((int)strafeVelocity);
 };
 
 void ChassisControllerHDrive::trampoline(void* param) {
