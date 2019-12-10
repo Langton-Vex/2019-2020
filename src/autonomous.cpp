@@ -263,8 +263,7 @@ void init_autonomous() {
     ccont = ChassisControllerBuilder()
                 .withMotors({ left_port, lefttwo_port },
                     { right_port, righttwo_port })
-                .withGearset(AbstractMotor::gearset::green)
-                .withDimensions({ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
+                .withDimensions(AbstractMotor::gearset::green,{ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
                 .build();
 
     intake = std::make_unique<okapi::Motor>(intake_port);
@@ -324,7 +323,7 @@ void autonomous() {
         okapi::AbstractMotor::gearset::green, // strafe gearset
         okapi::ChassisScales(
             { { okapi::inch * 4.125, 15.1 * okapi::inch, // wheel diam, wheelbase diam
-                  1 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+                  0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
                 okapi::imev5GreenTPR }));
 
     //cc->tune();
