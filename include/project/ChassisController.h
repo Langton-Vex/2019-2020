@@ -2,6 +2,8 @@
 #define _CHASSIS_CONTROLLER_H_
 
 #include "main.h"
+#include "okapi/api/control/util/pathfinderUtil.hpp"
+#include "okapi/pathfinder/include/pathfinder.h"
 
 /* Yes everything uses okapi it's a great library dont judge
    There is nothing wrong with not wanting to reinvent the wheel
@@ -37,6 +39,22 @@ public:
     int maxVelocity = 150;
     double currentMaxVelocity = 0.0;
     double maxVoltage = 12.0;
+
+    okapi::PathfinderLimits plimits{ 0.5, 0.75, 1 };
+    std::string currentPath{ "" };
+    int direction = 1;
+    bool mirrored = false;
+
+    using TrajectoryPtr = std::unique_ptr<TrajectoryCandidate, void (*)(TrajectoryCandidate*)>;
+    using SegmentPtr = std::unique_ptr<Segment, void (*)(void*)>;
+
+    struct TrajectoryPair {
+        SegmentPtr left;
+        SegmentPtr right;
+        int length;
+    };
+
+    std::map<std::string, TrajectoryPair> paths{};
 
     static void trampoline(void* param);
 
@@ -87,6 +105,11 @@ public:
 
     void enableTurn(okapi::QAngle angle);
     void changeTurn(okapi::QAngle angle);
+
+    void generatePath(std::initializer_list<okapi::PathfinderPoint> iwaypoints,
+        const std::string& ipathId);
+    void removePath(const std::string& ipathId);
+    void runPath(const std::string& ipathId);
 
     void waitUntilSettled();
     bool waitUntilDistanceSettled();

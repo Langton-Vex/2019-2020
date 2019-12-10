@@ -5,6 +5,7 @@ enum class ControllerMode {
     straight,
     turn,
     strafe,
-    angle
+    angle,
+    pathfinderProfile
 };
 #endif

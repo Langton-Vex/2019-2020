@@ -135,14 +135,14 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
-void ChassisControllerHDrive::enableTurn(okapi::QAngle angle){
+void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
-void ChassisControllerHDrive::changeTurn(okapi::QAngle angle){
+void ChassisControllerHDrive::changeTurn(okapi::QAngle angle) {
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
@@ -170,7 +170,7 @@ void ChassisControllerHDrive::driveToPoint(okapi::Point point) {
 void ChassisControllerHDrive::driveToPointAsync(okapi::Point point) {
     auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
         point.inFT(okapi::StateMode::FRAME_TRANSFORMATION), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
-        
+
     turnAngle(angle);
     driveStraight(length);
 };
@@ -205,9 +205,63 @@ void ChassisControllerHDrive::diagToPoint(okapi::Point point) {
     diagToPointAsync(point);
     waitUntilSettled();
 };
+// Partially yeeted from okapi ty okapi <3
+void ChassisControllerHDrive::generatePath(std::initializer_list<okapi::PathfinderPoint> iwaypoints, const std::string& ipathId) {
+    if (iwaypoints.size() == 0)
+        return;
+
+    std::vector<Waypoint> points;
+    points.reserve(iwaypoints.size());
+    for (auto& point : iwaypoints) {
+        points.push_back(
+            Waypoint{ point.x.convert(okapi::meter), point.y.convert(okapi::meter), point.theta.convert(okapi::radian) });
+    }
+    TrajectoryCandidate candidate;
+    // Arguments:
+    // Fit Function:        FIT_HERMITE_CUBIC or FIT_HERMITE_QUINTIC
+    // Sample Count:        PATHFINDER_SAMPLES_HIGH (100 000)
+    //                      PATHFINDER_SAMPLES_LOW  (10 000)
+    //                      PATHFINDER_SAMPLES_FAST (1 000)
+    pathfinder_prepare(points.data(), points.size(), FIT_HERMITE_CUBIC, PATHFINDER_SAMPLES_FAST, 0.010, plimits.maxVel, plimits.maxAccel, plimits.maxJerk, &candidate);
+
+    int length = candidate.length;
+
+    // Array of Segments (the trajectory points) to store the trajectory in
+    SegmentPtr trajectory(static_cast<Segment*>(malloc(length * sizeof(Segment))), free);
+    SegmentPtr leftTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
+    SegmentPtr rightTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
+
+    // Generate the trajectory
+    pathfinder_generate(&candidate, trajectory.get());
+    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(),
+        rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
+    // In case
+    removePath(ipathId);
+
+    paths.emplace(ipathId,
+        TrajectoryPair{ std::move(leftTrajectory), std::move(rightTrajectory), length });
+};
+void ChassisControllerHDrive::removePath(const std::string& ipathId) {
+    if (currentPath == ipathId)
+        return;
+    auto oldPath = paths.find(ipathId);
+    if (oldPath != paths.end()) {
+        paths.erase(ipathId);
+    }
+};
+void ChassisControllerHDrive::runPath(const std::string& ipathId) {
+    turnPID->flipDisable(false);
+
+    mode.push_back(ControllerMode::turn);
+    mode.push_back(ControllerMode::pathfinderProfile);
+};
 
 void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};
 void ChassisControllerHDrive::diagToPointAndTurnAsync(okapi::Point point, okapi::QAngle angle){};
+
+/* ----------------------------------------------------------------
+   TUNING SECTION
+   ---------------------------------------------------------------- */
 
 std::string TuningToString(okapi::PIDTuner::Output tuning) {
     std::string ret = "Kp: ";
@@ -434,7 +488,7 @@ void ChassisControllerHDrive::step() {
         currentMaxVelocity = (double)std::min(currentMaxVelocity, (double)maxVelocity);
         //currentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
     }
-    fprintf(stderr, "hobgoblin: %f\n",(double)maxAccel * (double)asyncUpdateDelay * 0.001);
+    fprintf(stderr, "hobgoblin: %f\n", (double)maxAccel * (double)asyncUpdateDelay * 0.001);
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
@@ -469,13 +523,19 @@ void ChassisControllerHDrive::step() {
     // Speed limits that are updated every loop, awesome!
 
     //printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);
-    if (leftVelocity >= 0) leftVelocity = std::min(leftVelocity, currentMaxVelocity);
-    else leftVelocity = std::max(leftVelocity, -currentMaxVelocity);
-    if (rightVelocity >= 0) rightVelocity = std::min(rightVelocity, currentMaxVelocity);
-    else rightVelocity = std::max(rightVelocity, -currentMaxVelocity);
+    if (leftVelocity >= 0)
+        leftVelocity = std::min(leftVelocity, currentMaxVelocity);
+    else
+        leftVelocity = std::max(leftVelocity, -currentMaxVelocity);
+    if (rightVelocity >= 0)
+        rightVelocity = std::min(rightVelocity, currentMaxVelocity);
+    else
+        rightVelocity = std::max(rightVelocity, -currentMaxVelocity);
 
-    if (strafeVelocity >= 0) strafeVelocity = std::min(strafeVelocity, currentMaxVelocity);
-    else strafeVelocity = std::max(strafeVelocity, -currentMaxVelocity);
+    if (strafeVelocity >= 0)
+        strafeVelocity = std::min(strafeVelocity, currentMaxVelocity);
+    else
+        strafeVelocity = std::max(strafeVelocity, -currentMaxVelocity);
 
     leftSide->moveVelocity((int)leftVelocity);
     rightSide->moveVelocity((int)rightVelocity);

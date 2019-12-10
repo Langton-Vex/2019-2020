@@ -179,7 +179,7 @@ void three_cubes() {
 
 extern pros::ADIAnalogIn arm_pot;
 
-void pot_lookup(){
+void pot_lookup() {
     cc->stop_task();
     lift->flipDisable(true);
     fprintf(stderr, "starting");
@@ -187,10 +187,10 @@ void pot_lookup(){
     save_file.clear();
     peripherals->leftarm_mtr.move_velocity(30);
     peripherals->rightarm_mtr.move_velocity(30);
-    for(int i = 0; i < 500; i++) {
-      save_file << peripherals->leftarm_mtr.get_position() << ",";
-      save_file << arm_pot.get_value() << "\n";
-      pros::delay(10);
+    for (int i = 0; i < 500; i++) {
+        save_file << peripherals->leftarm_mtr.get_position() << ",";
+        save_file << arm_pot.get_value() << "\n";
+        pros::delay(10);
     }
     save_file.close();
     fprintf(stderr, "stopped");
@@ -198,7 +198,7 @@ void pot_lookup(){
 
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
-    cc->driveToPoint(okapi::Point({0.3_m,0.3_m}));
+    cc->driveToPoint(okapi::Point({ 0.3_m, 0.3_m }));
     //cc->driveStraight(50_cm);
     //cc->turnAngle(180_deg);
     //cc->strafe(20_cm);
@@ -215,8 +215,9 @@ void vision_test() {
   profileController->waitUntilSettled();
 
   */
-  while (true) pros::delay(100);
-  return;
+    while (true)
+        pros::delay(100);
+    return;
 
     pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
@@ -263,7 +264,7 @@ void init_autonomous() {
     ccont = ChassisControllerBuilder()
                 .withMotors({ left_port, lefttwo_port },
                     { right_port, righttwo_port })
-                .withDimensions(AbstractMotor::gearset::green,{ { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
+                .withDimensions(AbstractMotor::gearset::green, { { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
                 .build();
 
     intake = std::make_unique<okapi::Motor>(intake_port);
@@ -279,7 +280,7 @@ void init_autonomous() {
     configManager->register_auton("small_four_cubes", small_four_cubes);
 
     configManager->register_auton("Move 15", move_15);
-    configManager->register_auton("potentiomenter test",pot_lookup);
+    configManager->register_auton("potentiomenter test", pot_lookup);
 }
 
 void auton_cleanup() {
