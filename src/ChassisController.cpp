@@ -251,11 +251,43 @@ void ChassisControllerHDrive::removePath(const std::string& ipathId) {
         paths.erase(ipathId);
     }
 };
-void ChassisControllerHDrive::runPath(const std::string& ipathId) {
+// This function is blocking!
+void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed, bool mirrored) {
     turnPID->flipDisable(false);
 
-    mode.push_back(ControllerMode::turn);
-    mode.push_back(ControllerMode::pathfinderProfile);
+    // Probably not needed
+    //mode.push_back(ControllerMode::turn);
+    //mode.push_back(ControllerMode::pathfinderProfile);
+
+    auto rate = timeUtil->getRate();
+
+    TrajectoryPair &path = paths.find(ipathId)->second;
+    const int pathLength = path.length;
+
+    for (int i = 0; i < pathLength; ++i) {
+      const auto segDT = path.left.get()[i].dt * okapi::second;
+
+      const auto leftLinear = path.left.get()[i].velocity * okapi::mps;
+      const auto rightLinear = path.right.get()[i].velocity * okapi::mps;
+
+      const auto LinearToRot = (360* okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
+
+      const auto leftRPM = (leftLinear * LinearToRot).convert(okapi::rpm);
+      const auto rightRPM = (rightLinear * LinearToRot).convert(okapi::rpm);
+
+      const double rightSpeed = rightRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
+      const double leftSpeed = leftRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
+      if (mirrored) {
+        model->left(rightSpeed);
+        model->right(leftSpeed);
+      } else {
+        model->left(leftSpeed);
+        model->right(rightSpeed);
+      }
+
+      rate->delayUntil(segDT);
+    }
+
 };
 
 void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};

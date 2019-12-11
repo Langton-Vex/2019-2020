@@ -109,7 +109,7 @@ public:
     void generatePath(std::initializer_list<okapi::PathfinderPoint> iwaypoints,
         const std::string& ipathId);
     void removePath(const std::string& ipathId);
-    void runPath(const std::string& ipathId);
+    void runPath(const std::string& ipathId, bool reversed, bool mirrored);
 
     void waitUntilSettled();
     bool waitUntilDistanceSettled();
