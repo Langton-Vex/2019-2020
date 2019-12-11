@@ -73,9 +73,11 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     model = std::make_unique<okapi::ThreeEncoderSkidSteerModel>(leftSide, rightSide,
         leftSide->getEncoder(), strafeMotor->getEncoder(), rightSide->getEncoder(),
         maxVelocity, maxVoltage);
-
+    okapi::ChassisScales odomscales( { scales->wheelDiameter, scales->wheelTrack/2,
+          scales->middleWheelDistance,scales->middleWheelDiameter},
+        scales->tpr);
     odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
-        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), *scales);
+        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), odomscales);
 
     reset();
 
@@ -488,7 +490,6 @@ void ChassisControllerHDrive::step() {
         currentMaxVelocity = (double)std::min(currentMaxVelocity, (double)maxVelocity);
         //currentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
     }
-    fprintf(stderr, "hobgoblin: %f\n", (double)maxAccel * (double)asyncUpdateDelay * 0.001);
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);

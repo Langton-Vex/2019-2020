@@ -198,7 +198,9 @@ void pot_lookup() {
 
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
-    cc->driveToPoint(okapi::Point({ 0.3_m, 0.3_m }));
+    cc->driveToPoint(okapi::Point({ 2_ft, 0_m }));
+    cc->driveToPoint(okapi::Point({ 0_m, 0_m }));
+    //cc->lookToPoint(okapi::Point({ 1_m, 0_m }));
     //cc->driveStraight(50_cm);
     //cc->turnAngle(180_deg);
     //cc->strafe(20_cm);
