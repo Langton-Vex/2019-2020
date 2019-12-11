@@ -198,25 +198,24 @@ void pot_lookup() {
 
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
-    cc->driveToPoint(okapi::Point({ 2_ft, 0_m }));
-    cc->driveToPoint(okapi::Point({ 0_m, 0_m }));
-    //cc->lookToPoint(okapi::Point({ 1_m, 0_m }));
-    //cc->driveStraight(50_cm);
-    //cc->turnAngle(180_deg);
-    //cc->strafe(20_cm);
-    //cc->turnAngle(90_deg);
-    //return;
-    //cc->stop_task();
-    /*
-  auto profileController = AsyncMotionProfileControllerBuilder()
-                           .withLimits({0.5, 0.75, 1})
-                           .withOutput(ccont)
-                           .buildMotionProfileController();
-  profileController->generatePath({{0_ft, 0_ft, 0_deg}, {3_ft, -3_ft, -90_deg}}, "A");
-  profileController->setTarget("A");
-  profileController->waitUntilSettled();
+    
+    cc->driveToPoint({2_ft, 0_ft});
+    cc->driveToPoint({0_ft, 0_ft});
+    cc->lookToPoint({1_ft,0_ft});
 
-  */
+    //return;
+    /*
+    cc->stop_task();
+
+    auto profileController = AsyncMotionProfileControllerBuilder()
+                             .withLimits({0.5, 0.5, 0.5})
+                             .withOutput(ccont)
+                             .buildMotionProfileController();
+    profileController->generatePath({{0_ft, 0_ft, 0_deg}, {2_ft, -2_ft, -90_deg}}, "A");
+    profileController->setTarget("A");
+    profileController->waitUntilSettled();
+    */
+
     while (true)
         pros::delay(100);
     return;
@@ -309,7 +308,7 @@ void autonomous() {
 
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
-    PIDTuning turnTuning = PIDTuning(0.002304, 0, 0.000033);
+    PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
     PIDTuning strafeTuning = PIDTuning(0.002304, 0, 0.000013);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(

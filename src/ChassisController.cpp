@@ -70,8 +70,8 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     timeUtil = std::make_unique<okapi::TimeUtil>(okapi::TimeUtilFactory::createDefault());
     settledUtil = timeUtil->getSettledUtil();
 
-    model = std::make_unique<okapi::ThreeEncoderSkidSteerModel>(leftSide, rightSide,
-        leftSide->getEncoder(), strafeMotor->getEncoder(), rightSide->getEncoder(),
+    model = std::make_unique<okapi::HDriveModel>(leftSide, rightSide, strafeMotor,
+        leftSide->getEncoder(), rightSide->getEncoder(), strafeMotor->getEncoder(),
         maxVelocity, maxVoltage);
     okapi::ChassisScales odomscales( { scales->wheelDiameter, scales->wheelTrack/2,
           scales->middleWheelDistance,scales->middleWheelDiameter},

@@ -33,10 +33,10 @@ public:
     int asyncUpdateDelay = 10;
 
     std::unique_ptr<okapi::ThreeEncoderOdometry> odom;
-    std::shared_ptr<okapi::ThreeEncoderSkidSteerModel> model;
+    std::shared_ptr<okapi::HDriveModel> model;
 
-    int maxAccel = 150;
-    int maxVelocity = 150;
+    int maxAccel = 140;
+    int maxVelocity = 100;
     double currentMaxVelocity = 0.0;
     double maxVoltage = 12.0;
 
