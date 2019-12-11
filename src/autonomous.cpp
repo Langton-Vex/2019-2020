@@ -198,10 +198,10 @@ void pot_lookup() {
 
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
-    
-    cc->driveToPoint({2_ft, 0_ft});
-    cc->driveToPoint({0_ft, 0_ft});
-    cc->lookToPoint({1_ft,0_ft});
+
+    cc->driveToPoint({ 2_ft, 0_ft });
+    cc->driveToPoint({ 0_ft, 0_ft });
+    cc->lookToPoint({ 1_ft, 0_ft });
 
     //return;
     /*

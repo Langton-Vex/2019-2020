@@ -73,8 +73,8 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     model = std::make_unique<okapi::HDriveModel>(leftSide, rightSide, strafeMotor,
         leftSide->getEncoder(), rightSide->getEncoder(), strafeMotor->getEncoder(),
         maxVelocity, maxVoltage);
-    okapi::ChassisScales odomscales( { scales->wheelDiameter, scales->wheelTrack/2,
-          scales->middleWheelDistance,scales->middleWheelDiameter},
+    okapi::ChassisScales odomscales({ scales->wheelDiameter, scales->wheelTrack / 2,
+                                        scales->middleWheelDistance, scales->middleWheelDiameter },
         scales->tpr);
     odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
         std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), odomscales);
@@ -230,18 +230,18 @@ void ChassisControllerHDrive::generatePath(std::initializer_list<okapi::Pathfind
 
     // Array of Segments (the trajectory points) to store the trajectory in
     SegmentPtr trajectory(static_cast<Segment*>(malloc(length * sizeof(Segment))), free);
-    SegmentPtr leftTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
-    SegmentPtr rightTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
+    //SegmentPtr leftTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
+    //SegmentPtr rightTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
 
     // Generate the trajectory
     pathfinder_generate(&candidate, trajectory.get());
-    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(),
-        rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
+    //pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(),rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
+
     // In case
     removePath(ipathId);
 
     paths.emplace(ipathId,
-        TrajectoryPair{ std::move(leftTrajectory), std::move(rightTrajectory), length });
+        TrajectoryPair{ std::move(trajectory), length });
 };
 void ChassisControllerHDrive::removePath(const std::string& ipathId) {
     if (currentPath == ipathId)
@@ -261,33 +261,36 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
 
     auto rate = timeUtil->getRate();
 
-    TrajectoryPair &path = paths.find(ipathId)->second;
+    TrajectoryPair& path = paths.find(ipathId)->second;
     const int pathLength = path.length;
 
     for (int i = 0; i < pathLength; ++i) {
-      const auto segDT = path.left.get()[i].dt * okapi::second;
 
-      const auto leftLinear = path.left.get()[i].velocity * okapi::mps;
-      const auto rightLinear = path.right.get()[i].velocity * okapi::mps;
+        const auto segDT = path.segments.get()[i].dt * okapi::second;
 
-      const auto LinearToRot = (360* okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
+        const auto linear = path.segments.get()[i].velocity * okapi::mps;
 
-      const auto leftRPM = (leftLinear * LinearToRot).convert(okapi::rpm);
-      const auto rightRPM = (rightLinear * LinearToRot).convert(okapi::rpm);
+        const auto LinearToRot = (360 * okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
+        const auto chassisRPM = (linear * LinearToRot).convert(okapi::rpm);
 
-      const double rightSpeed = rightRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
-      const double leftSpeed = leftRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
-      if (mirrored) {
-        model->left(rightSpeed);
-        model->right(leftSpeed);
-      } else {
-        model->left(leftSpeed);
-        model->right(rightSpeed);
-      }
+        const double speed = chassisRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
+        const auto heading = path.segments.get()[i].heading * okapi::radian;
 
-      rate->delayUntil(segDT);
+        turnPID->setTarget(heading.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+        double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
+        double turnOut = turnPID->step(turnChange);
+        double turnVelocity = (double)straightGearset->internalGearset * turnOut;
+
+        if (mirrored) {
+            model->left(speed + turnVelocity);
+            model->right(speed - turnVelocity);
+        } else {
+            model->left(speed + turnVelocity);
+            model->right(speed - turnVelocity);
+        }
+
+        rate->delayUntil(segDT);
     }
-
 };
 
 void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};
