@@ -12,6 +12,7 @@ public:
     void user_control();
     void set(int power);
     void set_pos(double position);
+    double scale(double x, double min, double max, double a, double b);
 
     unsigned int current_major_position;
     unsigned int current_minor_position;
