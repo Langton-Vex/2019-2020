@@ -204,8 +204,8 @@ void vision_test() {
     cc->driveToPoint({ 0_ft, 0_ft });
     cc->lookToPoint({ 1_ft, 0_ft });
     */
-    cc->generatePath({{0_ft, 0_ft, 0_deg}, {2_ft, -2_ft, -90_deg}}, "A");
-    cc->runPath("A",false,false);
+    //cc->generatePath({{0_ft, 0_ft, 0_deg}, {2_ft, 4_ft, 45_deg}}, "A");
+    //cc->runPath("A",false,false);
     //return;
     /*
     cc->stop_task();
@@ -219,17 +219,17 @@ void vision_test() {
     profileController->waitUntilSettled();
     */
 
-    while (true)
-        pros::delay(100);
-    return;
+    //while (true)
+    //    pros::delay(100);
+    //return;
 
     pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-    auto straightPID = okapi::IterativeControllerFactory::posPID(0.0050, 0.000000, 0.0);
+    auto straightPID = okapi::IterativeControllerFactory::posPID(0.0020, 0.000000, 0.0);
     auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200, 0.000000, 0.00089);
-    auto strafePID = okapi::IterativeControllerFactory::posPID(0.003, 0.000000, 0.00089);
+    auto strafePID = okapi::IterativeControllerFactory::posPID(0.0018, 0.000000, 0.0005);
     double leftVelocity, rightVelocity, strafeVelocity;
 
     okapi::MotorGroup leftSide(
@@ -242,13 +242,15 @@ void vision_test() {
     while (true) {
         pros::vision_object_s_t rtn = camera.get_by_size(0);
         if (rtn.width > 30) {
-            double straightOut = straightPID.step(130 - rtn.width);
+            double straightOut = straightPID.step(215 - rtn.width);
             fprintf(stderr, "%f", straightOut);
             //double turnOut = turnPID.step(rtn.width - rtn.height);
             double strafeOut = turnPID.step(rtn.x_middle_coord);
             //double turnOut = 0;
-            leftVelocity = -200.0 * straightOut;
-            rightVelocity = -200.0 * straightOut;
+            if (turnPID.isSettled()){
+              leftVelocity = -200.0 * straightOut;
+              rightVelocity = -200.0 * straightOut;
+            }
             strafeVelocity = 200.0 * strafeOut;
 
             peripherals->left_mtr.move_velocity((int)leftVelocity);

@@ -264,6 +264,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     TrajectoryPair& path = paths.find(ipathId)->second;
     const int pathLength = path.length;
 
+    stop_task();
     for (int i = 0; i < pathLength; ++i) {
 
         const auto segDT = path.segments.get()[i].dt * okapi::second;
@@ -274,23 +275,30 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         const auto chassisRPM = (linear * LinearToRot).convert(okapi::rpm);
 
         const double speed = chassisRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
-        const auto heading = path.segments.get()[i].heading * okapi::radian;
+        auto heading = path.segments.get()[i].heading * okapi::radian;
+        if (heading.convert(okapi::degree) > 180){
+            heading = (360*okapi::degree - heading);
+        }
 
         turnPID->setTarget(heading.convert(okapi::degree) * scales->turn * straightGearset->ratio);
         double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
         double turnOut = turnPID->step(turnChange);
         double turnVelocity = (double)straightGearset->internalGearset * turnOut;
-        fprintf(stderr,"hubblebubble: %f\n",linear.convert(okapi::mps));
+        int leftVelocity;
+        int rightVelocity;
         if (mirrored) {
-            leftSide->moveVelocity(chassisRPM  + turnVelocity);
-            rightSide->moveVelocity(chassisRPM - turnVelocity);
+            leftVelocity = (int)(chassisRPM  - turnVelocity);
+            rightVelocity = (int)(chassisRPM  + turnVelocity);
         } else {
-            leftSide->moveVelocity(chassisRPM  + turnVelocity);
-            rightSide->moveVelocity(chassisRPM - turnVelocity);
+            leftVelocity = (int)(chassisRPM  + turnVelocity);
+            rightVelocity = (int)(chassisRPM  - turnVelocity);
         }
+        leftSide->moveVelocity(leftVelocity);
+        rightSide->moveVelocity(rightVelocity);
 
         rate->delayUntil(segDT);
     }
+    start_task();
 };
 
 void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};

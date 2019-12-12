@@ -42,7 +42,6 @@ void Arm::user_control() {
     }
 
     height_per = scale(arm_pot.get_value(),150,1623,0,100) / 100;
-    fprintf(stderr,"heigth: %f\n",height_per);
 
     // Quick and dirty place to put this
     std::string arm_pos = std::to_string(peripherals->leftarm_mtr.get_position());
