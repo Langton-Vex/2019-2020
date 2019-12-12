@@ -54,45 +54,11 @@ void set_temperature() {
 }
 
 void opcontrol() {
-    /*
-    pros::Task temp_task(set_temperature, nullptr, "temp_task");
-    pros::delay(20);
-    PIDTuning straightTuning = PIDTuning(0.01, 0.0, 0);
-    PIDTuning angleTuning = PIDTuning(0, 0, 0);
-    PIDTuning turnTuning = PIDTuning(10, 0, 0);
-    PIDTuning strafeTuning = PIDTuning(0, 0, 0);
-    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
-    okapi::MotorGroup leftSide(
-        {-left_port,-lefttwo_port });
-    okapi::MotorGroup rightSide(
-        {-right_port,-righttwo_port});
-    okapi::Motor strafeMotor(11);
-
-    std::unique_ptr<ChassisControllerHDrive> cc = std::make_unique<ChassisControllerHDrive>(
-        ChassisControllerHDrive(
-            straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning,
-            leftSide, rightSide, strafeMotor,
-            okapi::AbstractMotor::gearset::green,
-            okapi::AbstractMotor::gearset::green,
-            { { okapi::inch * 4.3, okapi::millimeter * 370 }, okapi::imev5GreenTPR }));
-    */
-    //cc->driveStraightAsync(10 * okapi::inch);
-    /*
-    cc->start_task();
-    cc->waitUntilSettled();
-    */
-
-    //cc->start_task();
-    //cc->driveStraight(5 * okapi::inch);
-    //cc->turnAngle(90 * okapi::degree);
-
-    //cc->waitUntilSettled();
-    //cc->tune();
-
-    //pros::Task temp_task(set_temperature, nullptr, "temp_task");
     std::shared_ptr<Chassis> chassis = Chassis::get();
     std::shared_ptr<Arm> arm = Arm::get();
     std::shared_ptr<Claw> claw = Claw::get();
+
+    peripherals->master_controller.print(-1, 0, ""); //NOTE: This may or may not work
 
     int it = 50;
     while (true) {

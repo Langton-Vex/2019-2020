@@ -49,7 +49,8 @@ public:
     using SegmentPtr = std::unique_ptr<Segment, void (*)(void*)>;
 
     struct TrajectoryPair {
-        SegmentPtr segments;
+        SegmentPtr left;
+        SegmentPtr right;
         int length;
     };
 

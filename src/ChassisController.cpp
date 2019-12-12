@@ -19,6 +19,9 @@
       * Motion profiling, or a velocity controller (?) will eventually do anyway.
       * limit acceleration by looping and solving (final velocity)2 - (initial velocity)2 = 2 × acceleration × distance
         for distance, are we above / below / about to cross the boundary? We can start slowing then.
+   * Very large amounts of this class use hard coded values, or make lots of assumptions about the programmer / external state
+     for example, gear ratios, motor speeds, motor encoder units, etc etc.  For a workable API that we can use in the future
+     This needs to be updated.
 */
 
 /* Remember with this controller that if you are doing two movements
@@ -230,18 +233,18 @@ void ChassisControllerHDrive::generatePath(std::initializer_list<okapi::Pathfind
 
     // Array of Segments (the trajectory points) to store the trajectory in
     SegmentPtr trajectory(static_cast<Segment*>(malloc(length * sizeof(Segment))), free);
-    //SegmentPtr leftTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
-    //SegmentPtr rightTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
+    SegmentPtr leftTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
+    SegmentPtr rightTrajectory((Segment*)malloc(sizeof(Segment) * length), free);
 
     // Generate the trajectory
     pathfinder_generate(&candidate, trajectory.get());
-    //pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(),rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
+    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(), rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
 
     // In case
     removePath(ipathId);
 
     paths.emplace(ipathId,
-        TrajectoryPair{ std::move(trajectory), length });
+        TrajectoryPair{ std::move(leftTrajectory), std::move(rightTrajectory), length });
 };
 void ChassisControllerHDrive::removePath(const std::string& ipathId) {
     if (currentPath == ipathId)
@@ -256,7 +259,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     turnPID->flipDisable(false);
 
     // Probably not needed
-    //mode.push_back(ControllerMode::turn);
+    mode.push_back(ControllerMode::turn);
     //mode.push_back(ControllerMode::pathfinderProfile);
 
     auto rate = timeUtil->getRate();
@@ -264,34 +267,55 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     TrajectoryPair& path = paths.find(ipathId)->second;
     const int pathLength = path.length;
 
+    EncoderFollower left_follower;
+    left_follower.last_error = 0;
+    left_follower.segment = 0;
+    left_follower.finished = 0;
+    EncoderFollower right_follower;
+    right_follower.last_error = 0;
+    right_follower.segment = 0;
+    right_follower.finished = 0;
+    // TODO: This assumes everything is in degrees, please consider changing this!!
+    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales->wheelDiameter.convert(okapi::meter) * M_PI, // Position, Ticks per Rev, Wheel Circumference
+        1.0, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
+
+    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales->wheelDiameter.convert(okapi::meter) * M_PI, // Position, Ticks per Rev, Wheel Circumference
+        1.0, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
+
+    /* This is jank, should be in step, this entire project needs refactoring into
+       mutiple files and step states need to be in different functions */
     stop_task();
-    for (int i = 0; i < pathLength; ++i) {
+    while (!left_follower.finished || !right_follower.finished) {
+        const auto segDT = path.left.get()[0].dt * okapi::second;
 
-        const auto segDT = path.segments.get()[i].dt * okapi::second;
+        //const auto linear = path.segments.get()[i].velocity * okapi::mps;
+        // NOTE: We probably want this?? I don't know until I try
+        double l = (double)straightGearset->internalGearset * pathfinder_follow_encoder(left_config, &left_follower, path.left.get(), pathLength, (int)leftSide->getPosition());
+        double r = (double)straightGearset->internalGearset * pathfinder_follow_encoder(right_config, &right_follower, path.right.get(), pathLength, (int)rightSide->getPosition());
 
-        const auto linear = path.segments.get()[i].velocity * okapi::mps;
+        //const auto LinearToRot = (360 * okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
+        //const auto chassisRPM = (linear * LinearToRot).convert(okapi::rpm);
+        //const double speed = chassisRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
 
-        const auto LinearToRot = (360 * okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
-        const auto chassisRPM = (linear * LinearToRot).convert(okapi::rpm);
-
-        const double speed = chassisRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
-        auto heading = path.segments.get()[i].heading * okapi::radian;
-        if (heading.convert(okapi::degree) > 180) {
-            heading = (360 * okapi::degree - heading);
+        // In degrees
+        auto heading = (left_follower.heading * okapi::radian).convert(okapi::degree);
+        if (heading > 180) {
+            heading = (180 - heading);
         }
 
-        turnPID->setTarget(heading.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+        turnPID->setTarget(heading * scales->turn * straightGearset->ratio);
         double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
         double turnOut = turnPID->step(turnChange);
         double turnVelocity = (double)straightGearset->internalGearset * turnOut;
+
         int leftVelocity;
         int rightVelocity;
         if (mirrored) {
-            leftVelocity = (int)(chassisRPM - turnVelocity);
-            rightVelocity = (int)(chassisRPM + turnVelocity);
+            leftVelocity = (int)(l - turnVelocity);
+            rightVelocity = (int)(r + turnVelocity);
         } else {
-            leftVelocity = (int)(chassisRPM + turnVelocity);
-            rightVelocity = (int)(chassisRPM - turnVelocity);
+            leftVelocity = (int)(l + turnVelocity);
+            rightVelocity = (int)(r - turnVelocity);
         }
         leftSide->moveVelocity(leftVelocity);
         rightSide->moveVelocity(rightVelocity);
@@ -299,6 +323,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         rate->delayUntil(segDT);
     }
     start_task();
+    waitUntilSettled();
 };
 
 void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};
