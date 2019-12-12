@@ -247,9 +247,9 @@ void vision_test() {
             //double turnOut = turnPID.step(rtn.width - rtn.height);
             double strafeOut = turnPID.step(rtn.x_middle_coord);
             //double turnOut = 0;
-            if (turnPID.isSettled()){
-              leftVelocity = -200.0 * straightOut;
-              rightVelocity = -200.0 * straightOut;
+            if (turnPID.isSettled()) {
+                leftVelocity = -200.0 * straightOut;
+                rightVelocity = -200.0 * straightOut;
             }
             strafeVelocity = 200.0 * strafeOut;
 

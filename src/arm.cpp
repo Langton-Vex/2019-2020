@@ -41,7 +41,7 @@ void Arm::user_control() {
         peripherals->rightarm_mtr.tare_position();
     }
 
-    height_per = scale(arm_pot.get_value(),150,1623,0,100) / 100;
+    height_per = scale(arm_pot.get_value(), 150, 1623, 0, 100) / 100;
 
     // Quick and dirty place to put this
     std::string arm_pos = std::to_string(peripherals->leftarm_mtr.get_position());
@@ -78,5 +78,5 @@ void Arm::set_pos(double position) {
 }
 //x is the number between current scale, a is the min of the new range, b is the max of the new range, min is the min of the current range, max is the max of the current range
 double Arm::scale(double x, double min, double max, double a, double b) {
-  return (a+b)-(((b-a)*(x-min))/(max-min)+a);
+    return (a + b) - (((b - a) * (x - min)) / (max - min) + a);
 }

@@ -5,7 +5,6 @@
 extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, intake_port, strafe_port;
 
-
 std::shared_ptr<Chassis> Chassis::get() {
     static std::shared_ptr<Chassis> instance(new Chassis);
     return instance;
@@ -48,27 +47,25 @@ void Chassis::user_control() {
     turn = turn * power_mult;
 
     int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
-    if (align_button){
-      if (!aligning){
-        aligning = true;
-        align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
-            TASK_STACK_DEPTH_DEFAULT, "Vision Align");
-      }
-    }
-    else{
-      aligning = false;
-      this->set(power, turn, strafe);
-      if (align_task){
-        align_task->remove();
-        align_task.reset();
-      }
-
+    if (align_button) {
+        this->set(power, 0, 0);
+        if (!aligning) {
+            aligning = true;
+            align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
+                TASK_STACK_DEPTH_DEFAULT, "Vision Align");
+        }
+    } else {
+        aligning = false;
+        this->set(power, turn, strafe);
+        if (align_task) {
+            align_task->remove();
+            align_task.reset();
+        }
     }
 
     //slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_Y);
     //power_mult = (slowmode) ? 0.5 : power_mult;
     //strafe = strafe * power_mult;
-
 }
 
 double Chassis::power_mult_calc() {
@@ -112,30 +109,37 @@ void Chassis::set(int power, int turn, int strafe) {
     //pros::lcd::set_text(4,right_v);
 }
 
-void Chassis::vision_align(void* param){
+// Currently set to only move strafe, as forward/backward align is unreliable / not necessary
+void Chassis::vision_align(void* param) {
+    okapi::AverageFilter<5> x_coord_filter;
+    /*
+    okapi::EmaFilter x_coord_filter(1);
+    okapi::DemaFilter x_coord_filter(1,1);
+    okapi::MedianFilter<5> x_coord_filter;
+    */
     pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
     auto straightPID = okapi::IterativeControllerFactory::posPID(0.0020, 0.000000, 0.0);
     auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200, 0.000000, 0.00089);
-    auto strafePID = okapi::IterativeControllerFactory::posPID(0.0018, 0.000000, 0.0005);
+    auto strafePID = okapi::IterativeControllerFactory::posPID(0.0016, 0.000000, 0.0002);
     double leftVelocity, rightVelocity, strafeVelocity;
-    fprintf(stderr,"Yeet\n");
 
     while (true) {
         pros::vision_object_s_t rtn = camera.get_by_size(0);
-        if (camera.get_object_count() == 0) continue;
+        if (camera.get_object_count() == 0)
+            continue;
         if (rtn.width > 30) {
-            double straightOut = straightPID.step(215 - rtn.width);
-            fprintf(stderr, "%f", straightOut);
+            double straightOut = -straightPID.step(215 - rtn.width);
+            double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
             //double turnOut = turnPID.step(rtn.width - rtn.height);
-            double strafeOut = turnPID.step(rtn.x_middle_coord);
-            //double turnOut = 0;
-            if (turnPID.isSettled()){
-              leftVelocity = -200.0 * straightOut;
-              rightVelocity = -200.0 * straightOut;
+            /*
+            if (strafePID.isSettled()){
+              leftVelocity = 200.0 * straightOut;
+              rightVelocity = 200.0 * straightOut;
             }
+            */
             strafeVelocity = 200.0 * strafeOut;
 
             peripherals->left_mtr.move_velocity((int)leftVelocity);
@@ -143,8 +147,7 @@ void Chassis::vision_align(void* param){
             peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
             peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
             peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
-
         }
         pros::delay(10);
-      }
+    }
 }

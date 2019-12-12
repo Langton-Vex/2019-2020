@@ -276,8 +276,8 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
 
         const double speed = chassisRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
         auto heading = path.segments.get()[i].heading * okapi::radian;
-        if (heading.convert(okapi::degree) > 180){
-            heading = (360*okapi::degree - heading);
+        if (heading.convert(okapi::degree) > 180) {
+            heading = (360 * okapi::degree - heading);
         }
 
         turnPID->setTarget(heading.convert(okapi::degree) * scales->turn * straightGearset->ratio);
@@ -287,11 +287,11 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         int leftVelocity;
         int rightVelocity;
         if (mirrored) {
-            leftVelocity = (int)(chassisRPM  - turnVelocity);
-            rightVelocity = (int)(chassisRPM  + turnVelocity);
+            leftVelocity = (int)(chassisRPM - turnVelocity);
+            rightVelocity = (int)(chassisRPM + turnVelocity);
         } else {
-            leftVelocity = (int)(chassisRPM  + turnVelocity);
-            rightVelocity = (int)(chassisRPM  - turnVelocity);
+            leftVelocity = (int)(chassisRPM + turnVelocity);
+            rightVelocity = (int)(chassisRPM - turnVelocity);
         }
         leftSide->moveVelocity(leftVelocity);
         rightSide->moveVelocity(rightVelocity);
