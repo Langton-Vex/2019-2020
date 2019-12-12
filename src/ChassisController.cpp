@@ -280,13 +280,13 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
         double turnOut = turnPID->step(turnChange);
         double turnVelocity = (double)straightGearset->internalGearset * turnOut;
-
+        fprintf(stderr,"hubblebubble: %f\n",linear.convert(okapi::mps));
         if (mirrored) {
-            model->left(speed + turnVelocity);
-            model->right(speed - turnVelocity);
+            leftSide->moveVelocity(chassisRPM  + turnVelocity);
+            rightSide->moveVelocity(chassisRPM - turnVelocity);
         } else {
-            model->left(speed + turnVelocity);
-            model->right(speed - turnVelocity);
+            leftSide->moveVelocity(chassisRPM  + turnVelocity);
+            rightSide->moveVelocity(chassisRPM - turnVelocity);
         }
 
         rate->delayUntil(segDT);

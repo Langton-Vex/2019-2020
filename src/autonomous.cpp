@@ -199,10 +199,13 @@ void pot_lookup() {
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
 
+    /*
     cc->driveToPoint({ 2_ft, 0_ft });
     cc->driveToPoint({ 0_ft, 0_ft });
     cc->lookToPoint({ 1_ft, 0_ft });
-
+    */
+    cc->generatePath({{0_ft, 0_ft, 0_deg}, {2_ft, -2_ft, -90_deg}}, "A");
+    cc->runPath("A",false,false);
     //return;
     /*
     cc->stop_task();
