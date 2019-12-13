@@ -9,6 +9,7 @@ std::shared_ptr<Chassis> Chassis::get() {
     static std::shared_ptr<Chassis> instance(new Chassis);
     return instance;
 }
+pros::Mutex align_mutex;
 
 Chassis::Chassis() {
     pros::motor_gearset_e_t motor_gearset = peripherals->left_mtr.get_gearing();
@@ -47,20 +48,28 @@ void Chassis::user_control() {
     turn = turn * power_mult;
 
     int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
+    if (!align_task){
+      align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
+          TASK_STACK_DEPTH_DEFAULT, "Vision Align");
+      align_task->suspend();
+    }
+
     if (align_button) {
-        this->set(power, 0, 0);
+        this->set(power, 0, -9999);
         if (!aligning) {
             aligning = true;
-            align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
-                TASK_STACK_DEPTH_DEFAULT, "Vision Align");
+            align_task->resume();
         }
     } else {
-        aligning = false;
-        this->set(power, turn, strafe);
-        if (align_task) {
-            align_task->remove();
-            align_task.reset();
+        if (aligning){
+          align_mutex.take(TIMEOUT_MAX);
+          fprintf(stderr, "ending\n");
+          align_task->suspend();
+          align_mutex.give();
+          aligning = false;
         }
+        this->set(power, turn, strafe);
+
     }
 
     //slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_Y);
@@ -100,8 +109,8 @@ void Chassis::set(int power, int turn, int strafe) {
     peripherals->right_mtr.move_velocity(right);
     peripherals->lefttwo_mtr.move_velocity(left);
     peripherals->righttwo_mtr.move_velocity(right);
-
-    peripherals->strafe_mtr.move(strafe);
+    if (abs(strafe) > -9999)
+      peripherals->strafe_mtr.move(strafe);
 
     std::string left_v = std::to_string(peripherals->left_mtr.get_actual_velocity());
     std::string right_v = std::to_string(peripherals->right_mtr.get_actual_velocity());
@@ -127,11 +136,12 @@ void Chassis::vision_align(void* param) {
     double leftVelocity, rightVelocity, strafeVelocity;
 
     while (true) {
+        align_mutex.take(TIMEOUT_MAX);
         pros::vision_object_s_t rtn = camera.get_by_size(0);
         if (camera.get_object_count() == 0)
             continue;
         if (rtn.width > 30) {
-            double straightOut = -straightPID.step(215 - rtn.width);
+            //double straightOut = -straightPID.step(215 - rtn.width);
             double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
             //double turnOut = turnPID.step(rtn.width - rtn.height);
             /*
@@ -142,12 +152,14 @@ void Chassis::vision_align(void* param) {
             */
             strafeVelocity = 200.0 * strafeOut;
 
-            peripherals->left_mtr.move_velocity((int)leftVelocity);
-            peripherals->right_mtr.move_velocity((int)rightVelocity);
-            peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
-            peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
+            //peripherals->left_mtr.move_velocity((int)leftVelocity);
+            //peripherals->right_mtr.move_velocity((int)rightVelocity);
+            //peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
+            //peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
             peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
         }
+        align_mutex.give();
         pros::delay(10);
+
     }
 }

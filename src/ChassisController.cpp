@@ -257,6 +257,7 @@ void ChassisControllerHDrive::removePath(const std::string& ipathId) {
 // This function is blocking!
 void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed, bool mirrored) {
     turnPID->flipDisable(false);
+    reset();
 
     // Probably not needed
     mode.push_back(ControllerMode::turn);
@@ -277,17 +278,16 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     right_follower.finished = 0;
     // TODO: This assumes everything is in degrees, please consider changing this!!
     EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales->wheelDiameter.convert(okapi::meter) * M_PI, // Position, Ticks per Rev, Wheel Circumference
-        1.0, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
+        0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
     EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales->wheelDiameter.convert(okapi::meter) * M_PI, // Position, Ticks per Rev, Wheel Circumference
-        1.0, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
+        0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
     /* This is jank, should be in step, this entire project needs refactoring into
        mutiple files and step states need to be in different functions */
     stop_task();
     while (!left_follower.finished || !right_follower.finished) {
         const auto segDT = path.left.get()[0].dt * okapi::second;
-
         //const auto linear = path.segments.get()[i].velocity * okapi::mps;
         // NOTE: We probably want this?? I don't know until I try
         double l = (double)straightGearset->internalGearset * pathfinder_follow_encoder(left_config, &left_follower, path.left.get(), pathLength, (int)leftSide->getPosition());
@@ -300,7 +300,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         // In degrees
         auto heading = (left_follower.heading * okapi::radian).convert(okapi::degree);
         if (heading > 180) {
-            heading = (180 - heading);
+            heading = (360.0 - heading);
         }
 
         turnPID->setTarget(heading * scales->turn * straightGearset->ratio);
