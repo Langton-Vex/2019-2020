@@ -9,10 +9,14 @@ class Arm {
 public:
     static std::shared_ptr<Arm> get();
 
+    void init(); // Only called duriing itialize
+
     void user_control();
     void set(int power);
     void set_pos(double position);
+    void set_height(okapi::QLength height);
     double scale(double x, double min, double max, double a, double b);
+    void waitUntilSettled();
 
     unsigned int current_major_position;
     unsigned int current_minor_position;

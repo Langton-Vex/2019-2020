@@ -48,10 +48,10 @@ void Chassis::user_control() {
     turn = turn * power_mult;
 
     int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
-    if (!align_task){
-      align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
-          TASK_STACK_DEPTH_DEFAULT, "Vision Align");
-      align_task->suspend();
+    if (!align_task) {
+        align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
+            TASK_STACK_DEPTH_DEFAULT, "Vision Align");
+        align_task->suspend();
     }
 
     if (align_button) {
@@ -61,15 +61,14 @@ void Chassis::user_control() {
             align_task->resume();
         }
     } else {
-        if (aligning){
-          align_mutex.take(TIMEOUT_MAX);
-          fprintf(stderr, "ending\n");
-          align_task->suspend();
-          align_mutex.give();
-          aligning = false;
+        if (aligning) {
+            align_mutex.take(TIMEOUT_MAX);
+            fprintf(stderr, "ending\n");
+            align_task->suspend();
+            align_mutex.give();
+            aligning = false;
         }
         this->set(power, turn, strafe);
-
     }
 
     //slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_Y);
@@ -110,7 +109,7 @@ void Chassis::set(int power, int turn, int strafe) {
     peripherals->lefttwo_mtr.move_velocity(left);
     peripherals->righttwo_mtr.move_velocity(right);
     if (abs(strafe) > -9999)
-      peripherals->strafe_mtr.move(strafe);
+        peripherals->strafe_mtr.move(strafe);
 
     std::string left_v = std::to_string(peripherals->left_mtr.get_actual_velocity());
     std::string right_v = std::to_string(peripherals->right_mtr.get_actual_velocity());
@@ -160,6 +159,5 @@ void Chassis::vision_align(void* param) {
         }
         align_mutex.give();
         pros::delay(10);
-
     }
 }

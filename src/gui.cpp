@@ -57,11 +57,11 @@ void GUI::build_main(lv_obj_t* parent) {
 
     std::string routines_str;
     std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
-    for (int i = 0; i < configManager->autonomous_names.size(); i++) {
+    for (int i = 0; i < configManager->auton_routines.size(); i++) {
         if (i > 0)
-            routines_str.append("\n" + configManager->autonomous_names[i]);
+            routines_str.append("\n" + configManager->get_auton_name(i));
         else
-            routines_str.append(configManager->autonomous_names[i]);
+            routines_str.append(configManager->get_auton_name(i));
     }
     lv_roller_set_options(auton_select, routines_str.c_str());
 

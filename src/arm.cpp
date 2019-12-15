@@ -1,18 +1,21 @@
 #include "main.h"
 #include <sstream>
 
-const double max_height = -850;
-const int pot_min = 1642;
+const auto max_height = 60 * okapi::inch;
+const int pot_min = 1623;
+const int pot_max = 150;
 const char pot_port = 'A';
+const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.00025, 0, 0 };
 
 pros::ADIAnalogIn arm_pot(pot_port);
 
 using namespace okapi;
 
-extern int left_port, right_port, lefttwo_port, righttwo_port,
+extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, leftintake_port, rightintake_port;
 
-extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
+std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
+std::shared_ptr<okapi::AsyncPositionController<double, double>> integrated_lift;
 
 void lift_stack(int cubes);
 
@@ -22,13 +25,27 @@ std::shared_ptr<Arm> Arm::get() {
 }
 
 Arm::Arm() {
-    peripherals->leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    peripherals->rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
     current_major_position = 0;
     current_minor_position = 0;
     user_pos_modifier = 0;
     sensitivity = 0.0001;
+}
+
+void Arm::init() {
+    peripherals->leftarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    peripherals->rightarm_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    integrated_lift = okapi::AsyncPosControllerBuilder()
+                          .withMotor({ leftarm_port, rightarm_port })
+                          .build();
+
+    lift = okapi::AsyncPosControllerBuilder()
+               .withMotor({ leftarm_port, rightarm_port })
+               .withSensor('A')
+               .withGains(pot_controller_gains)
+               .build();
+    lift->flipDisable(true);
+    integrated_lift->flipDisable(true);
 }
 
 void Arm::user_control() {
@@ -41,7 +58,10 @@ void Arm::user_control() {
         peripherals->rightarm_mtr.tare_position();
     }
 
-    height_per = scale(arm_pot.get_value(), 150, 1623, 0, 100) / 100;
+    if (!lift->isDisabled())
+        lift->flipDisable(true);
+
+    height_per = scale(arm_pot.get_value(), pot_min, pot_max, 0, 100) / 100;
 
     // Quick and dirty place to put this
     std::string arm_pos = std::to_string(peripherals->leftarm_mtr.get_position());
@@ -56,14 +76,14 @@ void Arm::user_control() {
     //double power_mult = 1;
     power = power /* * power_mult*/;
     if (abs(power) > 15) {
-        if (!lift->isDisabled())
-            lift->flipDisable(true);
+        if (!integrated_lift->isDisabled())
+            integrated_lift->flipDisable(true);
 
         this->set(power);
-        lift->setTarget(peripherals->leftarm_mtr.get_position());
+        integrated_lift->setTarget(peripherals->leftarm_mtr.get_position());
     } else {
-        if (lift->isDisabled())
-            lift->flipDisable(false);
+        if (integrated_lift->isDisabled())
+            integrated_lift->flipDisable(false);
     }
 }
 
@@ -76,7 +96,18 @@ void Arm::set_pos(double position) {
     peripherals->leftarm_mtr.move_absolute(position, 63);
     peripherals->rightarm_mtr.move_absolute(position, 63);
 }
+
+void Arm::set_height(okapi::QLength height) {
+    int pot_delta = abs(pot_max - pot_min);
+    double target = scale(height.convert(meter), 0, max_height.convert(meter), pot_min, pot_max);
+    lift->flipDisable(false);
+    lift->setTarget(target);
+}
+void Arm::waitUntilSettled() {
+    lift->waitUntilSettled();
+};
+
 //x is the number between current scale, a is the min of the new range, b is the max of the new range, min is the min of the current range, max is the max of the current range
-double Arm::scale(double x, double min, double max, double a, double b) {
+double Arm::scale(double x, double min, double max, double b, double a) {
     return (a + b) - (((b - a) * (x - min)) / (max - min) + a);
 }

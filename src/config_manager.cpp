@@ -39,10 +39,27 @@ void ConfigManager::load_config() {
     }
 }
 
-void ConfigManager::register_auton(std::string name, auton_routine routine) {
-    autonomous_names.push_back(name);
+void ConfigManager::register_auton(std::string name, auton_func func) {
+    auto routine = std::make_tuple(name, func, okapi::OdomState());
     auton_routines.push_back(routine);
 };
+void ConfigManager::register_auton(std::string name, auton_func func, okapi::OdomState state) {
+    auto routine = std::make_tuple(name, func, state);
+    auton_routines.push_back(routine);
+};
+
+auton_func ConfigManager::get_auton_func(int id) {
+    return std::get<1>(auton_routines[id]);
+}
+std::string ConfigManager::get_auton_name(int id) {
+    return std::get<0>(auton_routines[id]);
+}
+okapi::OdomState ConfigManager::get_auton_state(int id) {
+    return std::get<2>(auton_routines[id]);
+} /* TODO: Little bit of a flaw here, but the pitch isn't symmetrical, so we need
+           to check which side we are on, and flip some coordinates, but also
+           do this in the autons as well.
+*/
 
 void ConfigManager::select_auton(int id) {
     //if (id > auton_routines.size()){

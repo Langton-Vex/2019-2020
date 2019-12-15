@@ -20,7 +20,7 @@
 extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, intake_port, strafe_port;
 
-void set_temperature() {
+void set_temperature(int i) {
 
     std::shared_ptr<GUI> gui = GUI::get();
 
@@ -43,7 +43,12 @@ void set_temperature() {
     stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;
     lift_imbalance_str = stream.str();
 
-    peripherals->master_controller.print(0, 0, "A:%d;C:%d", (int)arm_temp, (int)chassis_temp);
+    if (i == 3)
+        peripherals->master_controller.print(0, 0, "Arm:%d", (int)arm_temp);
+    if (i == 2)
+        peripherals->master_controller.print(1, 0, "Chassis:%d", (int)chassis_temp);
+    if (i == 1)
+        peripherals->master_controller.print(2, 0, "Claw:%d", (int)claw_temp);
 
     gui->set_line(0, arm_pos_string);
     gui->set_line(1, lift_imbalance_str);
@@ -71,10 +76,10 @@ void opcontrol() {
         claw->user_control();
 
         it--;
-        if (it == 49)
-            set_temperature();
         if (it == 0)
             it = 50;
+        if (it <= 9 && it % 3 == 0) // Trying to delay over 50ms but not using tasks ...
+            set_temperature(it / 3);
 
         pros::delay(20);
     }

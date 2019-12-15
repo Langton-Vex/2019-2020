@@ -14,6 +14,7 @@ extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
+const auto INTAKE_FROM_CENTER = 3.0_ft;
 
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
@@ -22,160 +23,7 @@ pros::Mutex cc_mutex;
 // This mutex is not actually used for the controller, rather the shared_ptr
 // We  don't want two threads trying to set/reset this pointer!
 
-extern std::shared_ptr<okapi::AsyncPosIntegratedController> lift;
-
-void lift_stack(int cubes) {
-    lift->setMaxVelocity(22);
-    lift->setTarget(-108);
-    intake->moveVelocity(-200);
-    pros::delay(1500);
-    lift->setTarget(lift->getTarget() + (18.45 * 5.5 * (cubes - 1))); //TODO: Make this not hard-coded
-    lift->waitUntilSettled(); // Perfect stacking speeds from 4 inches up
-    intake->moveVelocity(0);
-    lift->setMaxVelocity(100);
-}
-
-// Starts pointing towards small goal zone
-void near_small() {
-    ccont->moveDistance(17 * inch);
-    ccont->moveDistance(-18_in);
-}
-
-void do_nothing() {
-    while (true)
-        pros::delay(100);
-};
-
-void move_15() {
-    cc->driveStraight(18_in);
-    cc->driveStraight(-18_in);
-}
-
-void small_four_cubes() {
-    auto i = Claw::get();
-    int side = ConfigManager::get()->selected_team;
-
-    // Pick up preload
-    i->set(-127);
-    //intake->moveVelocity(-200);
-    pros::delay(500); // make this some kinda distance based.
-
-    lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
-    lift->waitUntilSettled();
-    cc->driveStraight(36 * okapi::centimeter);
-    i->set(127);
-    cc->driveStraight(-3 * okapi::centimeter);
-
-    lift->setTarget(0);
-    pros::delay(100);
-    i->set(127);
-    lift->waitUntilSettled();
-    i->set(-127);
-    pros::delay(500);
-    // Drive to scoring zone, place cubes, move out of the way a bit
-    lift->setTarget(18.45 * 6.7);
-    lift->waitUntilSettled();
-    cc->driveStraight(6.7 * okapi::inch);
-
-    lift->setTarget(0);
-    pros::delay(100);
-    i->set(127);
-    lift->waitUntilSettled();
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    i->set(-127);
-    pros::delay(500);
-    // Drive to scoring zone, place cubes, move out of the way a bit
-    lift->setTarget(18.45 * 5.5);
-    cc->turnAngle(-139 * okapi::degree);
-    cc->driveStraight(54 * okapi::centimeter);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    i->set(127);
-    lift->setTarget(18.45 * 5.5);
-    lift->waitUntilSettled();
-}
-
-void two_cubes() {
-    auto i = Claw::get();
-    int side = ConfigManager::get()->selected_team;
-
-    // Pick up preload
-    i->set(-127);
-    //intake->moveVelocity(-200);
-    pros::delay(500); // make this some kinda distance based.
-
-    // drive to first cube and pickup
-    cc->driveStraight(3 * okapi::centimeter);
-    lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
-    lift->waitUntilSettled();
-    cc->driveStraight(17.5 * okapi::centimeter);
-    i->set(127);
-    cc->driveStraight(-5 * okapi::centimeter);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    pros::delay(500);
-    i->set(-127);
-    pros::delay(650);
-    lift->setTarget(18.45 * 5.5);
-    lift->waitUntilSettled();
-
-    cc->turnAngle(102 * okapi::degree * side);
-    cc->driveStraight(87 * okapi::centimeter);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    i->set(127);
-    lift->setTarget(18.45 * 5.5);
-    lift->waitUntilSettled();
-}
-
-void three_cubes() {
-    auto i = Claw::get();
-    int side = ConfigManager::get()->selected_team;
-
-    // Pick up preload
-    i->set(-127);
-    //intake->moveVelocity(-200);
-    pros::delay(500); // make this some kinda distance based.
-
-    // drive to first cube and pickup
-    lift->setTarget(18.45 * 6.6); // TODO: make pot based!!
-    lift->waitUntilSettled();
-    cc->driveStraight(21 * okapi::centimeter);
-    i->set(127);
-    cc->driveStraight(-5 * okapi::centimeter);
-    lift->setTarget(0);
-
-    lift->waitUntilSettled();
-    i->set(-127);
-    pros::delay(600);
-
-    // move arm up, drive to second cube
-
-    cc->driveStraight(14 * okapi::inch);
-    lift->setTarget(18.45 * 8.2);
-    lift->waitUntilSettled();
-    cc->turnAngle(90 * okapi::degree * side);
-    cc->driveStraight(32 * okapi::centimeter);
-
-    // Pickup second cube
-    lift->setTarget(0);
-    pros::delay(100);
-    i->set(127);
-    lift->waitUntilSettled();
-    i->set(-127);
-    pros::delay(500);
-
-    // Drive to scoring zone, place cubes, move out of the way a bit
-    lift->setTarget(18.45 * 5.5);
-    cc->turnAngle(40 * okapi::degree * side);
-    cc->driveStraight(53 * okapi::centimeter);
-    lift->setTarget(0);
-    lift->waitUntilSettled();
-    i->set(127);
-    lift->setTarget(18.45 * 5.5);
-    lift->waitUntilSettled();
-}
+extern std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
 
 extern pros::ADIAnalogIn arm_pot;
 
@@ -195,7 +43,6 @@ void pot_lookup() {
     save_file.close();
     fprintf(stderr, "stopped");
 };
-
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
 
@@ -204,8 +51,8 @@ void vision_test() {
     cc->driveToPoint({ 0_ft, 0_ft });
     cc->lookToPoint({ 1_ft, 0_ft });
     */
-    cc->generatePath({{0_ft, 0_ft, 0_deg}, {2_ft, 0_ft, 0_deg}}, "A");
-    cc->runPath("A",false,false);
+    cc->generatePath({ { 0_ft, 0_ft, 0_deg }, { 2_ft, 0_ft, 0_deg } }, "A");
+    cc->runPath("A", false, false);
     //return;
     /*
     cc->stop_task();
@@ -222,14 +69,152 @@ void vision_test() {
     //while (true)
     //    pros::delay(100);
     //return;
-
-    pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 }
 
-void init_autonomous() {
+// Starts pointing towards small goal zone
+void near_small() {
+    ccont->moveDistance(17 * inch);
+    ccont->moveDistance(-18_in);
+}
 
+void do_nothing() {
+    while (true)
+        pros::delay(100);
+};
+
+void move_15() {
+    cc->driveStraight(18_in);
+    cc->driveStraight(-18_in);
+}
+
+void four_stack() {
+    int side = ConfigManager::get()->selected_team;
+    std::shared_ptr<Arm> arm = Arm::get();
+    okapi::QAngle inward;
+    if (side < 0)
+        inward = 180_deg;
+    else
+        inward = 0_deg;
+
+    cc->driveStraight(5_in);
+    arm->set_height(10_in);
+    cc->driveToPoint({ 97.1_in, 49.9_in - INTAKE_FROM_CENTER });
+    cc->setHeading(inward);
+    intake->moveVoltage(12000);
+    pros::delay(500);
+    arm->set_height(15_in);
+    cc->driveStraight(-2_ft);
+    cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
+    cc->setHeading(inward + (90 * side) * okapi::degree);
+    cc->strafe(side * 1_ft);
+    arm->set_height(0_in);
+    arm->waitUntilSettled();
+    intake->moveVoltage(-12000);
+}
+
+void seven_stack() {
+    int side = ConfigManager::get()->selected_team;
+    std::shared_ptr<Arm> arm = Arm::get();
+    okapi::QAngle inward;
+    if (side < 0)
+        inward = 180_deg;
+    else
+        inward = 0_deg;
+
+    cc->driveStraight(5_in);
+    arm->set_height(10_in);
+    cc->driveToPoint({ 72.8_in + 12_in, 44.4_in - INTAKE_FROM_CENTER });
+    cc->setHeading(inward);
+    cc->strafe(-12_in * side);
+    cc->driveStraight(5.5_in);
+    intake->moveVoltage(12000);
+    pros::delay(500);
+    arm->set_height(15_in);
+    cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
+    cc->setHeading(inward + (90 * side) * okapi::degree);
+    cc->strafe(1_ft);
+    arm->set_height(0_in);
+    arm->waitUntilSettled();
+    intake->moveVoltage(-12000);
+    pros::delay(500);
+    cc->driveStraightAsync(-5_in);
+    arm->set_height(0_in);
+    cc->waitUntilSettled();
+
+    cc->driveToPoint({ 97.1_in, 49.9_in - INTAKE_FROM_CENTER });
+    cc->setHeading(inward);
+    intake->moveVoltage(12000);
+    pros::delay(500);
+    arm->set_height(15_in);
+    cc->driveStraight(-2_ft);
+    cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
+    cc->setHeading(inward + (90 * side) * okapi::degree);
+    cc->strafe(1_ft);
+    arm->set_height(0_in);
+    arm->waitUntilSettled();
+    intake->moveVoltage(-12000);
+}
+
+void four_floor() {
+    int side = ConfigManager::get()->selected_team;
+    std::shared_ptr<Arm> arm = Arm::get();
+    okapi::QAngle inward;
+    if (side < 0)
+        inward = 180_deg;
+    else
+        inward = 0_deg;
+
+    cc->driveToPoint({ 26.4_in, 33.4_in - INTAKE_FROM_CENTER });
+    cc->setHeading(inward);
+    for (int i = 0; i < 3; i++) {
+        intake->moveVoltage(12000);
+        pros::delay(500);
+        arm->set_height(5.5_in);
+        arm->waitUntilSettled();
+        cc->driveStraight(5.5_ft);
+        intake->moveVoltage(-12000);
+        pros::delay(500);
+        arm->set_height(0_in);
+    }
+    intake->moveVoltage(12000);
+
+    cc->driveToPoint({ 0.75_ft, 0.75_ft - INTAKE_FROM_CENTER });
+    arm->set_height(0_in);
+    arm->waitUntilSettled();
+    intake->moveVoltage(-12000);
+}
+
+/* ----------------------------------------------------------------
+   AUTON HOUSE KEEPING FUNCTIONS
+   ---------------------------------------------------------------- */
+
+void create_cc() {
+    PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
+    PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
+    PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
+    PIDTuning strafeTuning = PIDTuning(0.002304, 0, 0.000013);
+    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
+    okapi::MotorGroup leftSide(
+        { left_port, lefttwo_port });
+    okapi::MotorGroup rightSide(
+        { right_port, righttwo_port });
+    okapi::Motor strafeMotor(strafe_port);
+
+    // std::unique_ptr<ChassisControllerHDrive>
+    cc = std::make_unique<ChassisControllerHDrive>(
+        straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning, // Tunings
+        leftSide, rightSide, strafeMotor, // left mtr, right mtr, strafe mtr
+        okapi::AbstractMotor::gearset::green, // swerve steer gearset
+        okapi::AbstractMotor::gearset::green, // strafe gearset
+        okapi::ChassisScales(
+            { { okapi::inch * 4.125, 15.1 * okapi::inch, // wheel diam, wheelbase diam
+                  0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+                okapi::imev5GreenTPR }));
+}
+
+void init_autonomous() {
     ccont = ChassisControllerBuilder()
                 .withMotors({ left_port, lefttwo_port },
                     { right_port, righttwo_port })
@@ -239,17 +224,20 @@ void init_autonomous() {
     intake = std::make_unique<okapi::Motor>(intake_port);
 
     lift->flipDisable(true);
+
+    if (!cc)
+        create_cc();
+
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
-    configManager->register_auton("vision test", vision_test);
 
-    configManager->register_auton("three cubes", three_cubes);
-    configManager->register_auton("two cubes", two_cubes);
-    configManager->register_auton("small_four_cubes", small_four_cubes);
+    configManager->register_auton("four stack", four_stack,
+        okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
 
     configManager->register_auton("Move 15", move_15);
-    configManager->register_auton("potentiomenter test", pot_lookup);
+    //configManager->register_auton("potentiomenter test", pot_lookup);
+    //configManager->register_auton("vision test", vision_test);
 }
 
 void auton_cleanup() {
@@ -274,35 +262,14 @@ void autonomous() {
     pros::c::task_notify_when_deleting(CURRENT_TASK, our_cleanup_task, 0,
         pros::E_NOTIFY_ACTION_NONE);
 
-    PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
-    PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
-    PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.002304, 0, 0.000013);
-    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
-    okapi::MotorGroup leftSide(
-        { left_port, lefttwo_port });
-    okapi::MotorGroup rightSide(
-        { right_port, righttwo_port });
-    okapi::Motor strafeMotor(strafe_port);
-
-    // std::unique_ptr<ChassisControllerHDrive>
-    cc = std::make_unique<ChassisControllerHDrive>(
-        straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning, // Tunings
-        leftSide, rightSide, strafeMotor, // left mtr, right mtr, strafe mtr
-        okapi::AbstractMotor::gearset::green, // swerve steer gearset
-        okapi::AbstractMotor::gearset::green, // strafe gearset
-        okapi::ChassisScales(
-            { { okapi::inch * 4.125, 15.1 * okapi::inch, // wheel diam, wheelbase diam
-                  0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
-                okapi::imev5GreenTPR }));
-
-    //cc->tune();
+    if (!cc)
+        create_cc();
 
     // Run your standard auton
     std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
 
     if (configManager->auton_routines.size() > configManager->selected_auton) {
-        auton_routine routine = configManager->auton_routines[configManager->selected_auton];
+        auton_func routine = configManager->get_auton_func(configManager->selected_auton);
         cc->start_task();
         lift->flipDisable(false);
         routine(); // nullptr could happen, lets hope it doesn't :o

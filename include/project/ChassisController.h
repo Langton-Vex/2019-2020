@@ -94,6 +94,9 @@ public:
     void lookToPoint(okapi::Point point);
     void lookToPointAsync(okapi::Point point);
 
+    void setHeading(okapi::QAngle angle);
+    void setHeadingAsync(okapi::QAngle angle);
+
     void driveVector(okapi::QLength straight, okapi::QLength strafe);
     void driveVectorAsync(okapi::QLength straight, okapi::QLength strafe);
 

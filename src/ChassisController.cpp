@@ -197,6 +197,16 @@ void ChassisControllerHDrive::lookToPointAsync(okapi::Point point) {
     turnAngle(angle);
 };
 
+void ChassisControllerHDrive::setHeading(okapi::QAngle angle) {
+    setHeading(angle);
+    waitUntilSettled();
+};
+
+void ChassisControllerHDrive::setHeadingAsync(okapi::QAngle angle) {
+    auto delta = angle - odom->getState(okapi::StateMode::FRAME_TRANSFORMATION).theta;
+    turnAngle(delta);
+};
+
 void ChassisControllerHDrive::driveVectorAsync(okapi::QLength straight, okapi::QLength strafe) {
     driveStraightAsync(straight);
     strafeAsync(strafe);
@@ -277,10 +287,10 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     right_follower.segment = 0;
     right_follower.finished = 0;
     // TODO: This assumes everything is in degrees, please consider changing this!!
-    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales->wheelDiameter.convert(okapi::meter) * M_PI, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales->straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
-    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales->wheelDiameter.convert(okapi::meter) * M_PI, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales->straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
     /* This is jank, should be in step, this entire project needs refactoring into
@@ -298,7 +308,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         //const double speed = chassisRPM / toUnderlyingType(straightGearset->internalGearset) * reversed;
 
         // In degrees
-        auto heading = (left_follower.heading * okapi::radian).convert(okapi::degree);
+        double heading = (left_follower.heading * okapi::radian).convert(okapi::degree);
         if (heading > 180) {
             heading = (360.0 - heading);
         }
