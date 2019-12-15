@@ -1,12 +1,12 @@
 #include "main.h"
-#include <sstream>
 #include "okapi/impl/util/configurableTimeUtilFactory.hpp"
+#include <sstream>
 
 const auto max_height = 46 * okapi::inch;
 const int pot_min = 1623;
 const int pot_max = 150;
 const char pot_port = 'A';
-const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.0030,0.0000, 0.00013 };
+const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.0030, 0.0000, 0.00013 };
 
 pros::ADIAnalogIn arm_pot(pot_port);
 
@@ -44,7 +44,7 @@ void Arm::init() {
                .withMotor({ -leftarm_port, -rightarm_port })
                .withSensor(arm_pot)
                .withGains(pot_controller_gains)
-               .withTimeUtilFactory(okapi::ConfigurableTimeUtilFactory(5,2,250_ms))
+               .withTimeUtilFactory(okapi::ConfigurableTimeUtilFactory(5, 2, 250_ms))
                .build();
     lift->flipDisable(true);
     integrated_lift->flipDisable(true);
@@ -110,6 +110,9 @@ void Arm::waitUntilSettled() {
     lift->waitUntilSettled();
     fprintf(stderr, "error: %f", lift->getError());
 };
+void Arm::flipDisable(bool disable) {
+    lift->flipDisable(disable);
+}
 
 //x is the number between current scale, a is the min of the new range, b is the max of the new range, min is the min of the current range, max is the max of the current range
 double Arm::scale(double x, double min, double max, double b, double a) {

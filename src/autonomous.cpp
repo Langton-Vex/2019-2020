@@ -23,13 +23,13 @@ pros::Mutex cc_mutex;
 // This mutex is not actually used for the controller, rather the shared_ptr
 // We  don't want two threads trying to set/reset this pointer!
 
-extern std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
+//extern std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
 
 extern pros::ADIAnalogIn arm_pot;
 
 void pot_lookup() {
     cc->stop_task();
-    lift->flipDisable(true);
+    Arm::get()->flipDisable(true);
     fprintf(stderr, "starting");
     std::ofstream save_file("/usd/yeet.csv", std::ofstream::out | std::ofstream::trunc);
     save_file.clear();
@@ -89,7 +89,7 @@ void move_15() {
     cc->driveStraight(-18_in);
 }
 
-void arm_test(){
+void arm_test() {
     cc->setHeading(90_deg);
     return;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -105,9 +105,9 @@ void four_stack() {
         inward = 180_deg;
     else
         inward = 0_deg;
-    lift->flipDisable(true);
+    arm->flipDisable(true);
     cc->driveStraight(5_in);
-    lift->flipDisable(false);
+    arm->flipDisable(false);
     arm->set_height(2.5_in);
     arm->waitUntilSettled();
     cc->driveToPoint({ 105.7_in, 49.9_in - INTAKE_FROM_CENTER });
@@ -117,16 +117,54 @@ void four_stack() {
     pros::delay(500);
     arm->set_height(15_in);
     cc->driveStraight(-2_ft);
-    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER , 1_ft });
-    cc->lookToPoint({13_ft, 1_ft});
+    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
+    cc->lookToPoint({ 13_ft, 1_ft });
     //cc->strafe(side * 1_ft);
-    lift->flipDisable(false);
+    arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
-    lift->flipDisable(true);
+    arm->flipDisable(true);
     arm->set(-200);
     pros::delay(500);
     intake->moveVoltage(-12000);
+}
+void simpler_four_stack() {
+    int side = ConfigManager::get()->selected_team;
+    std::shared_ptr<Arm> arm = Arm::get();
+    okapi::QAngle inward;
+    if (side < 0)
+        inward = 180_deg;
+    else
+        inward = 0_deg;
+
+    // Get to cube
+    arm->flipDisable(true);
+    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    cc->driveStraight(cubeydelta);
+    arm->flipDisable(false);
+    arm->set_height(2.5_in);
+    cc->strafe(105.7_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    arm->waitUntilSettled();
+
+    cc->setHeading(inward);
+    intake->moveVoltage(12000);
+    pros::delay(500);
+    arm->set_height(7_in);
+    cc->driveStraight(-2_ft);
+    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
+    cc->lookToPoint({ 13_ft, 1_ft });
+    //cc->strafe(side * 1_ft);
+    arm->flipDisable(false);
+    arm->set_height(0_in);
+    arm->waitUntilSettled();
+    arm->flipDisable(true);
+    arm->set(-200);
+    pros::delay(500);
+    intake->moveVoltage(-12000);
+    pros::delay(500);
+    arm->set(0);
+    intake->moveVoltage(0);
+    cc->driveStraight(-1_in);
 }
 
 void seven_stack() {
@@ -138,38 +176,49 @@ void seven_stack() {
     else
         inward = 0_deg;
 
-    cc->driveStraight(5_in);
-    arm->set_height(10_in);
-    cc->driveToPoint({ 72.8_in + 12_in, 44.4_in - INTAKE_FROM_CENTER });
-    cc->setHeading(inward);
-    cc->strafe(-12_in * side);
-    cc->driveStraight(5.5_in);
+    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    cc->driveStraight(cubeydelta);
+    arm->set_height(2.5_in);
+    cc->strafe((70.3_in + 2.5_in) - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    arm->waitUntilSettled();
     intake->moveVoltage(12000);
-    pros::delay(500);
-    arm->set_height(15_in);
-    cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
-    cc->setHeading(inward + (90 * side) * okapi::degree);
-    cc->strafe(1_ft);
+
+    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
+    cc->lookToPoint({ 13_ft, 1_ft });
+    arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
+    arm->flipDisable(true);
+    arm->set(-200);
+    pros::delay(500);
     intake->moveVoltage(-12000);
+    pros::delay(500);
+    arm->set(0);
+    intake->moveVoltage(0);
     pros::delay(500);
     cc->driveStraightAsync(-5_in);
-    arm->set_height(0_in);
+    arm->set_height(0.1_in);
     cc->waitUntilSettled();
 
-    cc->driveToPoint({ 97.1_in, 49.9_in - INTAKE_FROM_CENTER });
+    cc->driveToPoint({ 105.7_in, 49.9_in - INTAKE_FROM_CENTER });
+    arm->set_height(2.5_in);
     cc->setHeading(inward);
+    cc->strafe(97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    arm->waitUntilSettled();
+
     intake->moveVoltage(12000);
     pros::delay(500);
-    arm->set_height(15_in);
-    cc->driveStraight(-2_ft);
+    arm->set_height(7_in);
     cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
-    cc->setHeading(inward + (90 * side) * okapi::degree);
-    cc->strafe(1_ft);
-    arm->set_height(0_in);
+    arm->set_height(22_in);
     arm->waitUntilSettled();
+    cc->lookToPoint({ 13_ft, 1_ft });
+
+    arm->set_height(21_in);
+    pros::delay(100);
     intake->moveVoltage(-12000);
+    arm->waitUntilSettled();
+    cc->driveStraight(-1_in);
 }
 
 void four_floor() {
@@ -238,7 +287,7 @@ void init_autonomous() {
 
     intake = std::make_unique<okapi::Motor>(intake_port);
 
-    lift->flipDisable(true);
+    Arm::get()->flipDisable(true);
 
     if (!cc)
         create_cc();
@@ -257,7 +306,7 @@ void init_autonomous() {
 }
 
 void auton_cleanup() {
-    lift->flipDisable(true);
+    Arm::get()->flipDisable(true);
     cc_mutex.take(TIMEOUT_MAX);
     if (cc) {
         cc->stop_task();
@@ -283,13 +332,14 @@ void autonomous() {
 
     // Run your standard auton
     std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
-    Arm::get()->set_height(0_in);
+    std::shared_ptr<Arm> arm = Arm::get();
+    arm->set_height(0_in);
     if (configManager->auton_routines.size() > configManager->selected_auton) {
         auton_func routine = configManager->get_auton_func(configManager->selected_auton);
         cc->start_task();
-        lift->flipDisable(false);
+        arm->flipDisable(false);
         routine(); // nullptr could happen, lets hope it doesn't :o
-        lift->flipDisable(true);
+        arm->flipDisable(true);
         cc->stop_task();
         //auton_task.remove();
     } else {

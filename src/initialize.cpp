@@ -7,7 +7,7 @@
  * to keep execution time for this mode under a few seconds.
  */
 
- /* If you manage to find this...
+/* If you manage to find this...
  Things to do:
    * Tune arm PID
    * test autons (obviously)

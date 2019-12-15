@@ -76,11 +76,8 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     model = std::make_unique<okapi::HDriveModel>(leftSide, rightSide, strafeMotor,
         leftSide->getEncoder(), rightSide->getEncoder(), strafeMotor->getEncoder(),
         maxVelocity, maxVoltage);
-    okapi::ChassisScales odomscales({ scales->wheelDiameter, scales->wheelTrack,
-                                        scales->middleWheelDistance, scales->middleWheelDiameter },
-        scales->tpr);
     odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
-        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), odomscales);
+        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), iscales);
 
     reset();
 
@@ -206,7 +203,7 @@ void ChassisControllerHDrive::setHeadingAsync(okapi::QAngle angle) {
 
     okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
     fprintf(stderr, "state angle: %f\n", state.theta.convert(okapi::degree));
-    auto delta =  state.theta - angle;
+    auto delta = state.theta - angle;
     delta *= -1;
     fprintf(stderr, "delta angle: %f\n", delta.convert(okapi::degree));
     turnAngle(delta);
