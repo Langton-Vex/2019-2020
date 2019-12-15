@@ -1,11 +1,12 @@
 #include "main.h"
 #include <sstream>
+#include "okapi/impl/util/configurableTimeUtilFactory.hpp"
 
-const auto max_height = 60 * okapi::inch;
+const auto max_height = 46 * okapi::inch;
 const int pot_min = 1623;
 const int pot_max = 150;
 const char pot_port = 'A';
-const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.00025, 0, 0 };
+const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.0030,0.0000, 0.00013 };
 
 pros::ADIAnalogIn arm_pot(pot_port);
 
@@ -38,11 +39,12 @@ void Arm::init() {
     integrated_lift = okapi::AsyncPosControllerBuilder()
                           .withMotor({ leftarm_port, rightarm_port })
                           .build();
-
+    std::shared_ptr<okapi::Potentiometer> arm_pot = std::make_unique<okapi::Potentiometer>(pot_port);
     lift = okapi::AsyncPosControllerBuilder()
-               .withMotor({ leftarm_port, rightarm_port })
-               .withSensor('A')
+               .withMotor({ -leftarm_port, -rightarm_port })
+               .withSensor(arm_pot)
                .withGains(pot_controller_gains)
+               .withTimeUtilFactory(okapi::ConfigurableTimeUtilFactory(5,2,250_ms))
                .build();
     lift->flipDisable(true);
     integrated_lift->flipDisable(true);
@@ -99,12 +101,14 @@ void Arm::set_pos(double position) {
 
 void Arm::set_height(okapi::QLength height) {
     int pot_delta = abs(pot_max - pot_min);
-    double target = scale(height.convert(meter), 0, max_height.convert(meter), pot_min, pot_max);
+    double target = scale(height.convert(meter), (0.5 * okapi::inch).convert(meter), max_height.convert(meter), pot_min, pot_max);
+    fprintf(stderr, "arm target: %f", target);
     lift->flipDisable(false);
-    lift->setTarget(target);
+    lift->setTarget((int)target);
 }
 void Arm::waitUntilSettled() {
     lift->waitUntilSettled();
+    fprintf(stderr, "error: %f", lift->getError());
 };
 
 //x is the number between current scale, a is the min of the new range, b is the max of the new range, min is the min of the current range, max is the max of the current range

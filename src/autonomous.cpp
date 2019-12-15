@@ -14,7 +14,7 @@ extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
-const auto INTAKE_FROM_CENTER = 3.0_ft;
+const auto INTAKE_FROM_CENTER = 12.5_in;
 
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
@@ -89,6 +89,14 @@ void move_15() {
     cc->driveStraight(-18_in);
 }
 
+void arm_test(){
+    cc->setHeading(90_deg);
+    return;
+    std::shared_ptr<Arm> arm = Arm::get();
+    arm->set_height(10_in);
+    arm->waitUntilSettled();
+}
+
 void four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -97,20 +105,27 @@ void four_stack() {
         inward = 180_deg;
     else
         inward = 0_deg;
-
+    lift->flipDisable(true);
     cc->driveStraight(5_in);
-    arm->set_height(10_in);
-    cc->driveToPoint({ 97.1_in, 49.9_in - INTAKE_FROM_CENTER });
+    lift->flipDisable(false);
+    arm->set_height(2.5_in);
+    arm->waitUntilSettled();
+    cc->driveToPoint({ 105.7_in, 49.9_in - INTAKE_FROM_CENTER });
     cc->setHeading(inward);
+    cc->strafe(97.1_in - 105.7_in);
     intake->moveVoltage(12000);
     pros::delay(500);
     arm->set_height(15_in);
     cc->driveStraight(-2_ft);
-    cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
-    cc->setHeading(inward + (90 * side) * okapi::degree);
-    cc->strafe(side * 1_ft);
+    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER , 1_ft });
+    cc->lookToPoint({13_ft, 1_ft});
+    //cc->strafe(side * 1_ft);
+    lift->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
+    lift->flipDisable(true);
+    arm->set(-200);
+    pros::delay(500);
     intake->moveVoltage(-12000);
 }
 
@@ -236,6 +251,7 @@ void init_autonomous() {
         okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
 
     configManager->register_auton("Move 15", move_15);
+    configManager->register_auton("arm test", arm_test);
     //configManager->register_auton("potentiomenter test", pot_lookup);
     //configManager->register_auton("vision test", vision_test);
 }
@@ -267,7 +283,7 @@ void autonomous() {
 
     // Run your standard auton
     std::shared_ptr<ConfigManager> configManager = ConfigManager::get();
-
+    Arm::get()->set_height(0_in);
     if (configManager->auton_routines.size() > configManager->selected_auton) {
         auton_func routine = configManager->get_auton_func(configManager->selected_auton);
         cc->start_task();

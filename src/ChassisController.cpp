@@ -76,7 +76,7 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     model = std::make_unique<okapi::HDriveModel>(leftSide, rightSide, strafeMotor,
         leftSide->getEncoder(), rightSide->getEncoder(), strafeMotor->getEncoder(),
         maxVelocity, maxVoltage);
-    okapi::ChassisScales odomscales({ scales->wheelDiameter, scales->wheelTrack / 2,
+    okapi::ChassisScales odomscales({ scales->wheelDiameter, scales->wheelTrack,
                                         scales->middleWheelDistance, scales->middleWheelDiameter },
         scales->tpr);
     odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
@@ -174,7 +174,7 @@ void ChassisControllerHDrive::driveToPoint(okapi::Point point) {
 
 void ChassisControllerHDrive::driveToPointAsync(okapi::Point point) {
     auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
-        point.inFT(okapi::StateMode::FRAME_TRANSFORMATION), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+        point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
 
     turnAngle(angle);
     driveStraight(length);
@@ -192,18 +192,23 @@ void ChassisControllerHDrive::lookToPoint(okapi::Point point) {
 
 void ChassisControllerHDrive::lookToPointAsync(okapi::Point point) {
     auto angle = okapi::OdomMath::computeAngleToPoint(
-        point.inFT(okapi::StateMode::FRAME_TRANSFORMATION), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+        point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
 
     turnAngle(angle);
 };
 
 void ChassisControllerHDrive::setHeading(okapi::QAngle angle) {
-    setHeading(angle);
+    setHeadingAsync(angle);
     waitUntilSettled();
 };
 
 void ChassisControllerHDrive::setHeadingAsync(okapi::QAngle angle) {
-    auto delta = angle - odom->getState(okapi::StateMode::FRAME_TRANSFORMATION).theta;
+
+    okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
+    fprintf(stderr, "state angle: %f\n", state.theta.convert(okapi::degree));
+    auto delta =  state.theta - angle;
+    delta *= -1;
+    fprintf(stderr, "delta angle: %f\n", delta.convert(okapi::degree));
     turnAngle(delta);
 };
 
@@ -552,7 +557,7 @@ void ChassisControllerHDrive::setMaxVelocity(int speed) {
 void ChassisControllerHDrive::step() {
     odom->step();
     okapi::OdomState state = odom->getState();
-    fprintf(stderr, "odom: %f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
+    //fprintf(stderr, "odom: %f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
 
     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
@@ -572,7 +577,7 @@ void ChassisControllerHDrive::step() {
     if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
         double straightOut = straightPID->step(distance_forward);
 
-        printf("%f straight error, %f angle error\n", straightPID->getError(), anglePID->getError());
+        //printf("%f straight error, %f angle error\n", straightPID->getError(), anglePID->getError());
         leftVelocity += (double)straightGearset->internalGearset * straightOut;
         rightVelocity += (double)straightGearset->internalGearset * straightOut;
 
