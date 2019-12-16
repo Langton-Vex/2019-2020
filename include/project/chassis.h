@@ -16,7 +16,7 @@ public:
     double power_mult_calc();
     void modify_profiled_velocity(int velocity);
 
-    static void vision_align(void* param);
+    int vision_align();
     std::unique_ptr<pros::Task> align_task;
 
     double turn_radius;

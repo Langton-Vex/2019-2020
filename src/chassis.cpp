@@ -9,25 +9,25 @@ std::shared_ptr<Chassis> Chassis::get() {
     static std::shared_ptr<Chassis> instance(new Chassis);
     return instance;
 }
-pros::Mutex align_mutex;
+
 okapi::AverageFilter<5> x_coord_filter;
+pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
+auto strafePID = okapi::IterativeControllerFactory::posPID(0.0051, 0.000000, 0.0);
 /*
 okapi::EmaFilter x_coord_filter(1);
 okapi::DemaFilter x_coord_filter(1,1);
 okapi::MedianFilter<5> x_coord_filter;
-*/
-pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
 auto straightPID = okapi::IterativeControllerFactory::posPID(0.0020, 0.000000, 0.0);
 auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200, 0.000000, 0.00089);
-auto strafePID = okapi::IterativeControllerFactory::posPID(0.0051, 0.000000, 0.0);
+*/
 
 Chassis::Chassis() {
     pros::motor_gearset_e_t motor_gearset = peripherals->left_mtr.get_gearing();
     if (motor_gearset == MOTOR_GEARSET_06)
         motor_speed = 600;
-    else if (motor_gearset == MOTOR_GEARSET_18)
+    if (motor_gearset == MOTOR_GEARSET_18)
         motor_speed = 200;
-    else if (motor_gearset == MOTOR_GEARSET_36)
+    if (motor_gearset == MOTOR_GEARSET_36)
         motor_speed = 100;
     //else throw std::invalid_argument("Cannot get gearset of left mtr");
 }
@@ -35,19 +35,19 @@ Chassis::Chassis() {
 void Chassis::user_control() {
     int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
     int turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
+    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
+    int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
+    int strafe_left = peripherals->master_controller.get_digital(DIGITAL_RIGHT);
+    int strafe_right = peripherals->master_controller.get_digital(DIGITAL_Y);
 
     int strafe;
-
-    int current_intake = peripherals->master_controller.get_digital(DIGITAL_RIGHT);
-    int current_eject = peripherals->master_controller.get_digital(DIGITAL_Y);
-    if (current_intake)
+    if (strafe_left)
         strafe = -127;
-    else if (current_eject)
+    else if (strafe_right)
         strafe = 127;
     else
         strafe = 0;
 
-    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
     if (slowmode_button == 1)
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
@@ -57,32 +57,10 @@ void Chassis::user_control() {
     power = power * power_mult;
     turn = turn * power_mult;
 
-    int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
-    if (!align_task) {
-        align_task = std::make_unique<pros::Task>(vision_align, (void*)NULL, TASK_PRIORITY_DEFAULT,
-            TASK_STACK_DEPTH_DEFAULT, "Vision Align");
-        align_task->suspend();
-    }
-
-    if (align_button) {
-        double strafeVelocity;
-        pros::vision_object_s_t rtn = camera.get_by_size(0);
-        if (camera.get_object_count() == 0) {
-            this->set(power, 0, -9999);
-            return;
-        }
-        if (rtn.width > 30) {
-            double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
-            strafeVelocity = 200.0 * strafeOut;
-        }
-        this->set(power, 0, strafeVelocity);
-    } else {
+    if (align_button)
+        this->set(power, 0, vision_align());
+    else
         this->set(power, turn, strafe);
-    }
-
-    //slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_Y);
-    //power_mult = (slowmode) ? 0.5 : power_mult;
-    //strafe = strafe * power_mult;
 }
 
 double Chassis::power_mult_calc() {
@@ -100,40 +78,36 @@ void Chassis::modify_profiled_velocity(int velocity) {
 
 void Chassis::set(int power, int turn, int strafe) {
 
-    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
-    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
-    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
-    //float powere = 1/(sgn(power) * 127) * pow((float)power,2); // exponential voltage function
-    //float turne = 1/(sgn(turn) * 127) * pow((float)turn,2);
-
     float powere = (sgn(power) / motor_speed) * pow(((float)power * motor_speed / 127), 2); // exponential speed function
     float turne = (sgn(turn) / motor_speed) * pow((float)(turn * motor_speed / 127), 2);
 
     int left = (int)powere + (int)turne;
     int right = (int)powere - (int)turne;
-    //pros::lcd::print(0, "Left: %d\nRight: %d\n", left,right);
 
     peripherals->left_mtr.move_velocity(left);
     peripherals->right_mtr.move_velocity(right);
     peripherals->lefttwo_mtr.move_velocity(left);
     peripherals->righttwo_mtr.move_velocity(right);
-    if (abs(strafe) > -9999)
+    if (strafe > -9999)
         peripherals->strafe_mtr.move(strafe);
 
     std::string left_v = std::to_string(peripherals->left_mtr.get_actual_velocity());
     std::string right_v = std::to_string(peripherals->right_mtr.get_actual_velocity());
-    //pros::lcd::set_text(3,left_v);
-    //pros::lcd::set_text(4,right_v);
 }
 
 // Currently set to only move strafe, as forward/backward align is unreliable / not necessary
-void Chassis::vision_align(void* param) {
+int Chassis::vision_align() {
 
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-    while (true) {
+    pros::vision_object_s_t rtn = camera.get_by_size(0);
+    if (camera.get_object_count() == 0)
+        return -9999;
 
-        pros::delay(10);
+    if (rtn.width > 20) {
+        double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
+        return motor_speed * strafeOut;
     }
+    return 0;
 }
