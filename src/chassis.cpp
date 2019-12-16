@@ -10,6 +10,16 @@ std::shared_ptr<Chassis> Chassis::get() {
     return instance;
 }
 pros::Mutex align_mutex;
+okapi::AverageFilter<5> x_coord_filter;
+/*
+okapi::EmaFilter x_coord_filter(1);
+okapi::DemaFilter x_coord_filter(1,1);
+okapi::MedianFilter<5> x_coord_filter;
+*/
+pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
+auto straightPID = okapi::IterativeControllerFactory::posPID(0.0020, 0.000000, 0.0);
+auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200, 0.000000, 0.00089);
+auto strafePID = okapi::IterativeControllerFactory::posPID(0.0051, 0.000000, 0.0);
 
 Chassis::Chassis() {
     pros::motor_gearset_e_t motor_gearset = peripherals->left_mtr.get_gearing();
@@ -55,19 +65,18 @@ void Chassis::user_control() {
     }
 
     if (align_button) {
-        this->set(power, 0, -9999);
-        if (!aligning) {
-            aligning = true;
-            align_task->resume();
+        double strafeVelocity;
+        pros::vision_object_s_t rtn = camera.get_by_size(0);
+        if (camera.get_object_count() == 0) {
+            this->set(power, 0, -9999);
+            return;
         }
+        if (rtn.width > 30) {
+            double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
+            strafeVelocity = 200.0 * strafeOut;
+        }
+        this->set(power, 0, strafeVelocity);
     } else {
-        if (aligning) {
-            align_mutex.take(TIMEOUT_MAX);
-            fprintf(stderr, "ending\n");
-            align_task->suspend();
-            align_mutex.give();
-            aligning = false;
-        }
         this->set(power, turn, strafe);
     }
 
@@ -119,45 +128,12 @@ void Chassis::set(int power, int turn, int strafe) {
 
 // Currently set to only move strafe, as forward/backward align is unreliable / not necessary
 void Chassis::vision_align(void* param) {
-    okapi::AverageFilter<5> x_coord_filter;
-    /*
-    okapi::EmaFilter x_coord_filter(1);
-    okapi::DemaFilter x_coord_filter(1,1);
-    okapi::MedianFilter<5> x_coord_filter;
-    */
-    pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
+
     //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
-    auto straightPID = okapi::IterativeControllerFactory::posPID(0.0020, 0.000000, 0.0);
-    auto turnPID = okapi::IterativeControllerFactory::posPID(0.00200, 0.000000, 0.00089);
-    auto strafePID = okapi::IterativeControllerFactory::posPID(0.0016, 0.000000, 0.0002);
-    double leftVelocity, rightVelocity, strafeVelocity;
-
     while (true) {
-        align_mutex.take(TIMEOUT_MAX);
-        pros::vision_object_s_t rtn = camera.get_by_size(0);
-        if (camera.get_object_count() == 0)
-            continue;
-        if (rtn.width > 30) {
-            //double straightOut = -straightPID.step(215 - rtn.width);
-            double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
-            //double turnOut = turnPID.step(rtn.width - rtn.height);
-            /*
-            if (strafePID.isSettled()){
-              leftVelocity = 200.0 * straightOut;
-              rightVelocity = 200.0 * straightOut;
-            }
-            */
-            strafeVelocity = 200.0 * strafeOut;
 
-            //peripherals->left_mtr.move_velocity((int)leftVelocity);
-            //peripherals->right_mtr.move_velocity((int)rightVelocity);
-            //peripherals->lefttwo_mtr.move_velocity((int)leftVelocity);
-            //peripherals->righttwo_mtr.move_velocity((int)rightVelocity);
-            peripherals->strafe_mtr.move_velocity((int)strafeVelocity);
-        }
-        align_mutex.give();
         pros::delay(10);
     }
 }

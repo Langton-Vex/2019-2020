@@ -101,6 +101,11 @@ void competition_initialize() {
     auto state = config_manager->get_auton_state(config_manager->selected_auton);
     if (side < 0)
         state.theta = 180 * okapi::degree - state.theta;
+    peripherals->left_mtr.tare_position();
+    peripherals->right_mtr.tare_position();
+    peripherals->lefttwo_mtr.tare_position();
+    peripherals->lefttwo_mtr.tare_position();
+    cc->odom->step();
     cc->odom->setState(state,
         okapi::StateMode::CARTESIAN);
 

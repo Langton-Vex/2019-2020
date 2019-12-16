@@ -18,7 +18,6 @@ public:
 
     static void vision_align(void* param);
     std::unique_ptr<pros::Task> align_task;
-    bool aligning = false;
 
     double turn_radius;
     double wheel_circumference;

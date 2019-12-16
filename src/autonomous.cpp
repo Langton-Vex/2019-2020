@@ -90,13 +90,14 @@ void move_15() {
 }
 
 void arm_test() {
-    cc->setHeading(90_deg);
+    //cc->setHeading(90_deg);
+    cc->strafe(6_in);
     return;
     std::shared_ptr<Arm> arm = Arm::get();
     arm->set_height(10_in);
     arm->waitUntilSettled();
 }
-
+/*
 void four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -128,6 +129,7 @@ void four_stack() {
     pros::delay(500);
     intake->moveVoltage(-12000);
 }
+*/
 void simpler_four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -139,21 +141,23 @@ void simpler_four_stack() {
 
     // Get to cube
     arm->flipDisable(true);
-    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    auto cubeydelta = (48.2_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(2.5_in);
-    cc->strafe(105.7_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    arm->set_height(2.3_in);
+    cc->strafe(95.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
     arm->waitUntilSettled();
 
     cc->setHeading(inward);
+    cc->driveStraight(1.2_in);
     intake->moveVoltage(12000);
     pros::delay(500);
     arm->set_height(7_in);
-    cc->driveStraight(-2_ft);
-    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
-    cc->lookToPoint({ 13_ft, 1_ft });
-    //cc->strafe(side * 1_ft);
+    cc->driveStraight(-1.5_ft);
+    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 9_in });
+    cc->lookToPoint({ 13_ft, cc->odom->getState(okapi::StateMode::CARTESIAN).y });
+    //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
+    //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );
     arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
@@ -162,9 +166,10 @@ void simpler_four_stack() {
     pros::delay(500);
     intake->moveVoltage(-12000);
     pros::delay(500);
-    arm->set(0);
+    arm->set(200);
     intake->moveVoltage(0);
-    cc->driveStraight(-1_in);
+    cc->driveStraight(-2_in);
+    arm->set(0);
 }
 
 void seven_stack() {
@@ -258,7 +263,7 @@ void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.002304, 0, 0.000013);
+    PIDTuning strafeTuning = PIDTuning(0.002, 0, 0.00003);
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
         { left_port, lefttwo_port });
@@ -296,7 +301,7 @@ void init_autonomous() {
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
 
-    configManager->register_auton("four stack", four_stack,
+    configManager->register_auton("four stack", simpler_four_stack,
         okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
 
     configManager->register_auton("Move 15", move_15);
