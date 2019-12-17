@@ -133,11 +133,6 @@ void four_stack() {
 void simpler_four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
-    okapi::QAngle inward;
-    if (side < 0)
-        inward = 180_deg;
-    else
-        inward = 0_deg;
 
     // Get to cube
     arm->flipDisable(true);
@@ -145,17 +140,19 @@ void simpler_four_stack() {
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
     arm->set_height(2.3_in);
-    cc->strafe(95.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
     arm->waitUntilSettled();
 
-    cc->setHeading(inward);
+    cc->setHeading(0_deg);
     cc->driveStraight(1.2_in);
     intake->moveVoltage(12000);
     pros::delay(500);
     arm->set_height(7_in);
     cc->driveStraight(-1.5_ft);
-    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 9_in });
-    cc->lookToPoint({ 13_ft, cc->odom->getState(okapi::StateMode::CARTESIAN).y });
+    auto large_side = (side > 0)? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
+      cc->driveToPoint({ large_side, 9_in });
+      cc->lookToPoint({large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
+
     //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
     //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );
     arm->flipDisable(false);
@@ -300,7 +297,6 @@ void init_autonomous() {
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
-
     configManager->register_auton("four stack", simpler_four_stack,
         okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
 

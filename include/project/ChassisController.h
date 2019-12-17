@@ -88,11 +88,11 @@ public:
     void strafe(okapi::QLength distance);
     void strafeAsync(okapi::QLength distance);
 
-    void driveToPoint(okapi::Point point);
-    void driveToPointAsync(okapi::Point point);
+    void driveToPoint(okapi::Point point, bool turnreversed = false);
+    void driveToPointAsync(okapi::Point point, bool turnreversed = false);
 
-    void lookToPoint(okapi::Point point);
-    void lookToPointAsync(okapi::Point point);
+    void lookToPoint(okapi::Point point, bool turnreversed = false);
+    void lookToPointAsync(okapi::Point point, bool turnreversed = false);
 
     void setHeading(okapi::QAngle angle);
     void setHeadingAsync(okapi::QAngle angle);

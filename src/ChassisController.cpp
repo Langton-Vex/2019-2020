@@ -164,16 +164,16 @@ void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
         distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
 };
 
-void ChassisControllerHDrive::driveToPoint(okapi::Point point) {
-    driveToPointAsync(point);
+void ChassisControllerHDrive::driveToPoint(okapi::Point point, bool turnreversed) {
+    driveToPointAsync(point, turnreversed);
     waitUntilSettled();
 };
 
-void ChassisControllerHDrive::driveToPointAsync(okapi::Point point) {
+void ChassisControllerHDrive::driveToPointAsync(okapi::Point point, bool turnreversed) {
     auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
         point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
-
-    turnAngle(angle);
+    if (turnreversed) turnAngle(-angle);
+    else turnAngle(angle);
     driveStraight(length);
 };
 
@@ -182,16 +182,17 @@ void ChassisControllerHDrive::driveVector(okapi::QLength straight, okapi::QLengt
     waitUntilSettled();
 };
 
-void ChassisControllerHDrive::lookToPoint(okapi::Point point) {
-    lookToPointAsync(point);
+void ChassisControllerHDrive::lookToPoint(okapi::Point point, bool turnreversed) {
+    lookToPointAsync(point, turnreversed);
     waitUntilSettled();
 };
 
-void ChassisControllerHDrive::lookToPointAsync(okapi::Point point) {
+void ChassisControllerHDrive::lookToPointAsync(okapi::Point point, bool turnreversed) {
     auto angle = okapi::OdomMath::computeAngleToPoint(
         point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
 
-    turnAngle(angle);
+    if (turnreversed) turnAngle(-angle);
+    else turnAngle(angle);
 };
 
 void ChassisControllerHDrive::setHeading(okapi::QAngle angle) {

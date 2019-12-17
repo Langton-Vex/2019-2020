@@ -12,7 +12,7 @@ std::shared_ptr<Chassis> Chassis::get() {
 
 okapi::AverageFilter<5> x_coord_filter;
 pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
-auto strafePID = okapi::IterativeControllerFactory::posPID(0.0051, 0.000000, 0.0);
+auto strafePID = okapi::IterativeControllerFactory::posPID(0.0071, 0.000000, 0.00005);
 /*
 okapi::EmaFilter x_coord_filter(1);
 okapi::DemaFilter x_coord_filter(1,1);
