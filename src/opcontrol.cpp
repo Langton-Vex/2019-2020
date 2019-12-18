@@ -20,6 +20,7 @@
 extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
     leftarm_port, rightarm_port, intake_port, strafe_port;
 
+extern std::atomic<int> vision_distance;
 void set_temperature(int i) {
 
     std::shared_ptr<GUI> gui = GUI::get();
@@ -42,13 +43,12 @@ void set_temperature(int i) {
     std::stringstream stream;
     stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;
     lift_imbalance_str = stream.str();
-
     if (i == 3)
-        peripherals->master_controller.print(0, 0, "Arm:%d", (int)arm_temp);
+        peripherals->master_controller.print(1, 0, "%d, %d, %d", (int)arm_temp, (int)chassis_temp, (int)claw_temp);
     if (i == 2)
-        peripherals->master_controller.print(1, 0, "Chassis:%d", (int)chassis_temp);
+        peripherals->master_controller.print(0, 0, "Arm,Chassis,Claw");
     if (i == 1)
-        peripherals->master_controller.print(2, 0, "Claw:%d", (int)claw_temp);
+        peripherals->master_controller.print(2, 0, "%d", vision_distance.load());
 
     gui->set_line(0, arm_pos_string);
     gui->set_line(1, lift_imbalance_str);
@@ -65,7 +65,7 @@ void opcontrol() {
 
     peripherals->master_controller.print(-1, 0, ""); //NOTE: This may or may not work
 
-    int it = 50;
+    int it = 12;
     while (true) {
         //lv_ta_add_text(GUI::get()->console_box,std::to_string(pros::millis()).c_str());
         //cc->step();

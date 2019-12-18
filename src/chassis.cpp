@@ -10,6 +10,9 @@ std::shared_ptr<Chassis> Chassis::get() {
     return instance;
 }
 
+
+std::atomic<int> vision_distance;
+
 okapi::AverageFilter<5> x_coord_filter;
 pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
 auto strafePID = okapi::IterativeControllerFactory::posPID(0.0071, 0.000000, 0.00005);
@@ -106,8 +109,11 @@ int Chassis::vision_align() {
         return -9999;
 
     if (rtn.width > 20) {
+        vision_distance.store(190 - rtn.width);
         double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
         return motor_speed * strafeOut;
+
+
     }
     return 0;
 }
