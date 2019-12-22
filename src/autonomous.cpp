@@ -149,9 +149,9 @@ void simpler_four_stack() {
     pros::delay(500);
     arm->set_height(7_in);
     cc->driveStraight(-1.5_ft);
-    auto large_side = (side > 0)? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
-      cc->driveToPoint({ large_side, 9_in });
-      cc->lookToPoint({large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
+    auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
+    cc->driveToPoint({ large_side, 9_in });
+    cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
     //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );

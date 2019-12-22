@@ -10,7 +10,6 @@ std::shared_ptr<Chassis> Chassis::get() {
     return instance;
 }
 
-
 std::atomic<int> vision_distance;
 
 okapi::AverageFilter<5> x_coord_filter;
@@ -112,8 +111,6 @@ int Chassis::vision_align() {
         vision_distance.store(190 - rtn.width);
         double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
         return motor_speed * strafeOut;
-
-
     }
     return 0;
 }

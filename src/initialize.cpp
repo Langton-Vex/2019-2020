@@ -7,16 +7,15 @@
  * to keep execution time for this mode under a few seconds.
  */
 
-/* If you manage to find this...
+/* NOTE: If you manage to find this...
  Things to do:
    * Tune arm PID
-   * test autons (obviously)
    * test motion profiling
-   * test vision align (mostly tuning, maybe try expo filters?)
    * double check things dont break when switching comp modes
-   * make sure user control isn't broken
-   * test autons on 2 sides
-   * auton reliability
+   * Arm PID actually scales pot values to motor encoder values and runs internal PID?
+   * Clean up this entire code base
+   * lua autons
+   * comms to a computer program
  */
 
 extern const int8_t left_port = 20;
