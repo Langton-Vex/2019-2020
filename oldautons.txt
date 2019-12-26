@@ -1,0 +1,356 @@
+
+// Starts pointing towards singular cube one tile left of large goal zone
+void colour_tile() {
+
+    ccont->getModel()->setMaxVelocity(150);
+    int side = ConfigManager::get()->selected_team;
+    lift->setMaxVelocity(200);
+
+    lift->setTarget(-148);
+    ccont->getModel()->setMaxVelocity(100);
+    ccont->moveDistanceAsync(11.2 * inch);
+    lift->waitUntilSettled();
+    ccont->waitUntilSettled();
+    lift->setMaxVelocity(100);
+    //ccont->turnAngle(-110_deg);
+    //ccont->moveDistance(5_in);
+
+    intake->moveVelocity(200);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    lift->setTarget(-100);
+    pros::delay(1000);
+    //pros::delay(500); // TODO: This defo needs changing
+    //intake->moveVelocity(0);
+    //lift->setTarget(-200);
+    //lift->waitUntilSettled();
+
+    ccont->moveDistance(-7.5 * inch);
+    intake->moveVelocity(0);
+    ccont->turnAngle(100_deg * side);
+    ccont->moveDistance(38_in);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    lift_stack(2);
+
+    lift->setMaxVelocity(100);
+    ccont->getModel()->setMaxVelocity(100);
+    ccont->moveDistance(-17 * inch);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+}
+
+void colour_tile_3_point() {
+
+    ccont->getModel()->setMaxVelocity(150);
+    int side = ConfigManager::get()->selected_team;
+    lift->setMaxVelocity(200);
+
+    lift->setTarget(-108);
+    ccont->getModel()->setMaxVelocity(100);
+    ccont->moveDistanceAsync(11.5 * inch);
+    ccont->waitUntilSettled();
+    lift->setMaxVelocity(100);
+    //ccont->turnAngle(-110_deg);
+    //ccont->moveDistance(5_in);
+
+    intake->moveVelocity(200);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    lift->setTarget(-100);
+    pros::delay(1000);
+    //pros::delay(500); // TODO: This defo needs changing
+    //intake->moveVelocity(0);
+    //lift->setTarget(-200);
+    //lift->waitUntilSettled();
+
+    ccont->moveDistance(3.5 * inch);
+    ccont->turnAngle(90_deg * side);
+    lift->setMaxVelocity(200);
+    lift->setTarget(-148);
+    ccont->moveDistance(19 * inch);
+    lift->setMaxVelocity(100);
+
+    intake->moveVelocity(200);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    pros::delay(750);
+    //lift->setTarget(-100);
+
+    ccont->moveDistance(3 * inch);
+    ccont->turnAngle(55_deg * side);
+    ccont->moveDistance(20_in);
+
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    lift_stack(3);
+
+    lift->setMaxVelocity(100);
+    ccont->getModel()->setMaxVelocity(75);
+    ccont->moveDistance(-17 * inch);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+}
+
+/* This starts with the left side of the robot in line with the middle of
+cube to the right of the medium sized tower */
+void four_stack() {
+    int side = ConfigManager::get()->selected_team;
+    lift->setMaxVelocity(100);
+
+    ccont->moveDistance(20_in);
+    ccont->moveDistance(-5.5 * inch);
+    ccont->turnAngle(-90_deg * side);
+
+    lift->setTarget(-(24.7 * 18.1123));
+    lift->waitUntilSettled();
+    ccont->getModel()->setMaxVelocity(75);
+    ccont->moveDistance(7_in);
+    intake->moveVelocity(-200);
+    lift->setTarget(lift->getTarget() - (18.1123 * 4));
+    pros::delay(1200);
+    lift->waitUntilSettled();
+    intake->moveVelocity(0);
+    ccont->getModel()->setMaxVelocity(25);
+    ccont->moveDistance(-6_in);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    ccont->getModel()->setMaxVelocity(150);
+
+    ccont->turnAngle(90_deg * side);
+    ccont->moveDistance(13_in);
+    ccont->turnAngle(90_deg * side);
+    ccont->moveDistance(12.5 * inch);
+    lift->setTarget(-(18 * 18.1123));
+    ccont->turnAngle(-90_deg * side);
+    ccont->moveDistance(6_in);
+    lift->waitUntilSettled();
+    intake->moveVelocity(200);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    ccont->turnAngle(90_deg * side);
+    ccont->moveDistance(32_in);
+    ccont->turnAngle(80_deg * side);
+    ccont->moveDistance(20_in);
+}
+
+void four_stack_only() {
+    int side = ConfigManager::get()->selected_team;
+    lift->setMaxVelocity(100);
+
+    ccont->moveDistance(22 * inch);
+    lift->setTarget(-(18 * 18.1123));
+    lift->waitUntilSettled();
+    ccont->getModel()->setMaxVelocity(75);
+    ccont->moveDistance(5_in);
+    intake->moveVelocity(200);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    ccont->turnAngle(90_deg * side);
+    ccont->moveDistance(32_in);
+    ccont->turnAngle(80_deg * side);
+    ccont->moveDistance(32_in);
+}
+/* This autonomous starts with the right side of the robot lined up with the
+   middle of the left mid tower cube */
+void four_floor_small() {
+    ccont->moveDistance(20_in);
+    ccont->moveDistance(-5.5 * inch);
+
+    lift->setTarget(-(24.7 * 18.1123));
+    ccont->getModel()->setMaxVelocity(75);
+    ccont->turnAngle(90_deg);
+    lift->waitUntilSettled();
+    ccont->moveDistance(7_in);
+    intake->moveVelocity(-200);
+
+    ccont->moveDistance(3_in);
+    intake->moveVelocity(-200);
+    lift->setTarget(lift->getTarget() - (18.1123 * 1.5));
+    pros::delay(1200);
+    lift->waitUntilSettled();
+    ccont->moveDistance(-7_in);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    ccont->getModel()->setMaxVelocity(150);
+    ccont->moveDistance(-13_in);
+    ccont->turnAngle(90_deg);
+    ccont->moveDistance(4_in);
+    ccont->turnAngle(90_deg);
+    ccont->moveDistance(15_in);
+    ccont->turnAngle(90_deg);
+
+    intake->moveVelocity(200);
+    for (int i = 0; i < 4; i++) {
+        lift->setTarget(-108);
+        lift->waitUntilSettled();
+        ccont->moveDistance(5.5 * inch);
+        lift->setTarget(0);
+        pros::delay(1200);
+    }
+
+    ccont->moveDistance(-35_in);
+    ccont->turnAngle(-100_deg);
+    ccont->moveDistance(14_in);
+}
+
+//  starts in line with the 4 floor cubes
+void simple_four_floor() {
+    lift->setTarget(-(5.5 * 18.1123));
+    ccont->moveDistance(17.15_in);
+    intake->moveVelocity(200);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    lift->setTarget(-(5.5 * 18.1123));
+    ccont->moveDistance(5.5_in);
+    lift->setTarget(0);
+    lift->waitUntilSettled();
+    ccont->moveDistance(-3_in);
+    ccont->turnAngle(-135_deg);
+    lift->setTarget(-(28.5 * 18.1123));
+    lift_stack(3);
+}
+void auton_safety(void* param) {
+    while (true) {
+        double power_mult = chassis.power_mult_calc();
+        //printf("power mult: %f\n",power_mult);
+        int max_speed = 150 * round(power_mult);
+        if (max_speed > 150)
+            max_speed = 150;
+        chassis.modify_profiled_velocity(max_speed);
+        ccont->getModel()->setMaxVelocity(max_speed);
+
+        pros::delay(20);
+    }
+}
+
+/* ----------------------------------------------------------------
+   ROUND 2: newer autons I may want?
+   ---------------------------------------------------------------- */
+
+
+   void small_four_cubes() {
+       auto i = Claw::get();
+       int side = ConfigManager::get()->selected_team;
+
+       // Pick up preload
+       i->set(-127);
+       //intake->moveVelocity(-200);
+       pros::delay(500); // make this some kinda distance based.
+
+       lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
+       lift->waitUntilSettled();
+       cc->driveStraight(36 * okapi::centimeter);
+       i->set(127);
+       cc->driveStraight(-3 * okapi::centimeter);
+
+       lift->setTarget(0);
+       pros::delay(100);
+       i->set(127);
+       lift->waitUntilSettled();
+       i->set(-127);
+       pros::delay(500);
+       // Drive to scoring zone, place cubes, move out of the way a bit
+       lift->setTarget(18.45 * 6.7);
+       lift->waitUntilSettled();
+       cc->driveStraight(6.7 * okapi::inch);
+
+       lift->setTarget(0);
+       pros::delay(100);
+       i->set(127);
+       lift->waitUntilSettled();
+       lift->setTarget(0);
+       lift->waitUntilSettled();
+       i->set(-127);
+       pros::delay(500);
+       // Drive to scoring zone, place cubes, move out of the way a bit
+       lift->setTarget(18.45 * 5.5);
+       cc->turnAngle(-139 * okapi::degree);
+       cc->driveStraight(54 * okapi::centimeter);
+       lift->setTarget(0);
+       lift->waitUntilSettled();
+       i->set(127);
+       lift->setTarget(18.45 * 5.5);
+       lift->waitUntilSettled();
+   }
+
+   void two_cubes() {
+       auto i = Claw::get();
+       int side = ConfigManager::get()->selected_team;
+
+       // Pick up preload
+       i->set(-127);
+       //intake->moveVelocity(-200);
+       pros::delay(500); // make this some kinda distance based.
+
+       // drive to first cube and pickup
+       cc->driveStraight(3 * okapi::centimeter);
+       lift->setTarget(18.45 * 6.7); // TODO: make pot based!!
+       lift->waitUntilSettled();
+       cc->driveStraight(17.5 * okapi::centimeter);
+       i->set(127);
+       cc->driveStraight(-5 * okapi::centimeter);
+       lift->setTarget(0);
+       lift->waitUntilSettled();
+       pros::delay(500);
+       i->set(-127);
+       pros::delay(650);
+       lift->setTarget(18.45 * 5.5);
+       lift->waitUntilSettled();
+
+       cc->turnAngle(102 * okapi::degree * side);
+       cc->driveStraight(87 * okapi::centimeter);
+       lift->setTarget(0);
+       lift->waitUntilSettled();
+       i->set(127);
+       lift->setTarget(18.45 * 5.5);
+       lift->waitUntilSettled();
+   }
+
+   void three_cubes() {
+       auto i = Claw::get();
+       int side = ConfigManager::get()->selected_team;
+
+       // Pick up preload
+       i->set(-127);
+       //intake->moveVelocity(-200);
+       pros::delay(500); // make this some kinda distance based.
+
+       // drive to first cube and pickup
+       lift->setTarget(18.45 * 6.6); // TODO: make pot based!!
+       lift->waitUntilSettled();
+       cc->driveStraight(21 * okapi::centimeter);
+       i->set(127);
+       cc->driveStraight(-5 * okapi::centimeter);
+       lift->setTarget(0);
+
+       lift->waitUntilSettled();
+       i->set(-127);
+       pros::delay(600);
+
+       // move arm up, drive to second cube
+
+       cc->driveStraight(14 * okapi::inch);
+       lift->setTarget(18.45 * 8.2);
+       lift->waitUntilSettled();
+       cc->turnAngle(90 * okapi::degree * side);
+       cc->driveStraight(32 * okapi::centimeter);
+
+       // Pickup second cube
+       lift->setTarget(0);
+       pros::delay(100);
+       i->set(127);
+       lift->waitUntilSettled();
+       i->set(-127);
+       pros::delay(500);
+
+       // Drive to scoring zone, place cubes, move out of the way a bit
+       lift->setTarget(18.45 * 5.5);
+       cc->turnAngle(40 * okapi::degree * side);
+       cc->driveStraight(53 * okapi::centimeter);
+       lift->setTarget(0);
+       lift->waitUntilSettled();
+       i->set(127);
+       lift->setTarget(18.45 * 5.5);
+       lift->waitUntilSettled();
+   }
