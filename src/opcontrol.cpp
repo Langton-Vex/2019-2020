@@ -23,10 +23,10 @@ void set_temperature(int i) {
     int arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
     int claw_temp = peripherals->intake_mtr.get_temperature();
 
-    double leftarm_pwr = peripherals->leftarm_mtr.get_power();
-    double rightarm_pwr = peripherals->rightarm_mtr.get_power();
-    double smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
-    double normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
+    float leftarm_pwr = peripherals->leftarm_mtr.get_power();
+    float rightarm_pwr = peripherals->rightarm_mtr.get_power();
+    float smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
+    float normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
 
     std::stringstream stream;
     stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;

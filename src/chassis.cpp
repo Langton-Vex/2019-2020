@@ -21,17 +21,18 @@ std::shared_ptr<Chassis> Chassis::get() {
 Chassis::Chassis() {
     pros::motor_gearset_e_t motor_gearset = peripherals->left_mtr.get_gearing();
     if (motor_gearset == MOTOR_GEARSET_06)
-        motor_speed = 600;
+        motor_speed = 600.0;
     if (motor_gearset == MOTOR_GEARSET_18)
-        motor_speed = 200;
+        motor_speed = 200.0;
     if (motor_gearset == MOTOR_GEARSET_36)
-        motor_speed = 100;
+        motor_speed = 100.0;
     //else throw std::invalid_argument("Cannot get gearset of left mtr");
 }
 
 void Chassis::user_control() {
-    int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
-    int turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
+    float power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
+    float turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
+
     int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
     int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
     int strafe_left = peripherals->master_controller.get_digital(DIGITAL_RIGHT);
@@ -42,7 +43,7 @@ void Chassis::user_control() {
     if (slowmode_button == 1)
         slowmode = !slowmode;
 
-    double power_mult = (slowmode) ? 0.5 : power_mult_calc();
+    float power_mult = (slowmode) ? 0.5 : power_mult_calc();
 
     power *= power_mult;
     turn *= power_mult;
@@ -53,19 +54,19 @@ void Chassis::user_control() {
         this->set(power, turn, strafe);
 }
 
-double Chassis::power_mult_calc() {
+float Chassis::power_mult_calc() {
     std::shared_ptr<Arm> arm = Arm::get();
-    double power_mult = (arm->height_per < 0.5) ? (1.0 - arm->height_per) : 0.5;
+    float power_mult = (arm->height_per < 0.5) ? (1.0 - arm->height_per) : 0.5;
     return power_mult;
 }
 
 void Chassis::set(float power, float turn, float strafe) {
 
-    float powere = (sgn(power) / (float)motor_speed) * pow(power * motor_speed / 127.0, 2); // exponential speed function
-    float turne = (sgn(turn) / (float)motor_speed) * pow(turn * motor_speed / 127.0, 2);
+    float powere = (sgn(power) / motor_speed) * pow(power * motor_speed / 127.0, 2); // exponential speed function
+    float turne = (sgn(turn) / motor_speed) * pow(turn * motor_speed / 127.0, 2);
 
-    int left = (int)powere + (int)turne;
-    int right = (int)powere - (int)turne;
+    int left = powere + turne;
+    int right = powere - turne;
 
     peripherals->left_mtr.move_velocity(left);
     peripherals->right_mtr.move_velocity(right);
@@ -81,7 +82,7 @@ int Chassis::vision_align() {
         return 0;
 
     if (rtn.width > 20) {
-        double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
+        float strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
         return motor_speed * strafeOut;
     }
     return 0;

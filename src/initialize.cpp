@@ -9,13 +9,23 @@
 
 /* NOTE: If you manage to find this...
  Things to do:
-   * Tune arm PID
+   * arm PID tuner
    * test motion profiling
-   * double check things dont break when switching comp modes
    * Arm PID actually scales pot values to motor encoder values and runs internal PID?
    * Clean up this entire code base
    * lua autons
    * comms to a computer program
+   * Create a controller manager to manage printing to the controller
+   * Work on setting up odom state properly, clean up auton code so routines can be split
+   * Abstraction of autons so that the position of a GoalZone or Cube is correct for each side
+   * Make GUI nicer (error pop up?)
+   * Make config manager more resilient, I.E SD card corruption and whatnot.
+   * Folder up some of this code.
+   * Move arm, chassis, claw to one robot class, but still have subsystems seperated
+     within that class. Not sure how to do this, but one robot class is a very good idea.
+   * Peripherals struct is passed around a little weirdly, it's a pointer, maybe make it part of
+     aforementioned robot class construction?
+   * Use okapi::MotorGroup to clean up some repetitive code.
  */
 
 int8_t left_port = 20;
@@ -59,14 +69,6 @@ void initialize() {
     //pros::lcd::initialize();
     //pros::lcd::set_text(1, "This means things are working?");
     // btw statics are cool
-    /*
-	FILE* config_file = fopen("/usd/config.txt", "r"); // file on SD card
-  char buf[50]; // This just needs to be larger than the contents of the file
-  fread(buf, 1, 50, config_file); // passing 1 because a `char` is 1 byte, and 50 b/c it's the length of buf
-  printf("%s\n", buf); // print the string read from the file
-  // Should print "Example text" to the terminal
-  fclose(config_file); // always close files when you're done with them
-  */
 }
 
 /**

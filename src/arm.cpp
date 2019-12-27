@@ -78,12 +78,12 @@ void Arm::set(int power) {
 
 void Arm::set_height(okapi::QLength height) {
     int pot_delta = abs(pot_max - pot_min);
-    double target = scale(height.convert(meter), (0.5 * okapi::inch).convert(meter), max_height.convert(meter), pot_min, pot_max);
+    double target = scale(height.convert(meter), 0, max_height.convert(meter), pot_min, pot_max);
     fprintf(stderr, "arm target: %f", target);
     pos_controller->flipDisable(false);
     balance_controller->flipDisable(true);
 
-    pos_controller->setTarget((int)target);
+    pos_controller->setTarget(target); // Using a double should prevent casting
 }
 void Arm::waitUntilSettled() {
     pos_controller->waitUntilSettled();

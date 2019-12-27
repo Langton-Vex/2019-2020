@@ -5,15 +5,20 @@
 // A chassis controller and turn it into something beautiful with odom and motion profiling
 
 /* TODO:
-   * Probably need to split this class into multiple files, because it's getting huge
-   * Get the PID control working obviously.
-   * Get odom working, and well, probably with tracking wheels if we can.
-   * Add motion profiling? (oh god)
-   * clean up some of the code.
-   * Double check logic so that it all works as expected.
+   * Get  tracking wheels if we can.
+   * Work on motion profiling (current iteration needs testing before that though)
+   * clean up ALL of the code.
+     * To add onto this, a lot of this code is repetitive (See the waitUntilSetted methods)
+       and some of the code in the step() function is just shocking. All that code can be
+       cleaned up and whatever
+     * Take inspiration from Vulcan, and initialise this class with a struct containing
+       the values you want to initialise with.
+     * Smart pointer creation is ugly, probably should just have an initializer list.
+
    * Take the tuner function and make it a lot more flexible, i.e if it were in
      A cold package / library, make each element toggleable, ranges tweakable, etc.
      Current solution of updating tuning function is a little hacky.
+
    * Ok so we can solve the DR4B shifts weight problem in two ways:
       * Motion profiling, or a velocity controller (?) will eventually do anyway.
       * limit acceleration by looping and solving (final velocity)2 - (initial velocity)2 = 2 × acceleration × distance
@@ -30,7 +35,6 @@
  * I would even fix this
  * Just make sure that you don't do anything to complicated
  */
-
 
  ChassisControllerHDrive::ChassisControllerHDrive(
      PIDTuning straightTuning, PIDTuning angleTuning,
