@@ -13,7 +13,6 @@ public:
 
     void user_control();
     void set(int power);
-    void set_pos(double position);
     void set_height(okapi::QLength height);
     double scale(double x, double min, double max, double a, double b);
     void waitUntilSettled();

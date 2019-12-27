@@ -18,23 +18,19 @@
    * comms to a computer program
  */
 
-extern const int8_t left_port = 20;
-extern const int8_t right_port = 17;
-extern const int8_t lefttwo_port = 19;
-extern const int8_t righttwo_port = 18;
-extern const int8_t intake_port = 3;
-extern const int8_t strafe_port = 16;
-extern const int8_t leftarm_port = 1;
-extern const int8_t rightarm_port = 2;
+int8_t left_port = 20;
+int8_t right_port = 17;
+int8_t lefttwo_port = 19;
+int8_t righttwo_port = 18;
+int8_t intake_port = 3;
+int8_t strafe_port = 16;
+int8_t leftarm_port = 1;
+int8_t rightarm_port = 2;
 
 /* TODO: Yikes these definitions are getting messy, these need to be moved to
    one file at some point. */
 
-extern std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
-;
 extern std::shared_ptr<ChassisControllerHDrive> cc;
-
-// TODO: These need to be mutex managed pointers
 
 std::unique_ptr<Peripherals_t> peripherals;
 
@@ -55,7 +51,6 @@ void initialize() {
     Arm::get()->init();
 
     pros::delay(20);
-    lift->flipDisable(true);
     init_autonomous();
 
     pros::delay(100);

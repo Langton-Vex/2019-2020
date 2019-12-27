@@ -93,20 +93,8 @@ void GUI::build_main(lv_obj_t* parent) {
     side_sw_off_style.body.main_color = LV_COLOR_HEX(0x0000ff);
     side_sw_off_style.body.grad_color = LV_COLOR_HEX(0x0000ff);
 
-    //side_sw_bg_style.body.main_color= LV_COLOR_HEX(0x424247);
-
-    //side_sw_indic_style.body.radius = LV_RADIUS_CIRCLE;
     side_sw_bg_style.body.radius = LV_RADIUS_CIRCLE;
 
-    //side_sw_indic_style.body.main_color = LV_COLOR_HEX(0xff0000);
-    //side_sw_bg_style.body.main_color = LV_COLOR_HEX(0xff0000);
-    //side_sw_indic_style.body.grad_color = LV_COLOR_HEX(0xff0000);
-    /*
-    side_sw_indic_style.body.main_color = LV_COLOR_HEX(0xffffff);
-    side_sw_indic_style.body.grad_color = LV_COLOR_HEX(0xffffff);
-    side_sw_indic_style.body.padding.hor = LV_DPI/5;
-    side_sw_indic_style.body.padding.ver = 0;
-    */
     lv_obj_t* side = lv_sw_create(h, NULL);
     lv_sw_set_action(side, cb_side);
 
@@ -125,16 +113,6 @@ void GUI::build_main(lv_obj_t* parent) {
     lv_label_set_long_mode(side_label, LV_LABEL_LONG_EXPAND);
     lv_label_set_text(side_label, "Team\ncolour");
     lv_obj_align(side_label, side, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
-    /*
-    lv_obj_t* goto_start = lv_btn_create(h, NULL);
-    lv_btnm_set_action(goto_start, goto_start_cb);
-    lv_obj_align(goto_start, side, LV_ALIGN_OUT_LEFT_MID, -50, 0);
-
-    lv_obj_t* goto_start_label = lv_label_create(h, NULL);
-    lv_label_set_long_mode(goto_start_label, LV_LABEL_LONG_EXPAND);
-    lv_label_set_text(goto_start_label, "Goto\nStart");
-    lv_obj_align(goto_start_label, goto_start, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
-    */
 }
 
 void GUI::build_console(lv_obj_t* parent) {
@@ -177,6 +155,30 @@ void GUI::build_console(lv_obj_t* parent) {
     lv_ta_set_text(console_box, "Initializing hackerman console:\n");
 }
 
+lv_obj_t* create_guage(lv_obj_t* h, int align) {
+    static lv_style_t guage_style;
+    lv_style_copy(&guage_style, &lv_style_pretty_color);
+    guage_style.body.main_color = LV_COLOR_HEX3(0xFFF); /*Line color at the beginning*/
+    guage_style.body.grad_color = LV_COLOR_HEX3(0xFFF); /*Line color at the end*/
+    guage_style.body.padding.hor = 10; /*Scale line length*/
+    guage_style.body.padding.inner = 8; /*Scale label padding*/
+    guage_style.body.border.color = LV_COLOR_HEX3(0x333); /*Needle middle circle color*/
+    guage_style.line.width = 3;
+    guage_style.text.color = LV_COLOR_HEX3(0xFFF);
+    guage_style.line.color = LV_COLOR_RED; /*Line color after the critical value*/
+    guage_style.text.font = &lv_font_dejavu_10;
+
+    lv_obj_t* guage = lv_gauge_create(h, NULL);
+    lv_obj_set_size(guage, 125, 125);
+    lv_obj_align(guage, NULL, align, 0, 0);
+    lv_gauge_set_range(guage, 0, 70);
+    lv_gauge_set_critical_value(guage, 50);
+    lv_gauge_set_style(guage, &guage_style);
+    lv_gauge_set_scale(guage, 220, 13, 8);
+
+    return guage;
+}
+
 void GUI::build_diagnostics(lv_obj_t* parent) {
     lv_page_set_scrl_layout(parent, LV_LAYOUT_PRETTY);
 
@@ -193,47 +195,9 @@ void GUI::build_diagnostics(lv_obj_t* parent) {
     lv_obj_set_click(h, false);
     lv_cont_set_fit(h, true, true);
 
-    static lv_style_t style_table;
-    lv_style_copy(&style_table, &lv_style_plain);
-
-    static lv_style_t guage_style;
-    lv_style_copy(&guage_style, &lv_style_pretty_color);
-    guage_style.body.main_color = LV_COLOR_HEX3(0xFFF); /*Line color at the beginning*/
-    guage_style.body.grad_color = LV_COLOR_HEX3(0xFFF); /*Line color at the end*/
-    guage_style.body.padding.hor = 10; /*Scale line length*/
-    guage_style.body.padding.inner = 8; /*Scale label padding*/
-    guage_style.body.border.color = LV_COLOR_HEX3(0x333); /*Needle middle circle color*/
-    guage_style.line.width = 3;
-    guage_style.text.color = LV_COLOR_HEX3(0xFFF);
-    guage_style.line.color = LV_COLOR_RED; /*Line color after the critical value*/
-    guage_style.text.font = &lv_font_dejavu_10;
-
-    arm_temp_guage = lv_gauge_create(h, NULL);
-    lv_obj_set_size(arm_temp_guage, 125, 125);
-    lv_obj_align(arm_temp_guage, NULL, LV_ALIGN_OUT_LEFT_MID, 0, 0);
-    lv_gauge_set_style(arm_temp_guage, &style_table);
-    lv_gauge_set_range(arm_temp_guage, 0, 70);
-    lv_gauge_set_critical_value(arm_temp_guage, 50);
-    lv_gauge_set_style(arm_temp_guage, &guage_style);
-    lv_gauge_set_scale(arm_temp_guage, 220, 13, 8);
-
-    chassis_temp_guage = lv_gauge_create(h, NULL);
-    lv_obj_set_size(chassis_temp_guage, 125, 125);
-    lv_obj_align(chassis_temp_guage, arm_temp_guage, LV_ALIGN_OUT_RIGHT_MID, 20, 0);
-    lv_gauge_set_style(chassis_temp_guage, &style_table);
-    lv_gauge_set_range(chassis_temp_guage, 0, 70);
-    lv_gauge_set_critical_value(chassis_temp_guage, 50);
-    lv_gauge_set_style(chassis_temp_guage, &guage_style);
-    lv_gauge_set_scale(chassis_temp_guage, 220, 13, 8);
-
-    claw_temp_guage = lv_gauge_create(h, NULL);
-    lv_obj_set_size(claw_temp_guage, 125, 125);
-    lv_obj_align(claw_temp_guage, chassis_temp_guage, LV_ALIGN_OUT_RIGHT_MID, 20, 0);
-    lv_gauge_set_style(claw_temp_guage, &style_table);
-    lv_gauge_set_range(claw_temp_guage, 0, 70);
-    lv_gauge_set_critical_value(claw_temp_guage, 50);
-    lv_gauge_set_style(claw_temp_guage, &guage_style);
-    lv_gauge_set_scale(claw_temp_guage, 220, 13, 8);
+    arm_temp_guage = create_guage(h, LV_ALIGN_OUT_LEFT_MID);
+    chassis_temp_guage = create_guage(h, LV_ALIGN_OUT_RIGHT_MID);
+    claw_temp_guage = create_guage(h, LV_ALIGN_OUT_RIGHT_MID);
 }
 
 lv_res_t GUI::cb_auton_select(lv_obj_t* auton_select) {

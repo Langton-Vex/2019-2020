@@ -1,5 +1,3 @@
-
-
 #include "main.h"
 #include <iomanip>
 #include <sstream>
@@ -17,23 +15,13 @@
  * task, not resume it from where it left off.
  */
 
-extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
-    leftarm_port, rightarm_port, intake_port, strafe_port;
-
-extern std::atomic<int> vision_distance;
 void set_temperature(int i) {
-
     std::shared_ptr<GUI> gui = GUI::get();
-
-    std::string temp = "Arm: ";
-    std::string arm_pos_string = "Arm: ";
     std::string lift_imbalance_str = "Imbalance to the left: ";
 
-    arm_pos_string.append(std::to_string(peripherals->leftarm_mtr.get_position()));
-
-    double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
-    double arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
-    double claw_temp = (peripherals->intake_mtr.get_temperature());
+    int chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
+    int arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
+    int claw_temp = peripherals->intake_mtr.get_temperature();
 
     double leftarm_pwr = peripherals->leftarm_mtr.get_power();
     double rightarm_pwr = peripherals->rightarm_mtr.get_power();
@@ -43,15 +31,13 @@ void set_temperature(int i) {
     std::stringstream stream;
     stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;
     lift_imbalance_str = stream.str();
-    if (i == 3)
-        peripherals->master_controller.print(1, 0, "%d, %d, %d", (int)arm_temp, (int)chassis_temp, (int)claw_temp);
-    if (i == 2)
-        peripherals->master_controller.print(0, 0, "Arm,Chassis,Claw");
-    if (i == 1)
-        peripherals->master_controller.print(2, 0, "%d", vision_distance.load());
 
-    gui->set_line(0, arm_pos_string);
-    gui->set_line(1, lift_imbalance_str);
+    if (i == 3)
+        peripherals->master_controller.print(0, 0, "Arm,Chassis,Claw");
+    if (i == 2)
+        peripherals->master_controller.print(1, 0, "%d, %d, %d", arm_temp, chassis_temp, claw_temp);
+
+    gui->set_line(0, lift_imbalance_str);
 
     lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);
     lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);
@@ -63,7 +49,7 @@ void opcontrol() {
     std::shared_ptr<Arm> arm = Arm::get();
     std::shared_ptr<Claw> claw = Claw::get();
 
-    peripherals->master_controller.print(-1, 0, ""); //NOTE: This may or may not work
+    peripherals->master_controller.print(-1, 0, "");
 
     int it = 12;
     while (true) {

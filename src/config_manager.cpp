@@ -17,15 +17,10 @@ void ConfigManager::save_config() {
 }
 
 void ConfigManager::load_config() {
-    bool file_exists;
-    if (FILE* file = fopen(save_filepath.c_str(), "r")) {
-        fclose(file);
-        file_exists = true;
-    } else {
-        file_exists = false;
-    }
-
+    FILE* file = fopen(save_filepath.c_str(), "r");
+    bool file_exists = file != NULL;
     if (file_exists) {
+        fclose(file);
         std::ifstream input_file(save_filepath);
         char temp_string[256];
 
@@ -62,22 +57,10 @@ okapi::OdomState ConfigManager::get_auton_state(int id) {
 */
 
 void ConfigManager::select_auton(int id) {
-    //if (id > auton_routines.size()){
-    //if (auton_routines.size() == 0)
-    //  throw std::range_error("An auton must exist! This is a nullptr catch");
-    //selected_auton = 0;
-    //}
-    //else
     selected_auton = id;
     this->save_config();
 }
 void ConfigManager::select_team(int team) {
-    //if (team > auton_routines.size()){
-    //if (auton_routines.size() == 0)
-    //  throw std::range_error("An auton must exist! This is a nullptr catch");
-    //selected_team = 0;
-    //}
-    //else
     selected_team = team;
 
     this->save_config();

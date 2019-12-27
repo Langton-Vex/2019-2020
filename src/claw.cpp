@@ -17,18 +17,11 @@ void Claw::user_control() {
     int current_intake = peripherals->master_controller.get_digital(DIGITAL_L2);
     int current_eject = peripherals->master_controller.get_digital(DIGITAL_R2);
 
-    if (current_intake)
-        power = -127;
-
-    else if (current_eject)
-        power = 127;
-    else
-        power = 0;
+    power = (current_intake) ? -127 : (current_eject) ? 127 : 0;
 
     this->set(power);
 }
 
 void Claw::set(int power) {
     peripherals->intake_mtr.move(power);
-    //peripherals->claw_mtr.move_absolute(position,127);
 }

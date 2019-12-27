@@ -13,7 +13,7 @@ float sgn(int x);
 
 extern std::unique_ptr<Peripherals_t> peripherals;
 
-
+#include "project/globals.h"
 #include "project/ControllerMode.h"
 #include "project/TuningMode.h"
 #include "project/PIDTuning.h"
@@ -23,6 +23,7 @@ extern std::unique_ptr<Peripherals_t> peripherals;
 #include "project/arm.h"
 #include "project/claw.h"
 #include "project/config_manager.h"
+#include "project/autonroutines.h"
 
 
 // can use smart pointers later, but meh
