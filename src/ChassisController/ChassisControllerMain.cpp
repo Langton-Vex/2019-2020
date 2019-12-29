@@ -5,7 +5,7 @@
 // A chassis controller and turn it into something beautiful with odom and motion profiling
 
 /* TODO:
-   * Get  tracking wheels if we can.
+   * Get tracking wheels if we can.
    * Work on motion profiling (current iteration needs testing before that though)
    * clean up ALL of the code.
      * To add onto this, a lot of this code is repetitive (See the waitUntilSetted methods)
@@ -146,6 +146,30 @@
      return true;
  };
 
+
+ void ChassisControllerHDrive::waitUntilSettled() {
+     if (!mode.empty()) {
+         std::remove_if(mode.begin(), mode.end(), [this](ControllerMode a) {
+             if (a == ControllerMode::straight) {
+                 fprintf(stderr, "waiting for straight");
+                 return waitUntilDistanceSettled();
+             }
+             if (a == ControllerMode::turn) {
+                 fprintf(stderr, "waiting for turn");
+                 return waitUntilTurnSettled();
+             }
+             if (a == ControllerMode::strafe) {
+                 fprintf(stderr, "waiting for strafe");
+                 return waitUntilStrafeSettled();
+             }
+             return false; // What to do here?
+         });
+     }
+     // finally:
+     disable_controllers();
+     reset();
+ };
+
  void ChassisControllerHDrive::disable_controllers() {
      straightPID->flipDisable(true);
      anglePID->flipDisable(true);
@@ -240,9 +264,10 @@
  }
 
  void ChassisControllerHDrive::asyncThread() {
+   uint32_t millis = pros::millis();
      while (task_running) {
          this->step();
-         pros::delay(asyncUpdateDelay);
+         pros::Task::delay_until(&millis, asyncUpdateDelay);
      }
  }
 

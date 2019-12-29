@@ -106,6 +106,18 @@ public:
     void diagToPointAndTurn(okapi::Point point, okapi::QAngle angle);
     void diagToPointAndTurnAsync(okapi::Point point, okapi::QAngle angle);
 
+    void straightXDistance(okapi::QLength XCoord);
+    void straightXDistanceAsync(okapi::QLength XCoord);
+
+    void straightYDistance(okapi::QLength YCoord);
+    void straightYDistanceAsync(okapi::QLength YCoord);
+
+    void strafeXDistance(okapi::QLength XCoord);
+    void strafeXDistanceAsync(okapi::QLength XCoord);
+
+    void strafeYDistance(okapi::QLength YCoord);
+    void strafeYDistanceAsync(okapi::QLength YCoord);
+
     void enableTurn(okapi::QAngle angle);
     void changeTurn(okapi::QAngle angle);
 

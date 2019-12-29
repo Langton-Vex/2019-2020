@@ -22,6 +22,19 @@ pros::Mutex cc_mutex;
 
 //extern std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
 
+void open_claw() {
+    intake->moveVoltage(-12000);
+    while (intake->getActualVelocity() > 5)
+        pros::delay(10);
+    intake->moveVoltage(0);
+}
+
+void close_claw() {
+    intake->moveVoltage(12000);
+    while (intake->getActualVelocity() > 5)
+        pros::delay(10);
+}
+
 void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);

@@ -1,9 +1,12 @@
 #include "main.h"
-
+#include <math.h>
 
 void ChassisControllerHDrive::setMaxVelocity(int speed) {
     maxVelocity = speed;
 };
+
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::driveStraight(okapi::QLength distance) {
     driveStraightAsync(distance);
     waitUntilSettled();
@@ -20,6 +23,8 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
         distance.convert(okapi::meter) * scales->straight * straightGearset->ratio);
 };
 
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
     turnAngleAsync(angle);
     waitUntilSettled();
@@ -32,6 +37,8 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
 
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
@@ -42,6 +49,8 @@ void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
 void ChassisControllerHDrive::changeTurn(okapi::QAngle angle) {
     turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
 };
+
+// ----------------------------------------------------------------
 
 void ChassisControllerHDrive::strafe(okapi::QLength distance) {
     strafeAsync(distance);
@@ -59,6 +68,8 @@ void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
         distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
 };
 
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::driveToPoint(okapi::Point point, bool turnreversed) {
     driveToPointAsync(point, turnreversed);
     waitUntilSettled();
@@ -74,6 +85,7 @@ void ChassisControllerHDrive::driveToPointAsync(okapi::Point point, bool turnrev
     driveStraight(length);
 };
 
+// ----------------------------------------------------------------
 
 void ChassisControllerHDrive::lookToPoint(okapi::Point point, bool turnreversed) {
     lookToPointAsync(point, turnreversed);
@@ -90,6 +102,8 @@ void ChassisControllerHDrive::lookToPointAsync(okapi::Point point, bool turnreve
         turnAngle(angle);
 };
 
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::setHeading(okapi::QAngle angle) {
     setHeadingAsync(angle);
     waitUntilSettled();
@@ -105,6 +119,8 @@ void ChassisControllerHDrive::setHeadingAsync(okapi::QAngle angle) {
     turnAngle(delta);
 };
 
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::driveVector(okapi::QLength straight, okapi::QLength strafe) {
     driveVectorAsync(straight, strafe);
     waitUntilSettled();
@@ -115,6 +131,56 @@ void ChassisControllerHDrive::driveVectorAsync(okapi::QLength straight, okapi::Q
     strafeAsync(strafe);
 };
 
+// ----------------------------------------------------------------
+
+void ChassisControllerHDrive::straightXDistance(okapi::QLength XCoord){
+  straightXDistanceAsync(XCoord);
+  waitUntilSettled();
+};
+void ChassisControllerHDrive::straightXDistanceAsync(okapi::QLength XCoord){
+  okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
+  okapi::QLength distance = (XCoord - state.x) / sin(state.theta.convert(okapi::radian));
+  driveStraightAsync(distance);
+};
+
+// ----------------------------------------------------------------
+
+void ChassisControllerHDrive::straightYDistance(okapi::QLength YCoord){
+  straightYDistance(YCoord);
+  waitUntilSettled();
+};
+void ChassisControllerHDrive::straightYDistanceAsync(okapi::QLength YCoord){
+    okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
+    okapi::QLength distance = (YCoord - state.y) / cos(state.theta.convert(okapi::radian));
+    driveStraightAsync(distance);
+};
+
+// ----------------------------------------------------------------
+
+void ChassisControllerHDrive::strafeXDistance(okapi::QLength XCoord){
+  strafeXDistance(XCoord);
+  waitUntilSettled();
+};
+void ChassisControllerHDrive::strafeXDistanceAsync(okapi::QLength XCoord){
+  okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
+  okapi::QLength distance = (XCoord - state.x) / cos(state.theta.convert(okapi::radian));
+  strafeAsync(distance);
+};
+
+// ----------------------------------------------------------------
+
+void ChassisControllerHDrive::strafeYDistance(okapi::QLength YCoord){
+  strafeYDistance(YCoord);
+  waitUntilSettled();
+};
+void ChassisControllerHDrive::strafeYDistanceAsync(okapi::QLength YCoord){
+  okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
+  okapi::QLength distance = (YCoord - state.y) / sin(state.theta.convert(okapi::radian));
+  strafeAsync(distance);
+};
+
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::diagToPointAsync(okapi::Point point) {
     okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
     driveVectorAsync(point.y - state.y, point.x - state.x);
@@ -123,6 +189,8 @@ void ChassisControllerHDrive::diagToPoint(okapi::Point point) {
     diagToPointAsync(point);
     waitUntilSettled();
 };
+
+// ----------------------------------------------------------------
 
 // Partially yeeted from okapi ty okapi <3
 void ChassisControllerHDrive::generatePath(std::initializer_list<okapi::PathfinderPoint> iwaypoints, const std::string& ipathId) {
@@ -240,29 +308,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     waitUntilSettled();
 };
 
+// ----------------------------------------------------------------
+
 void ChassisControllerHDrive::diagToPointAndTurn(okapi::Point point, okapi::QAngle angle){};
 void ChassisControllerHDrive::diagToPointAndTurnAsync(okapi::Point point, okapi::QAngle angle){};
-
-
-void ChassisControllerHDrive::waitUntilSettled() {
-    if (!mode.empty()) {
-        std::remove_if(mode.begin(), mode.end(), [this](ControllerMode a) {
-            if (a == ControllerMode::straight) {
-                fprintf(stderr, "waiting for straight");
-                return waitUntilDistanceSettled();
-            }
-            if (a == ControllerMode::turn) {
-                fprintf(stderr, "waiting for turn");
-                return waitUntilTurnSettled();
-            }
-            if (a == ControllerMode::strafe) {
-                fprintf(stderr, "waiting for strafe");
-                return waitUntilStrafeSettled();
-            }
-            return false; // What to do here?
-        });
-    }
-    // finally:
-    disable_controllers();
-    reset();
-};

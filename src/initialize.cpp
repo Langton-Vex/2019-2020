@@ -18,7 +18,11 @@
    * Create a controller manager to manage printing to the controller
    * Work on setting up odom state properly, clean up auton code so routines can be split
    * Abstraction of autons so that the position of a GoalZone or Cube is correct for each side
-   * Make GUI nicer (error pop up?)
+   * Make GUI nicer
+     * Odom debug
+     * Error pop up
+     * better auton selector
+     * Better temperature guages
    * Make config manager more resilient, I.E SD card corruption and whatnot.
    * Folder up some of this code.
    * Move arm, chassis, claw to one robot class, but still have subsystems seperated
@@ -102,10 +106,11 @@ void competition_initialize() {
     cc->odom->step();
     cc->odom->setState(state,
         okapi::StateMode::CARTESIAN);
-
+    uint32_t now = pros::millis();
     while (pros::competition::is_disabled()) {
         if (cc)
             cc->odom->step();
+        pros::Task::delay_until(&now, 10);
         /* keep track of odom state while initialising
          this means that the robot can be pushed during initialising and keep
          track of where it is, good for setting up auton relative to the field

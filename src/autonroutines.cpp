@@ -8,6 +8,9 @@ extern pros::ADIAnalogIn arm_pot;
 
 okapi::QLength INTAKE_FROM_CENTER = 12.5_in;
 
+void open_claw();
+void close_claw();
+
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
 
@@ -84,80 +87,61 @@ void four_stack() {
 
     // Get to cube
     arm->flipDisable(true);
-    auto cubeydelta = (48.2_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
-    cc->driveStraight(cubeydelta);
+    cc->straightYDistance(48.2_in - INTAKE_FROM_CENTER);
     arm->flipDisable(false);
     arm->set_height(2.3_in);
-    cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
+    cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) - (3_in * side));
+    //cc->strafeXDistance(97.1_in);
     arm->waitUntilSettled();
 
     cc->setHeading(0_deg);
     cc->driveStraight(1.2_in);
-    intake->moveVoltage(12000);
-    pros::delay(500);
+    close_claw();
     arm->set_height(7_in);
     cc->driveStraight(-1.5_ft);
     auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
     cc->driveToPoint({ large_side, 9_in });
     cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
-    //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
-    //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );
-    arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
-    arm->flipDisable(true);
-    arm->set(-200);
-    pros::delay(500);
-    intake->moveVoltage(-12000);
-    pros::delay(500);
-    arm->set(200);
-    intake->moveVoltage(0);
-    cc->driveStraight(-2_in);
-    arm->set(0);
+    // For some reason arm does not want to change height here with the controller?
+    open_claw();
+    arm->set_height(5_in);
+    cc->driveStraight(-4_in);
 }
 
 void seven_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
-    okapi::QAngle inward;
-    if (side < 0)
-        inward = 180_deg;
-    else
-        inward = 0_deg;
 
-    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
-    cc->driveStraight(cubeydelta);
+    cc->straightYDistance(49.9_in - INTAKE_FROM_CENTER);
     arm->set_height(2.5_in);
-    cc->strafe((70.3_in + 2.5_in) - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    cc->strafeXDistance(70.3_in + 2.5_in);
     arm->waitUntilSettled();
-    intake->moveVoltage(12000);
+    close_claw();
 
     cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
     cc->lookToPoint({ 13_ft, 1_ft });
-    arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
-    arm->flipDisable(true);
-    arm->set(-200);
-    pros::delay(500);
-    intake->moveVoltage(-12000);
-    pros::delay(500);
-    arm->set(0);
-    intake->moveVoltage(0);
-    pros::delay(500);
+
+    arm->set_height(0_in);
+    arm->waitUntilSettled();
+
+    open_claw();
+    arm->set_height(1_in);
     cc->driveStraightAsync(-5_in);
     arm->set_height(0.1_in);
     cc->waitUntilSettled();
 
     cc->driveToPoint({ 105.7_in, 49.9_in - INTAKE_FROM_CENTER });
     arm->set_height(2.5_in);
-    cc->setHeading(inward);
-    cc->strafe(97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    cc->setHeading(0_deg);
+    cc->strafeXDistance(97.1_in);
     arm->waitUntilSettled();
 
-    intake->moveVoltage(12000);
-    pros::delay(500);
+    close_claw();
     arm->set_height(7_in);
     cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
     arm->set_height(22_in);
@@ -165,8 +149,8 @@ void seven_stack() {
     cc->lookToPoint({ 13_ft, 1_ft });
 
     arm->set_height(21_in);
-    pros::delay(100);
-    intake->moveVoltage(-12000);
+
+    open_claw();
     arm->waitUntilSettled();
     cc->driveStraight(-1_in);
 }
