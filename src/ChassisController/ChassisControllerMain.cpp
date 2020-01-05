@@ -39,48 +39,30 @@
  ChassisControllerHDrive::ChassisControllerHDrive(
      PIDTuning straightTuning, PIDTuning angleTuning,
      PIDTuning turnTuning, PIDTuning strafeTuning,
-     PIDTuning hypotTuning, okapi::MotorGroup ileftSide,
-     okapi::MotorGroup irightSide, okapi::Motor istrafe,
+     okapi::MotorGroup ileftSide, okapi::MotorGroup irightSide, okapi::Motor istrafe,
      okapi::AbstractMotor::GearsetRatioPair istraightGearset,
      okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
-     okapi::ChassisScales iscales) {
+     okapi::ChassisScales iscales):
+
+     straightGearset(istraightGearset), strafeGearset(istrafeGearset), scales(iscales),
+     leftSide(ileftSide), rightSide(irightSide), strafeMotor(istrafe),
+     timeUtil(okapi::TimeUtilFactory::createDefault()), settledUtil(timeUtil.getSettledUtil()),
+     straightPID(okapi::IterativeControllerFactory::posPID(straightTuning.kP, straightTuning.kI, straightTuning.kD)),
+     anglePID(okapi::IterativeControllerFactory::posPID(angleTuning.kP, angleTuning.kI, angleTuning.kD)),
+     turnPID(okapi::IterativeControllerFactory::posPID(turnTuning.kP, turnTuning.kI, turnTuning.kD)),
+     strafePID(okapi::IterativeControllerFactory::posPID(strafeTuning.kP, strafeTuning.kI, strafeTuning.kD))
+      {
 
      pros::delay(100); // Just a good idea
 
-     // Here be a wall of constructors
-     straightPID = std::make_unique<okapi::IterativePosPIDController>(
-         okapi::IterativeControllerFactory::posPID(
-             straightTuning.kP, straightTuning.kI, straightTuning.kD));
-     anglePID = std::make_unique<okapi::IterativePosPIDController>(
-         okapi::IterativeControllerFactory::posPID(
-             angleTuning.kP, angleTuning.kI, angleTuning.kD));
-     turnPID = std::make_unique<okapi::IterativePosPIDController>(
-         okapi::IterativeControllerFactory::posPID(
-             turnTuning.kP, turnTuning.kI, turnTuning.kD));
-     strafePID = std::make_unique<okapi::IterativePosPIDController>(
-         okapi::IterativeControllerFactory::posPID(
-             strafeTuning.kP, strafeTuning.kI, strafeTuning.kD));
-     hypotPID = std::make_unique<okapi::IterativePosPIDController>(
-         okapi::IterativeControllerFactory::posPID(
-             hypotTuning.kP, hypotTuning.kI, hypotTuning.kD));
+     auto leftptr = std::make_shared<okapi::MotorGroup>(leftSide);
+     auto rightptr = std::make_shared<okapi::MotorGroup>(rightSide);
+     auto strafeptr = std::make_shared<okapi::Motor>(strafeMotor);
 
-     straightGearset = std::make_unique<okapi::AbstractMotor::GearsetRatioPair>(
-         istraightGearset);
-     strafeGearset = std::make_unique<okapi::AbstractMotor::GearsetRatioPair>(
-         istrafeGearset);
-     scales = std::make_unique<okapi::ChassisScales>(
-         iscales);
-
-     leftSide = std::make_unique<okapi::MotorGroup>(ileftSide);
-     rightSide = std::make_unique<okapi::MotorGroup>(irightSide);
-     strafeMotor = std::make_unique<okapi::Motor>(istrafe);
-
-     timeUtil = std::make_unique<okapi::TimeUtil>(okapi::TimeUtilFactory::createDefault());
-     settledUtil = timeUtil->getSettledUtil();
-
-     model = std::make_unique<okapi::HDriveModel>(leftSide, rightSide, strafeMotor,
-         leftSide->getEncoder(), rightSide->getEncoder(), strafeMotor->getEncoder(),
+     model = std::make_unique<okapi::HDriveModel>(leftptr, rightptr, strafeptr,
+         leftSide.getEncoder(), rightSide.getEncoder(), strafeMotor.getEncoder(),
          maxVelocity, maxVoltage);
+
      odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
          std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), iscales);
 
@@ -96,53 +78,52 @@
  };
 
  void ChassisControllerHDrive::reset() {
-     leftSideStart = leftSide->getPosition();
-     rightSideStart = rightSide->getPosition();
-     strafeStart = strafeMotor->getPosition();
+     leftSideStart = leftSide.getPosition();
+     rightSideStart = rightSide.getPosition();
+     strafeStart = strafeMotor.getPosition();
      mode.clear();
 
-     leftSide->moveVelocity(0);
-     rightSide->moveVelocity(0);
-     strafeMotor->moveVelocity(0);
+     leftSide.moveVelocity(0);
+     rightSide.moveVelocity(0);
+     strafeMotor.moveVelocity(0);
 
      currentMaxVelocity = 0.0;
 
-     straightPID->reset();
-     anglePID->reset();
-     turnPID->reset();
-     strafePID->reset();
-     hypotPID->reset();
+     straightPID.reset();
+     anglePID.reset();
+     turnPID.reset();
+     strafePID.reset();
  }
 
 
  bool ChassisControllerHDrive::waitUntilDistanceSettled() {
-     while (!straightPID->isSettled()) {
+     while (!straightPID.isSettled()) {
          pros::delay(2);
      }
-     straightPID->flipDisable(true);
+     straightPID.flipDisable(true);
      return true;
  };
 
  bool ChassisControllerHDrive::waitUntilAngleSettled() {
-     while (!anglePID->isSettled()) {
+     while (!anglePID.isSettled()) {
          pros::delay(2);
      }
-     anglePID->flipDisable(true);
+     anglePID.flipDisable(true);
      return true;
  };
 
  bool ChassisControllerHDrive::waitUntilTurnSettled() {
-     while (!turnPID->isSettled()) {
+     while (!turnPID.isSettled()) {
          pros::delay(2);
      }
-     turnPID->flipDisable(true);
+     turnPID.flipDisable(true);
      return true;
  };
  bool ChassisControllerHDrive::waitUntilStrafeSettled() {
-     while (!strafePID->isSettled()) {
+     while (!strafePID.isSettled()) {
          pros::delay(2);
      }
-     strafePID->flipDisable(true);
+     strafePID.flipDisable(true);
      return true;
  };
 
@@ -171,11 +152,10 @@
  };
 
  void ChassisControllerHDrive::disable_controllers() {
-     straightPID->flipDisable(true);
-     anglePID->flipDisable(true);
-     turnPID->flipDisable(true);
-     strafePID->flipDisable(true);
-     hypotPID->flipDisable(true);
+     straightPID.flipDisable(true);
+     anglePID.flipDisable(true);
+     turnPID.flipDisable(true);
+     strafePID.flipDisable(true);
  };
 
 
@@ -184,71 +164,56 @@
      okapi::OdomState state = odom->getState();
      //fprintf(stderr, "odom: %f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
 
-     double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
-     double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
-     double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
-     double strafeChange = strafeMotor->getPosition() - strafeStart;
+     double distance_forward = ((leftSide.getPosition() - leftSideStart) + (rightSide.getPosition() - rightSideStart)) / 2.0;
+     double angleChange = ((leftSide.getPosition() - leftSideStart) - (rightSide.getPosition() - rightSideStart));
+     double turnChange = ((leftSide.getPosition() - leftSideStart) - (rightSide.getPosition() - rightSideStart)) / 2.0;
+     double strafeChange = strafeMotor.getPosition() - strafeStart;
 
      double leftVelocity = 0;
      double rightVelocity = 0;
      double strafeVelocity = 0;
-     std::shared_ptr<Chassis> chassis = Chassis::get();
+     //std::shared_ptr<Chassis> chassis = Chassis::get();
      if (mode.size() > 0) {
          currentMaxVelocity += (double)maxAccel * (double)asyncUpdateDelay * 0.001;
          currentMaxVelocity = (double)std::min(currentMaxVelocity, (double)maxVelocity);
-         //currentMaxVelocity = currentMaxVelocity * chassis->power_mult_calc();
+         //currentMaxVelocity = currentMaxVelocity * chassis.power_mult_calc();
      }
 
      if (std::find(mode.begin(), mode.end(), ControllerMode::straight) != mode.end()) {
-         double straightOut = straightPID->step(distance_forward);
+         double straightOut = straightPID.step(distance_forward);
 
-         //printf("%f straight error, %f angle error\n", straightPID->getError(), anglePID->getError());
-         leftVelocity += (double)straightGearset->internalGearset * straightOut;
-         rightVelocity += (double)straightGearset->internalGearset * straightOut;
+         //printf("%f straight error, %f angle error\n", straightPID.getError(), anglePID.getError());
+         leftVelocity += (double)straightGearset.internalGearset * straightOut;
+         rightVelocity += (double)straightGearset.internalGearset * straightOut;
 
          //printf("straightOut: %f, leftVelocity:%f\n", straightOut, leftVelocity);
      }
 
      if (std::find(mode.begin(), mode.end(), ControllerMode::turn) != mode.end()) {
-         double turnOut = turnPID->step(turnChange);
-         printf("%f turn error\n", turnPID->getError());
-         leftVelocity += (double)straightGearset->internalGearset * turnOut;
-         rightVelocity -= (double)straightGearset->internalGearset * turnOut;
+         double turnOut = turnPID.step(turnChange);
+         leftVelocity += (double)straightGearset.internalGearset * turnOut;
+         rightVelocity -= (double)straightGearset.internalGearset * turnOut;
      }
 
      if (std::find(mode.begin(), mode.end(), ControllerMode::strafe) != mode.end()) {
-         double strafeOut = strafePID->step(strafeChange);
+         double strafeOut = strafePID.step(strafeChange);
 
-         strafeVelocity += (double)strafeGearset->internalGearset * strafeOut;
+         strafeVelocity += (double)strafeGearset.internalGearset * strafeOut;
      }
 
      if (std::find(mode.begin(), mode.end(), ControllerMode::angle) != mode.end()) {
-         double angleOut = anglePID->step(angleChange);
+         double angleOut = anglePID.step(angleChange);
 
-         leftVelocity += (double)straightGearset->internalGearset * angleOut;
-         leftVelocity -= (double)straightGearset->internalGearset * angleOut;
+         leftVelocity += (double)straightGearset.internalGearset * angleOut;
+         leftVelocity -= (double)straightGearset.internalGearset * angleOut;
      }
 
      // Speed limits that are updated every loop, awesome!
 
      //printf("distance: %f, angle: %f, turn: %f\n", distance_forward, angleChange, turnChange);
-     if (leftVelocity >= 0)
-         leftVelocity = std::min(leftVelocity, currentMaxVelocity);
-     else
-         leftVelocity = std::max(leftVelocity, -currentMaxVelocity);
-     if (rightVelocity >= 0)
-         rightVelocity = std::min(rightVelocity, currentMaxVelocity);
-     else
-         rightVelocity = std::max(rightVelocity, -currentMaxVelocity);
-
-     if (strafeVelocity >= 0)
-         strafeVelocity = std::min(strafeVelocity, currentMaxVelocity);
-     else
-         strafeVelocity = std::max(strafeVelocity, -currentMaxVelocity);
-
-     leftSide->moveVelocity((int)leftVelocity);
-     rightSide->moveVelocity((int)rightVelocity);
-     strafeMotor->moveVelocity((int)strafeVelocity);
+     leftSide.moveVelocity((int)std::copysign(std::min(abs(leftVelocity), currentMaxVelocity), leftVelocity));
+     rightSide.moveVelocity((int)std::copysign(std::min(abs(rightVelocity), currentMaxVelocity), rightVelocity));
+     strafeMotor.moveVelocity((int)std::copysign(std::min(abs(strafeVelocity), currentMaxVelocity), strafeVelocity));
  };
 
  void ChassisControllerHDrive::trampoline(void* param) {

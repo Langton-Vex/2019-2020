@@ -13,14 +13,14 @@ void ChassisControllerHDrive::driveStraight(okapi::QLength distance) {
 };
 void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     //disable_controllers();
-    straightPID->flipDisable(false);
-    anglePID->flipDisable(false);
+    straightPID.flipDisable(false);
+    anglePID.flipDisable(false);
     reset();
     mode.push_back(ControllerMode::straight);
     mode.push_back(ControllerMode::angle);
-    anglePID->setTarget(0);
-    straightPID->setTarget(
-        distance.convert(okapi::meter) * scales->straight * straightGearset->ratio);
+    anglePID.setTarget(0);
+    straightPID.setTarget(
+        distance.convert(okapi::meter) * scales.straight * straightGearset.ratio);
 };
 
 // ----------------------------------------------------------------
@@ -31,23 +31,23 @@ void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
 };
 void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     //disable_controllers();
-    turnPID->flipDisable(false);
+    turnPID.flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+    turnPID.setTarget(angle.convert(okapi::degree) * scales.turn * straightGearset.ratio);
 };
 
 // ----------------------------------------------------------------
 
 void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
-    turnPID->flipDisable(false);
+    turnPID.flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+    turnPID.setTarget(angle.convert(okapi::degree) * scales.turn * straightGearset.ratio);
 };
 
 void ChassisControllerHDrive::changeTurn(okapi::QAngle angle) {
-    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+    turnPID.setTarget(angle.convert(okapi::degree) * scales.turn * straightGearset.ratio);
 };
 
 // ----------------------------------------------------------------
@@ -58,14 +58,14 @@ void ChassisControllerHDrive::strafe(okapi::QLength distance) {
 };
 void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
     //disable_controllers();
-    strafePID->flipDisable(false);
-    anglePID->flipDisable(false);
+    strafePID.flipDisable(false);
+    anglePID.flipDisable(false);
 
     mode.push_back(ControllerMode::strafe);
     mode.push_back(ControllerMode::angle);
-    anglePID->setTarget(0);
-    strafePID->setTarget(
-        distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
+    anglePID.setTarget(0);
+    strafePID.setTarget(
+        distance.convert(okapi::meter) * scales.middle * strafeGearset.ratio);
 };
 
 // ----------------------------------------------------------------
@@ -146,7 +146,7 @@ void ChassisControllerHDrive::straightXDistanceAsync(okapi::QLength XCoord){
 // ----------------------------------------------------------------
 
 void ChassisControllerHDrive::straightYDistance(okapi::QLength YCoord){
-  straightYDistance(YCoord);
+  straightYDistanceAsync(YCoord);
   waitUntilSettled();
 };
 void ChassisControllerHDrive::straightYDistanceAsync(okapi::QLength YCoord){
@@ -158,7 +158,7 @@ void ChassisControllerHDrive::straightYDistanceAsync(okapi::QLength YCoord){
 // ----------------------------------------------------------------
 
 void ChassisControllerHDrive::strafeXDistance(okapi::QLength XCoord){
-  strafeXDistance(XCoord);
+  strafeXDistanceAsync(XCoord);
   waitUntilSettled();
 };
 void ChassisControllerHDrive::strafeXDistanceAsync(okapi::QLength XCoord){
@@ -170,7 +170,7 @@ void ChassisControllerHDrive::strafeXDistanceAsync(okapi::QLength XCoord){
 // ----------------------------------------------------------------
 
 void ChassisControllerHDrive::strafeYDistance(okapi::QLength YCoord){
-  strafeYDistance(YCoord);
+  strafeYDistanceAsync(YCoord);
   waitUntilSettled();
 };
 void ChassisControllerHDrive::strafeYDistanceAsync(okapi::QLength YCoord){
@@ -220,7 +220,7 @@ void ChassisControllerHDrive::generatePath(std::initializer_list<okapi::Pathfind
 
     // Generate the trajectory
     pathfinder_generate(&candidate, trajectory.get());
-    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(), rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
+    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(), rightTrajectory.get(), scales.wheelTrack.convert(okapi::meter));
 
     // In case
     removePath(ipathId);
@@ -238,14 +238,14 @@ void ChassisControllerHDrive::removePath(const std::string& ipathId) {
 };
 // This function is blocking!
 void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed, bool mirrored) {
-    turnPID->flipDisable(false);
+    turnPID.flipDisable(false);
     reset();
 
     // Probably not needed
     mode.push_back(ControllerMode::turn);
     //mode.push_back(ControllerMode::pathfinderProfile);
 
-    auto rate = timeUtil->getRate();
+    auto rate = timeUtil.getRate();
 
     TrajectoryPair& path = paths.find(ipathId)->second;
     const int pathLength = path.length;
@@ -259,10 +259,10 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     right_follower.segment = 0;
     right_follower.finished = 0;
     // TODO: This assumes everything is in degrees, please consider changing this!!
-    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales->straight, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig left_config = { (int)leftSide.getPosition(), 360, scales.straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
-    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales->straight, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig right_config = { (int)rightSide.getPosition(), 360, scales.straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
     /* This is jank, should be in step, this entire project needs refactoring into
@@ -272,8 +272,8 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         const auto segDT = path.left.get()[0].dt * okapi::second;
         //const auto linear = path.segments.get()[i].velocity * okapi::mps;
         // NOTE: We probably want this?? I don't know until I try
-        double l = (double)straightGearset->internalGearset * pathfinder_follow_encoder(left_config, &left_follower, path.left.get(), pathLength, (int)leftSide->getPosition());
-        double r = (double)straightGearset->internalGearset * pathfinder_follow_encoder(right_config, &right_follower, path.right.get(), pathLength, (int)rightSide->getPosition());
+        double l = (double)straightGearset.internalGearset * pathfinder_follow_encoder(left_config, &left_follower, path.left.get(), pathLength, (int)leftSide.getPosition());
+        double r = (double)straightGearset.internalGearset * pathfinder_follow_encoder(right_config, &right_follower, path.right.get(), pathLength, (int)rightSide.getPosition());
 
         //const auto LinearToRot = (360 * okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
         //const auto chassisRPM = (linear * LinearToRot).convert(okapi::rpm);
@@ -285,10 +285,10 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
             heading = (360.0 - heading);
         }
 
-        turnPID->setTarget(heading * scales->turn * straightGearset->ratio);
-        double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
-        double turnOut = turnPID->step(turnChange);
-        double turnVelocity = (double)straightGearset->internalGearset * turnOut;
+        turnPID.setTarget(heading * scales.turn * straightGearset.ratio);
+        double turnChange = ((leftSide.getPosition() - leftSideStart) - (rightSide.getPosition() - rightSideStart)) / 2.0;
+        double turnOut = turnPID.step(turnChange);
+        double turnVelocity = (double)straightGearset.internalGearset * turnOut;
 
         int leftVelocity;
         int rightVelocity;
@@ -299,8 +299,8 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
             leftVelocity = (int)(l + turnVelocity);
             rightVelocity = (int)(r - turnVelocity);
         }
-        leftSide->moveVelocity(leftVelocity);
-        rightSide->moveVelocity(rightVelocity);
+        leftSide.moveVelocity(leftVelocity);
+        rightSide.moveVelocity(rightVelocity);
 
         rate->delayUntil(segDT);
     }

@@ -13,7 +13,6 @@ const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 extern okapi::QLength INTAKE_FROM_CENTER;
 
-std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
 std::shared_ptr<ChassisControllerHDrive> cc;
 pros::Mutex cc_mutex;
@@ -40,7 +39,6 @@ void create_cc() {
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
     PIDTuning strafeTuning = PIDTuning(0.002, 0, 0.00003);
-    PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
         { left_port, lefttwo_port });
     okapi::MotorGroup rightSide(
@@ -51,7 +49,7 @@ void create_cc() {
     cc_mutex.take(TIMEOUT_MAX);
     // Auton cleanup shouldn't get preempted, but just in case
     cc = std::make_unique<ChassisControllerHDrive>(
-        straightTuning, angleTuning, turnTuning, strafeTuning, hypotTuning, // Tunings
+        straightTuning, angleTuning, turnTuning, strafeTuning, // Tunings
         leftSide, rightSide, strafeMotor, // left mtr, right mtr, strafe mtr
         okapi::AbstractMotor::gearset::green, // swerve steer gearset
         okapi::AbstractMotor::gearset::green, // strafe gearset
@@ -63,11 +61,6 @@ void create_cc() {
 }
 
 void init_autonomous() {
-    ccont = ChassisControllerBuilder()
-                .withMotors({ left_port, lefttwo_port },
-                    { right_port, righttwo_port })
-                .withDimensions(AbstractMotor::gearset::green, { { WHEEL_DIAMETER, CHASSIS_WIDTH }, imev5GreenTPR })
-                .build();
 
     intake = std::make_unique<okapi::Motor>(intake_port);
 

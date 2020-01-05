@@ -17,8 +17,7 @@ public:
     ChassisControllerHDrive(
         PIDTuning straightTuning, PIDTuning angleTuning,
         PIDTuning turnTuning, PIDTuning strafeTuning,
-        PIDTuning hypotTuning, okapi::MotorGroup leftSide,
-        okapi::MotorGroup rightSide, okapi::Motor strafe,
+        okapi::MotorGroup leftSide, okapi::MotorGroup rightSide, okapi::Motor strafe,
         okapi::AbstractMotor::GearsetRatioPair istraightGearset,
         okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
         okapi::ChassisScales iscales);
@@ -63,19 +62,18 @@ public:
 
     // I don't like weird constructors OK
 
-    std::unique_ptr<okapi::IterativePosPIDController> straightPID;
-    std::unique_ptr<okapi::IterativePosPIDController> anglePID;
-    std::unique_ptr<okapi::IterativePosPIDController> turnPID;
-    std::unique_ptr<okapi::IterativePosPIDController> strafePID;
-    std::unique_ptr<okapi::IterativePosPIDController> hypotPID;
+    okapi::IterativePosPIDController straightPID;
+    okapi::IterativePosPIDController anglePID;
+    okapi::IterativePosPIDController turnPID;
+    okapi::IterativePosPIDController strafePID;
 
-    std::unique_ptr<okapi::AbstractMotor::GearsetRatioPair> straightGearset;
-    std::unique_ptr<okapi::AbstractMotor::GearsetRatioPair> strafeGearset;
-    std::unique_ptr<okapi::ChassisScales> scales;
+    okapi::AbstractMotor::GearsetRatioPair straightGearset;
+    okapi::AbstractMotor::GearsetRatioPair strafeGearset;
+    okapi::ChassisScales scales;
 
-    std::shared_ptr<okapi::AbstractMotor> leftSide;
-    std::shared_ptr<okapi::AbstractMotor> rightSide;
-    std::shared_ptr<okapi::Motor> strafeMotor;
+    okapi::MotorGroup leftSide;
+    okapi::MotorGroup rightSide;
+    okapi::Motor strafeMotor;
 
     double leftSideStart, rightSideStart, strafeStart;
 
@@ -147,7 +145,7 @@ public:
     void stop_task();
 
 private:
-    std::unique_ptr<okapi::TimeUtil> timeUtil;
+    okapi::TimeUtil timeUtil;
     std::unique_ptr<okapi::SettledUtil> settledUtil;
 };
 
