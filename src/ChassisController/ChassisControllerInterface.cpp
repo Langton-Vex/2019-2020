@@ -259,10 +259,10 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     right_follower.segment = 0;
     right_follower.finished = 0;
     // TODO: This assumes everything is in degrees, please consider changing this!!
-    EncoderConfig left_config = { (int)leftSide.getPosition(), 360, scales.straight, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales.straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
-    EncoderConfig right_config = { (int)rightSide.getPosition(), 360, scales.straight, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales.straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
     /* This is jank, should be in step, this entire project needs refactoring into
@@ -272,8 +272,8 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         const auto segDT = path.left.get()[0].dt * okapi::second;
         //const auto linear = path.segments.get()[i].velocity * okapi::mps;
         // NOTE: We probably want this?? I don't know until I try
-        double l = (double)straightGearset.internalGearset * pathfinder_follow_encoder(left_config, &left_follower, path.left.get(), pathLength, (int)leftSide.getPosition());
-        double r = (double)straightGearset.internalGearset * pathfinder_follow_encoder(right_config, &right_follower, path.right.get(), pathLength, (int)rightSide.getPosition());
+        double l = (double)straightGearset.internalGearset * pathfinder_follow_encoder(left_config, &left_follower, path.left.get(), pathLength, (int)leftSide->getPosition());
+        double r = (double)straightGearset.internalGearset * pathfinder_follow_encoder(right_config, &right_follower, path.right.get(), pathLength, (int)rightSide->getPosition());
 
         //const auto LinearToRot = (360 * okapi::degree / (scales->wheelDiameter * 1 * okapi::pi)) * straightGearset->ratio;
         //const auto chassisRPM = (linear * LinearToRot).convert(okapi::rpm);
@@ -286,7 +286,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
         }
 
         turnPID.setTarget(heading * scales.turn * straightGearset.ratio);
-        double turnChange = ((leftSide.getPosition() - leftSideStart) - (rightSide.getPosition() - rightSideStart)) / 2.0;
+        double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
         double turnOut = turnPID.step(turnChange);
         double turnVelocity = (double)straightGearset.internalGearset * turnOut;
 
@@ -299,8 +299,8 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
             leftVelocity = (int)(l + turnVelocity);
             rightVelocity = (int)(r - turnVelocity);
         }
-        leftSide.moveVelocity(leftVelocity);
-        rightSide.moveVelocity(rightVelocity);
+        leftSide->moveVelocity(leftVelocity);
+        rightSide->moveVelocity(rightVelocity);
 
         rate->delayUntil(segDT);
     }

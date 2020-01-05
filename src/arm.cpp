@@ -35,7 +35,7 @@ void Arm::init() {
                              .withMotor(rightarm_port)
                              .build();
 
-    std::shared_ptr<okapi::Potentiometer> arm_pot = std::make_unique<okapi::Potentiometer>(pot_port);
+    std::shared_ptr<okapi::Potentiometer> arm_pot = std::make_shared<okapi::Potentiometer>(pot_port);
 
     pos_controller = okapi::AsyncPosControllerBuilder()
                          .withMotor({ (int8_t)-leftarm_port, (int8_t)-rightarm_port })

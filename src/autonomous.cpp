@@ -13,7 +13,7 @@ const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
 extern okapi::QLength INTAKE_FROM_CENTER;
 
-std::shared_ptr<Motor> intake;
+Motor intake(intake_port);
 std::shared_ptr<ChassisControllerHDrive> cc;
 pros::Mutex cc_mutex;
 // This mutex is not actually used for the controller, rather the shared_ptr
@@ -22,23 +22,23 @@ pros::Mutex cc_mutex;
 //extern std::shared_ptr<okapi::AsyncPositionController<double, double>> lift;
 
 void open_claw() {
-    intake->moveVoltage(-12000);
-    while (intake->getActualVelocity() > 5)
+    intake.moveVoltage(-12000);
+    while (intake.getActualVelocity() > 5)
         pros::delay(10);
-    intake->moveVoltage(0);
+    intake.moveVoltage(0);
 }
 
 void close_claw() {
-    intake->moveVoltage(12000);
-    while (intake->getActualVelocity() > 5)
+    intake.moveVoltage(12000);
+    while (intake.getActualVelocity() > 5)
         pros::delay(10);
 }
 
 void create_cc() {
-    PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
-    PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
-    PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.002, 0, 0.00003);
+    PIDTuning straightTuning(0.001890, 0.0, 0.000019);
+    PIDTuning angleTuning(0.000764, 0, 0.000007);
+    PIDTuning turnTuning(0.001500, 0, 0.000053);
+    PIDTuning strafeTuning(0.002, 0, 0.00003);
     okapi::MotorGroup leftSide(
         { left_port, lefttwo_port });
     okapi::MotorGroup rightSide(
@@ -61,8 +61,6 @@ void create_cc() {
 }
 
 void init_autonomous() {
-
-    intake = std::make_unique<okapi::Motor>(intake_port);
 
     Arm::get()->flipDisable(true);
 

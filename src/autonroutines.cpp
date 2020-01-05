@@ -1,8 +1,7 @@
 #include "main.h"
 using namespace okapi;
 
-extern std::shared_ptr<okapi::ChassisController> ccont;
-extern std::shared_ptr<Motor> intake;
+extern Motor intake;
 extern std::shared_ptr<ChassisControllerHDrive> cc;
 extern pros::ADIAnalogIn arm_pot;
 
@@ -167,19 +166,19 @@ void four_floor() {
     cc->driveToPoint({ 26.4_in, 33.4_in - INTAKE_FROM_CENTER });
     cc->setHeading(inward);
     for (int i = 0; i < 3; i++) {
-        intake->moveVoltage(12000);
+        intake.moveVoltage(12000);
         pros::delay(500);
         arm->set_height(5.5_in);
         arm->waitUntilSettled();
         cc->driveStraight(5.5_ft);
-        intake->moveVoltage(-12000);
+        intake.moveVoltage(-12000);
         pros::delay(500);
         arm->set_height(0_in);
     }
-    intake->moveVoltage(12000);
+    intake.moveVoltage(12000);
 
     cc->driveToPoint({ 0.75_ft, 0.75_ft - INTAKE_FROM_CENTER });
     arm->set_height(0_in);
     arm->waitUntilSettled();
-    intake->moveVoltage(-12000);
+    intake.moveVoltage(-12000);
 }

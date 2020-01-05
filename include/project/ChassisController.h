@@ -71,9 +71,9 @@ public:
     okapi::AbstractMotor::GearsetRatioPair strafeGearset;
     okapi::ChassisScales scales;
 
-    okapi::MotorGroup leftSide;
-    okapi::MotorGroup rightSide;
-    okapi::Motor strafeMotor;
+    std::shared_ptr<okapi::MotorGroup> leftSide;
+    std::shared_ptr<okapi::MotorGroup> rightSide;
+    std::shared_ptr<okapi::Motor> strafeMotor;
 
     double leftSideStart, rightSideStart, strafeStart;
 
@@ -146,7 +146,6 @@ public:
 
 private:
     okapi::TimeUtil timeUtil;
-    std::unique_ptr<okapi::SettledUtil> settledUtil;
 };
 
 #endif

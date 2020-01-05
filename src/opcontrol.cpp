@@ -1,6 +1,4 @@
 #include "main.h"
-#include <iomanip>
-#include <sstream>
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -17,28 +15,16 @@
 
 void set_temperature(int i) {
     std::shared_ptr<GUI> gui = GUI::get();
-    std::string lift_imbalance_str = "Imbalance to the left: ";
 
-    int chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
-    int arm_temp = (peripherals->leftarm_mtr.get_temperature() + peripherals->rightarm_mtr.get_temperature()) / 2;
+    int chassis_temp = peripherals->left_mtr.get_temperature();
+    int arm_temp = peripherals->leftarm_mtr.get_temperature();
     int claw_temp = peripherals->intake_mtr.get_temperature();
-
-    float leftarm_pwr = peripherals->leftarm_mtr.get_power();
-    float rightarm_pwr = peripherals->rightarm_mtr.get_power();
-    float smallest_arm_pwr = std::min(leftarm_pwr, rightarm_pwr);
-    float normalised_imbalance = (leftarm_pwr / smallest_arm_pwr) - (rightarm_pwr / smallest_arm_pwr);
-
-    std::stringstream stream;
-    stream << lift_imbalance_str << std::fixed << std::setprecision(6) << normalised_imbalance;
-    lift_imbalance_str = stream.str();
 
     if (i == 3)
         peripherals->master_controller.print(0, 0, "Arm,Chassis,Claw");
     if (i == 2)
         peripherals->master_controller.print(1, 0, "%d, %d, %d", arm_temp, chassis_temp, claw_temp);
-
-    gui->set_line(0, lift_imbalance_str);
-
+        
     lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);
     lv_gauge_set_value(gui->arm_temp_guage, 0, arm_temp);
     lv_gauge_set_value(gui->claw_temp_guage, 0, claw_temp);

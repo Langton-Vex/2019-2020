@@ -96,13 +96,13 @@ void ChassisControllerHDrive::tune() {
 double ChassisControllerHDrive::controllerGet() {
     switch (tuningMode) {
     case TuningMode::TuneStraight:
-        return ((leftSide.getPosition() - leftSideStart) + (rightSide.getPosition() - rightSideStart)) / 2.0;
+        return ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
     case TuningMode::TuneAngle:
-        return ((leftSide.getPosition() - leftSideStart) - (rightSide.getPosition() - rightSideStart));
+        return ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
     case TuningMode::TuneTurn:
-        return ((leftSide.getPosition() - leftSideStart) - (rightSide.getPosition() - rightSideStart)) / 2.0;
+        return ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
     case TuningMode::TuneStrafe:
-        return strafeMotor.getPosition() - strafeStart;
+        return strafeMotor->getPosition() - strafeStart;
     default:
         return 0.0;
     }
@@ -123,7 +123,7 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
         //double turnOut = turnPID.step(turnChange);
 
         leftVelocity = (double)straightGearset.internalGearset * ivalue;
-        rightVelocity = (double)straightGearset.internalGearset * ivalue * -1.0;
+        rightVelocity = (double)straightGearset.internalGearset * -ivalue;
     }
     if (tuningMode == TuningMode::TuneAngle) {
         leftVelocity = (double)straightGearset.internalGearset * (ivalue);
@@ -136,7 +136,7 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
     }
     //fprintf(stderr, "out: %d", std::min((int)round(leftVelocity), maxVelocity));
 
-    leftSide.moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
-    rightSide.moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
-    strafeMotor.moveVelocity(std::min((int)round(strafeVelocity), maxVelocity));
+    leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
+    rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
+    strafeMotor->moveVelocity(std::min((int)round(strafeVelocity), maxVelocity));
 };
