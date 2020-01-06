@@ -80,11 +80,11 @@ void Chassis::modify_profiled_velocity(int velocity) {
 
 void Chassis::set(int power, int turn, int strafe) {
 
-    float powere = (sgn(power) / motor_speed) * pow(((float)power * motor_speed / 127), 2); // exponential speed function
-    float turne = (sgn(turn) / motor_speed) * pow((float)(turn * motor_speed / 127), 2);
+    int16_t powere = sgn(power) * motor_speed * pow(power / 127.0, 2); // exponential speed function
+    int16_t turne = sgn(turn) * motor_speed * pow(turn / 127.0, 2);
 
-    int left = (int)powere + (int)turne;
-    int right = (int)powere - (int)turne;
+    int left = powere + turne;
+    int right = powere - turne;
 
     peripherals->left_mtr.move_velocity(left);
     peripherals->right_mtr.move_velocity(right);
