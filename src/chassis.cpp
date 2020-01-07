@@ -37,10 +37,10 @@ Chassis::Chassis() {
 void Chassis::user_control() {
     int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
     int turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
-    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_B);
-    int align_button = peripherals->master_controller.get_digital(DIGITAL_DOWN);
-    int strafe_left = peripherals->master_controller.get_digital(DIGITAL_RIGHT);
-    int strafe_right = peripherals->master_controller.get_digital(DIGITAL_Y);
+    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
+    int align_button = peripherals->master_controller.get_digital(DIGITAL_B);
+    int strafe_left = peripherals->master_controller.get_digital(DIGITAL_R1);
+    int strafe_right = peripherals->master_controller.get_digital(DIGITAL_R2);
 
     int strafe;
     if (strafe_left)
@@ -80,16 +80,16 @@ void Chassis::modify_profiled_velocity(int velocity) {
 
 void Chassis::set(int power, int turn, int strafe) {
 
-    float powere = (sgn(power) / motor_speed) * pow(((float)power * motor_speed / 127), 2); // exponential speed function
-    float turne = (sgn(turn) / motor_speed) * pow((float)(turn * motor_speed / 127), 2);
+    float powere = (sgn(power) / 12000) * pow(((float)power * 12000 / 127), 2); // exponential speed function
+    float turne = (sgn(turn) / 12000) * pow((float)(turn * 12000 / 127), 2);
 
     int left = (int)powere + (int)turne;
     int right = (int)powere - (int)turne;
 
-    peripherals->left_mtr.move_velocity(left);
-    peripherals->right_mtr.move_velocity(right);
-    peripherals->lefttwo_mtr.move_velocity(left);
-    peripherals->righttwo_mtr.move_velocity(right);
+    peripherals->left_mtr.move_voltage(left);
+    peripherals->right_mtr.move_voltage(right);
+    peripherals->lefttwo_mtr.move_voltage(left);
+    peripherals->righttwo_mtr.move_voltage(right);
     if (strafe > -9999)
         peripherals->strafe_mtr.move(strafe);
 
