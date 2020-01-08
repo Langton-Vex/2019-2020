@@ -205,7 +205,7 @@ void new_four_stack() {
 
     auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
     cc->strafe((8_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
-    cc->driveToPoint({ large_side, 8 _in });
+    cc->driveToPoint({ large_side, 8_in });
     cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
