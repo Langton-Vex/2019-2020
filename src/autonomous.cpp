@@ -205,7 +205,7 @@ void new_four_stack() {
 
     auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
     cc->strafe((8_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
-    cc->driveToPoint({ large_side, 8  _in });
+    cc->driveToPoint({ large_side, 8 _in });
     cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
@@ -307,7 +307,7 @@ void four_floor() {
     arm->set_height(3.5_in);
 
     cc->driveToPoint({ 6_in + (INTAKE_FROM_CENTER * sin(cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian))),
-                    6_in + (INTAKE_FROM_CENTER * cos(cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian))) });
+        6_in + (INTAKE_FROM_CENTER * cos(cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian))) });
     arm->set_height(0_in);
     arm->waitUntilSettled();
 
@@ -318,7 +318,7 @@ void four_floor() {
     cc->driveStraight(-2_in);
 }
 
-void bob_auton(){
+void bob_auton() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
 

@@ -82,11 +82,10 @@ void Arm::user_control() {
             integrated_lift->flipDisable(true);
 
         this->set(power);
-        integrated_lift->setTarget(peripherals->leftarm_mtr.get_position());
-    } else {
-        if (integrated_lift->isDisabled())
-            integrated_lift->flipDisable(false);
-    }
+        double average_pos = (peripherals->leftarm_mtr.get_position() + peripherals->rightarm_mtr.get_position()) / 2.0;
+        integrated_lift->setTarget(average_pos);
+    } else if (integrated_lift->isDisabled())
+        integrated_lift->flipDisable(false);
 }
 
 void Arm::set(int power) {
