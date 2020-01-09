@@ -88,7 +88,7 @@ void vision_test() {
 
 // Starts pointing towards small goal zone
 void near_small() {
-    ccont->moveDistance(17 * inch);
+    ccont->moveDistance(12 * inch);
     ccont->moveDistance(-18_in);
 }
 
@@ -97,52 +97,6 @@ void do_nothing() {
         pros::delay(100);
 };
 
-void move_15() {
-    cc->driveStraight(18_in);
-    cc->driveStraight(-18_in);
-}
-
-void arm_test() {
-    //cc->setHeading(90_deg);
-    cc->strafe(6_in);
-    return;
-    std::shared_ptr<Arm> arm = Arm::get();
-    arm->set_height(10_in);
-    arm->waitUntilSettled();
-}
-/*
-void four_stack() {
-    int side = ConfigManager::get()->selected_team;
-    std::shared_ptr<Arm> arm = Arm::get();
-    okapi::QAngle inward;
-    if (side < 0)
-        inward = 180_deg;
-    else
-        inward = 0_deg;
-    arm->flipDisable(true);
-    cc->driveStraight(5_in);
-    arm->flipDisable(false);
-    arm->set_height(2.5_in);
-    arm->waitUntilSettled();
-    cc->driveToPoint({ 105.7_in, 49.9_in - INTAKE_FROM_CENTER });
-    cc->setHeading(inward);
-    cc->strafe(97.1_in - 105.7_in);
-    intake->moveVoltage(12000);
-    pros::delay(500);
-    arm->set_height(15_in);
-    cc->driveStraight(-2_ft);
-    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
-    cc->lookToPoint({ 13_ft, 1_ft });
-    //cc->strafe(side * 1_ft);
-    arm->flipDisable(false);
-    arm->set_height(0_in);
-    arm->waitUntilSettled();
-    arm->flipDisable(true);
-    arm->set(-200);
-    pros::delay(500);
-    intake->moveVoltage(-12000);
-}
-*/
 void simpler_four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -202,15 +156,12 @@ void new_four_stack() {
     intake->moveVoltage(12000);
     pros::delay(500);
     arm->set_height(3.5_in);
-    cc->setHeading((side > 0) ? 90_deg : -90_deg);
+
+    cc->driveStraight(-2_ft);
 
     auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
-    cc->strafe((8_in - cc->odom->getState(okapi::StateMode::CARTESIAN).y));
     cc->driveToPoint({ large_side, 8_in });
-    cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
-    //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
-    //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );
     arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();
@@ -221,62 +172,21 @@ void new_four_stack() {
     pros::delay(500);
     arm->set(200);
     intake->moveVoltage(0);
+    pros::delay(100);
+    arm->set(0);
     cc->driveStraight(-2_in);
     arm->set(0);
-}
 
-void seven_stack() {
-    int side = ConfigManager::get()->selected_team;
-    std::shared_ptr<Arm> arm = Arm::get();
-    okapi::QAngle inward;
-    if (side < 0)
-        inward = 180_deg;
-    else
-        inward = 0_deg;
-
-    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
-    cc->driveStraight(cubeydelta);
-    arm->set_height(2.5_in);
-    cc->strafe((70.3_in + 2.5_in) - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
-    arm->waitUntilSettled();
-    intake->moveVoltage(12000);
-
-    cc->driveToPoint({ 11.5_ft - INTAKE_FROM_CENTER, 1_ft });
-    cc->lookToPoint({ 13_ft, 1_ft });
-    arm->flipDisable(false);
+    // If arm control works?
+    /*
     arm->set_height(0_in);
     arm->waitUntilSettled();
-    arm->flipDisable(true);
-    arm->set(-200);
-    pros::delay(500);
     intake->moveVoltage(-12000);
     pros::delay(500);
-    arm->set(0);
+    arm->set_height(1_in);
     intake->moveVoltage(0);
-    pros::delay(500);
-    cc->driveStraightAsync(-5_in);
-    arm->set_height(0.1_in);
-    cc->waitUntilSettled();
-
-    cc->driveToPoint({ 105.7_in, 49.9_in - INTAKE_FROM_CENTER });
-    arm->set_height(2.5_in);
-    cc->setHeading(inward);
-    cc->strafe(97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
-    arm->waitUntilSettled();
-
-    intake->moveVoltage(12000);
-    pros::delay(500);
-    arm->set_height(7_in);
-    cc->driveToPoint({ 1_ft, 11.5_ft - INTAKE_FROM_CENTER });
-    arm->set_height(22_in);
-    arm->waitUntilSettled();
-    cc->lookToPoint({ 13_ft, 1_ft });
-
-    arm->set_height(21_in);
-    pros::delay(100);
-    intake->moveVoltage(-12000);
-    arm->waitUntilSettled();
-    cc->driveStraight(-1_in);
+    cc->driveStraight(-2_in);
+    */
 }
 
 void four_floor() {
@@ -356,18 +266,20 @@ void bob_auton() {
     arm->set_height(2.3_in);
     arm->waitUntilSettled();
     close_claw();
-    arm->set_height(6.5_in);
+
+    arm->set_height(3.5_in);
     arm->waitUntilSettled();
 
     cc->driveStraight(-1.5_ft);
     cc->driveToPoint({ small_side, 4.5_in });
-    cc->lookToPoint({ small_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
+    //cc->lookToPoint({ small_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
-    arm->set_height(2_in);
+    arm->set_height(0_in);
     arm->waitUntilSettled();
     open_claw();
-    arm->set_height(5_in);
+    arm->set_height(1_in);
     cc->driveStraight(-4_in);
+    arm->waitUntilSettled();
 }
 
 /* ----------------------------------------------------------------
@@ -425,8 +337,6 @@ void init_autonomous() {
     configManager->register_auton("four floor", four_floor,
         okapi::OdomState{ 26.4_in, 33.4_in - INTAKE_FROM_CENTER, 0_deg });
 
-    configManager->register_auton("Move 15", move_15);
-    configManager->register_auton("arm test", arm_test);
     //configManager->register_auton("potentiomenter test", pot_lookup);
     //configManager->register_auton("vision test", vision_test);
 }

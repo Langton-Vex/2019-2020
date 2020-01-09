@@ -107,6 +107,7 @@ void competition_initialize() {
         okapi::StateMode::CARTESIAN);
 
     while (pros::competition::is_disabled()) {
+        GUI::get()->set_line(0, "Odom stepping");
         if (cc)
             cc->odom->step();
         /* keep track of odom state while initialising
