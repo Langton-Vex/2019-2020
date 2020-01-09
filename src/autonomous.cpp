@@ -188,14 +188,15 @@ void new_four_stack() {
 
     // Get to cube
     arm->flipDisable(true);
-    auto cubeydelta = (48.2_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
-    auto nearcubeydelta = (26.4_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+
+    auto nearcubeydelta = 26.4_in - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
     cc->driveStraight(nearcubeydelta);
     arm->flipDisable(false);
     arm->set_height(2.3_in);
     cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
     cc->setHeading(0_deg);
-    cc->driveStraight(nearcubeydelta);
+    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    cc->driveStraight(cubeydelta);
 
     arm->waitUntilSettled();
     intake->moveVoltage(12000);
@@ -204,8 +205,8 @@ void new_four_stack() {
     cc->setHeading((side > 0) ? 90_deg : -90_deg);
 
     auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
-    cc->strafe((8_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
-    cc->driveToPoint({ large_side, 8  _in });
+    cc->strafe((8_in - cc->odom->getState(okapi::StateMode::CARTESIAN).y));
+    cc->driveToPoint({ large_side, 8_in });
     cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is

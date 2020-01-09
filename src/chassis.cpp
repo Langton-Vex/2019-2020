@@ -34,13 +34,16 @@ Chassis::Chassis() {
     //else throw std::invalid_argument("Cannot get gearset of left mtr");
 }
 
+bool alignnextloop = true;
+
 void Chassis::user_control() {
     int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
     int turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
     int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
     int align_button = peripherals->master_controller.get_digital(DIGITAL_B);
-    int strafe_left = peripherals->master_controller.get_digital(DIGITAL_R1);
-    int strafe_right = peripherals->master_controller.get_digital(DIGITAL_R2);
+    int strafe_left = peripherals->master_controller.get_digital(DIGITAL_R2);
+    int strafe_right = peripherals->master_controller.get_digital(DIGITAL_R1);
+
 
     int strafe;
     if (strafe_left)
@@ -53,16 +56,17 @@ void Chassis::user_control() {
     if (slowmode_button == 1)
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
-    double power_mult = power_mult_calc();
-    power_mult = (slowmode) ? 0.5 : power_mult;
 
-    power = power * power_mult;
-    turn = turn * power_mult;
 
-    if (align_button)
-        this->set(power, 0, vision_align());
+    if (align_button){
+        if (alignnextloop){
+          this->set(power, 0, vision_align());
+        }
+    }
     else
         this->set(power, turn, strafe);
+    alignnextloop = !alignnextloop;
+
 }
 
 double Chassis::power_mult_calc() {
@@ -80,11 +84,18 @@ void Chassis::modify_profiled_velocity(int velocity) {
 
 void Chassis::set(int power, int turn, int strafe) {
 
-    int16_t powere = sgn(power) * motor_speed * pow(power / 127.0, 2); // exponential speed function
-    int16_t turne = sgn(turn) * motor_speed * pow(turn / 127.0, 2);
+    double power_mult = power_mult_calc();
+    power_mult = (slowmode) ? 0.5 : power_mult;
 
-    int left = powere + turne;
-    int right = powere - turne;
+    float powere = power_mult * sgn(power) * 12000 * pow(power / 127.0, 2); // exponential speed function
+    float turne = power_mult * sgn(turn) * 12000 * pow(turn / 127.0, 2);
+
+
+
+    int left = (int)powere + (int)turne;
+    int right = (int)powere - (int)turne;
+
+    printf("l: %d, r: %d\n", left, right);
 
     peripherals->left_mtr.move_voltage(left);
     peripherals->right_mtr.move_voltage(right);
@@ -93,8 +104,6 @@ void Chassis::set(int power, int turn, int strafe) {
     if (strafe > -9999)
         peripherals->strafe_mtr.move(strafe);
 
-    std::string left_v = std::to_string(peripherals->left_mtr.get_actual_velocity());
-    std::string right_v = std::to_string(peripherals->right_mtr.get_actual_velocity());
 }
 
 // Currently set to only move strafe, as forward/backward align is unreliable / not necessary
