@@ -308,7 +308,7 @@ void four_floor() {
     arm->set_height(3.5_in);
 
     cc->driveToPoint({ 6_in + (INTAKE_FROM_CENTER * sin(cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian))),
-                    6_in + (INTAKE_FROM_CENTER * cos(cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian))) });
+        6_in + (INTAKE_FROM_CENTER * cos(cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian))) });
     arm->set_height(0_in);
     arm->waitUntilSettled();
 
@@ -319,7 +319,7 @@ void four_floor() {
     cc->driveStraight(-2_in);
 }
 
-void bob_auton(){
+void bob_auton() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
 
