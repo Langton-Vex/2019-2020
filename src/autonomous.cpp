@@ -149,7 +149,7 @@ void new_four_stack() {
     arm->set_height(2.3_in);
     cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
     cc->setHeading(0_deg);
-    auto cubeydelta = (49.9_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    auto cubeydelta = (48.7_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
     cc->driveStraight(cubeydelta);
 
     arm->waitUntilSettled();
@@ -160,7 +160,7 @@ void new_four_stack() {
     cc->driveStraight(-2_ft);
 
     auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
-    cc->driveToPoint({ large_side, 8_in });
+    cc->driveToPoint({ large_side, 5_in });
 
     arm->flipDisable(false);
     arm->set_height(0_in);

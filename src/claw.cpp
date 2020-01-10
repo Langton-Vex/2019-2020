@@ -7,7 +7,7 @@ std::shared_ptr<Claw> Claw::get() {
 }
 
 Claw::Claw() {
-    peripherals->intake_mtr.set_brake_mode(MOTOR_BRAKE_HOLD);
+    peripherals->intake_mtr.set_brake_mode(MOTOR_BRAKE_COAST);
 }
 
 void Claw::user_control() {

@@ -71,7 +71,7 @@ void Chassis::user_control() {
 
 double Chassis::power_mult_calc() {
     std::shared_ptr<Arm> arm = Arm::get();
-    double power_mult = (arm->height_per < 0.5) ? (1.0 - arm->height_per) : 0.5;
+    double power_mult = (arm->height_per < 0.75) ? (1.0 - arm->height_per) : 0.25;
     return power_mult;
 }
 
