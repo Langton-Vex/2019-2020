@@ -95,7 +95,7 @@ void competition_initialize() {
         // sensor garbage (at least it seems to work)
     std::shared_ptr<ConfigManager> config_manager = ConfigManager::get();
     while (!cc && pros::competition::is_disabled())
-        pros::delay(20);
+        pros::delay(10);
     int side = ConfigManager::get()->selected_team;
     auto state = config_manager->get_auton_state(config_manager->selected_auton);
     peripherals->left_mtr.tare_position();
@@ -110,6 +110,7 @@ void competition_initialize() {
         GUI::get()->set_line(0, "Odom stepping");
         if (cc)
             cc->odom->step();
+        pros::delay(10);
         /* keep track of odom state while initialising
          this means that the robot can be pushed during initialising and keep
          track of where it is, good for setting up auton relative to the field
