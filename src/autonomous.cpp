@@ -104,10 +104,17 @@ void simpler_four_stack() {
     // Get to cube
     arm->flipDisable(true);
     auto cubeydelta = (48.2_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    if (side < 0)
+      cubeydelta += 0.5_in;
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(2.3_in);
-    cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
+    arm->set_height(0.4_in);
+    if (side > 0){
+      cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
+    }
+    else{
+      cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
+    }
     arm->waitUntilSettled();
 
     cc->setHeading(0_deg);
@@ -116,9 +123,9 @@ void simpler_four_stack() {
     pros::delay(500);
     arm->set_height(7_in);
     cc->driveStraight(-1.5_ft);
-    auto large_side = (side > 0) ? 11.5_ft - INTAKE_FROM_CENTER : 58.6_in + INTAKE_FROM_CENTER;
+    auto large_side = (side > 0) ? 11.8_ft - INTAKE_FROM_CENTER : 55.5_in + INTAKE_FROM_CENTER;
     cc->driveToPoint({ large_side, 9_in });
-    cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
+    //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
     //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );

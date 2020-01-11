@@ -39,7 +39,7 @@ bool alignnextloop = true;
 void Chassis::user_control() {
     int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
     int turn = peripherals->master_controller.get_analog(ANALOG_RIGHT_X);
-    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_DOWN);
+    int slowmode_button = peripherals->master_controller.get_digital_new_press(DIGITAL_LEFT);
     int align_button = peripherals->master_controller.get_digital(DIGITAL_B);
     int strafe_left = peripherals->master_controller.get_digital(DIGITAL_R2);
     int strafe_right = peripherals->master_controller.get_digital(DIGITAL_R1);
