@@ -43,10 +43,8 @@ void Chassis::user_control() {
     if (slowmode_button == 1)
         slowmode = !slowmode;
 
-    float power_mult = (slowmode) ? 0.5 : power_mult_calc();
 
-    power *= power_mult;
-    turn *= power_mult;
+
 
     if (align_button)
         this->set(power, 0, vision_align());
@@ -61,9 +59,10 @@ float Chassis::power_mult_calc() {
 }
 
 void Chassis::set(float power, float turn, float strafe) {
+    float power_mult = (slowmode) ? 0.5 : power_mult_calc();
 
-    float powere = (sgn(power) / motor_speed) * pow(power * motor_speed / 127.0, 2); // exponential speed function
-    float turne = (sgn(turn) / motor_speed) * pow(turn * motor_speed / 127.0, 2);
+    float powere = std::copysign(power_mult * motor_speed * pow(power / 127.0, 2),power); // exponential speed function
+    float turne =  std::copysign(power_mult * motor_speed * pow(turn / 127.0, 2),turn);
 
     int left = powere + turne;
     int right = powere - turne;

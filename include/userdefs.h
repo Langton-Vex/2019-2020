@@ -3,11 +3,7 @@
 #include "api.h"
 // User definitions
 
-float sgn(int x);
-
 #include "project/peripherals_t.h"
-
-#include "project/macros.h"
 
 #include <memory>
 

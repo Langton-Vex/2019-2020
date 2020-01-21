@@ -21,7 +21,7 @@ std::shared_ptr<Arm> Arm::get() {
 }
 
 Arm::Arm() {
-    current_major_position = 0;
+    current_major_position = 1;
     current_minor_position = 0;
     user_pos_modifier = 0;
     sensitivity = 0.0001;

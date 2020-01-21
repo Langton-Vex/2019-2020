@@ -142,6 +142,7 @@ CSRC=$(foreach cext,$(CEXTS),$(call rwildcard, $(SRCDIR),*.$(cext), $1))
 COBJ=$(addprefix $(BINDIR)/,$(patsubst $(SRCDIR)/%,%.o,$(call CSRC, $1)))
 CXXSRC=$(foreach cxxext,$(CXXEXTS),$(call rwildcard, $(SRCDIR),*.$(cxxext), $1))
 CXXOBJ=$(addprefix $(BINDIR)/,$(patsubst $(SRCDIR)/%,%.o,$(call CXXSRC,$1)))
+HXXOBJ=$(addprefix $(INCDIR)/,$(patsubst $(INCDIR)/%,%.gch,$(PRECOMPILED_HEADERS)))
 
 GETALLOBJ=$(sort $(call ASMOBJ,$1) $(call COBJ,$1) $(call CXXOBJ,$1))
 
@@ -177,6 +178,7 @@ clean:
 	@echo Cleaning project
 	-$Drm -rf $(BINDIR)
 	-$Drm -rf $(DEPDIR)
+	-$Drm -f  $(HXXOBJ) 
 
 ifeq ($(IS_LIBRARY),1)
 ifeq ($(LIBNAME),libbest)
@@ -257,13 +259,21 @@ $(foreach cext,$(CEXTS),$(eval $(call c_rule,$(cext))))
 
 define cxx_rule
 $(BINDIR)/%.$1.o: $(SRCDIR)/%.$1
-$(BINDIR)/%.$1.o: $(SRCDIR)/%.$1 $(DEPDIR)/$(basename %).d
+$(BINDIR)/%.$1.o: $(SRCDIR)/%.$1 $(DEPDIR)/$(basename %).d $(HXXOBJ)
 	$(VV)mkdir -p $$(dir $$@)
 	$(VV)mkdir -p $(DEPDIR)/$$(dir $$(patsubst bin/%, %, $$@))
 	$$(call test_output_2,Compiled $$< ,$(CXX) -c $(INCLUDE) -iquote"$(INCDIR)/$$(dir $$*)" $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(DEPFLAGS) -o $$@ $$<,$(OK_STRING))
 	$(RENAMEDEPENDENCYFILE)
 endef
 $(foreach cxxext,$(CXXEXTS),$(eval $(call cxx_rule,$(cxxext))))
+
+
+define header_rule
+$(INCDIR)/%.$1.gch: $(INCDIR)/%.$1
+	$$(call test_output_2,Compiling $$< ,$$(CXX) -c $$< -I $$(INCDIR) $$(CXXFLAGS) $$(EXTRA_CXXFLAGS) -o $$@,$$(OK_STRING))
+endef
+$(foreach hxxext,$(HXXEXTS),$(eval $(call header_rule,$(hxxext))))
+
 
 define _pros_ld_timestamp
 $(VV)mkdir -p $(dir $(LDTIMEOBJ))
@@ -281,5 +291,6 @@ cxx-sysroot:
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
+.PRECIOUS: $(HXXOBJ)
 
 include $(wildcard $(patsubst ./src/%,$(DEPDIR)/%.d,$(basename $(CSRC) $(CXXSRC))))
