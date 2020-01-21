@@ -390,7 +390,8 @@ void ChassisControllerHDrive::tune() {
         0.0005, 0.004, 0, 0, 0, 0.00005);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 7 * okapi::second, 3000,
-        0.002, 0.004, 0, 0, 0, 0.0001);
+        0.001, 0.004, 0, 0, 0.000005, 0.00003,
+        5, 4); // Num iterations and num particles, default 5, 16
 
     /*
     tuningMode = TuningMode::TuneStraight;
@@ -422,7 +423,10 @@ void ChassisControllerHDrive::tune() {
     tuningMode = TuningMode::TuneStrafe;
     okapi::PIDTuner::Output strafeTune = StrafeTuner->autotune();
     std::string strafeValue = TuningToString(strafeTune);
-    printf("strafe value: %s\n", strafeValue.c_str());
+    while (true) {
+        printf("strafe value: %s\n", strafeValue.c_str());
+        pros::delay(2000);
+    }
 
     pros::delay(10000);
     auto s = okapi::PIDTunerFactory::createPtr(

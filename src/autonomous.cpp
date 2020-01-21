@@ -14,7 +14,7 @@ extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
-const auto INTAKE_FROM_CENTER = 12.5_in;
+const auto INTAKE_FROM_CENTER = 12.5_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
 
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
@@ -31,7 +31,7 @@ void open_claw() {
     intake->moveVoltage(-12000);
     while (intake->getActualVelocity() > 5)
         pros::delay(10);
-    intake->moveVoltage(0);
+    intake->moveVoltage(-1000); // -1volt
 }
 
 void close_claw() {
@@ -40,22 +40,6 @@ void close_claw() {
         pros::delay(10);
 }
 
-void pot_lookup() {
-    cc->stop_task();
-    Arm::get()->flipDisable(true);
-    fprintf(stderr, "starting");
-    std::ofstream save_file("/usd/yeet.csv", std::ofstream::out | std::ofstream::trunc);
-    save_file.clear();
-    peripherals->leftarm_mtr.move_velocity(30);
-    peripherals->rightarm_mtr.move_velocity(30);
-    for (int i = 0; i < 500; i++) {
-        save_file << peripherals->leftarm_mtr.get_position() << ",";
-        save_file << arm_pot.get_value() << "\n";
-        pros::delay(10);
-    }
-    save_file.close();
-    fprintf(stderr, "stopped");
-};
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
 
@@ -82,8 +66,6 @@ void vision_test() {
     //while (true)
     //    pros::delay(100);
     //return;
-    //vision_signature_s_t sig = pros::Vision::signature_from_utility ( 1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0 );
-    //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 }
 
 // Starts pointing towards small goal zone
@@ -94,7 +76,7 @@ void near_small() {
 
 void do_nothing() {
     while (true)
-        pros::delay(100);
+        pros::delay(10);
 };
 
 void simpler_four_stack() {
@@ -104,17 +86,13 @@ void simpler_four_stack() {
     // Get to cube
     arm->flipDisable(true);
     auto cubeydelta = (48.2_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
-    if (side < 0)
-      cubeydelta += 0.5_in;
+
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
     arm->set_height(0.4_in);
-    if (side > 0){
-      cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x) + (3_in * side * -1));
-    }
-    else{
-      cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
-    }
+
+    cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x)); // Needs strafe PID retuning!
+
     arm->waitUntilSettled();
 
     cc->setHeading(0_deg);
@@ -123,12 +101,11 @@ void simpler_four_stack() {
     pros::delay(500);
     arm->set_height(7_in);
     cc->driveStraight(-1.5_ft);
-    auto large_side = (side > 0) ? 11.8_ft - INTAKE_FROM_CENTER : 55.5_in + INTAKE_FROM_CENTER;
-    cc->driveToPoint({ large_side, 9_in });
+    double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
+    auto large_side = (side > 0) ? 11.5_ft - (sin(angle_rad) * INTAKE_FROM_CENTER) : 58.6_in - (sin(angle_rad) * INTAKE_FROM_CENTER);
+    cc->driveToPoint({ large_side, 3.5_in }); // NOTE: 3.5 inches here is pretty risky, so this might need changing
     //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
-    //cc->driveStraight(1_in); // NOTE: this shouldn't be necessary but is
-    //cc->strafe(0.2_ft- cc->odom->getState(okapi::StateMode::CARTESIAN).x );
     arm->flipDisable(false);
     arm->set_height(0_in);
     arm->waitUntilSettled();

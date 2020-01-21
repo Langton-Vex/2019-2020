@@ -117,3 +117,18 @@ void Arm::flipDisable(bool disable) {
 double Arm::scale(double x, double min, double max, double b, double a) {
     return (a + b) - (((b - a) * (x - min)) / (max - min) + a);
 }
+
+// I don't know where to put this but it can sit here for now and move in the rewrite.
+void tune_arm() {
+    std::shared_ptr<okapi::Potentiometer> arm_pot = std::make_unique<okapi::Potentiometer>(pot_port);
+    auto arm_motors = std::make_shared<okapi::MotorGroup>(-leftarm_port, -rightarm_port);
+    auto ArmTuner = okapi::PIDTunerFactory::create(
+        arm_pot, arm_motors, 7 * okapi::second, 500,
+        0.001, 0.005, 0.000005, 0.00005, 0.00005, 0.0005,
+        5, 4);
+    auto tuning = ArmTuner.autotune();
+    for (int i = 0; i < 5; i++) {
+        printf("\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);
+        pros::delay(2000);
+    }
+}

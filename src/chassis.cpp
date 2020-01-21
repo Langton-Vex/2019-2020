@@ -44,7 +44,6 @@ void Chassis::user_control() {
     int strafe_left = peripherals->master_controller.get_digital(DIGITAL_R2);
     int strafe_right = peripherals->master_controller.get_digital(DIGITAL_R1);
 
-
     int strafe;
     if (strafe_left)
         strafe = -127;
@@ -57,16 +56,13 @@ void Chassis::user_control() {
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
 
-
-    if (align_button){
-        if (alignnextloop){
-          this->set(power, 0, vision_align());
+    if (align_button) {
+        if (alignnextloop) {
+            this->set(power, 0, vision_align());
         }
-    }
-    else
+    } else
         this->set(power, turn, strafe);
     alignnextloop = !alignnextloop;
-
 }
 
 double Chassis::power_mult_calc() {
@@ -90,8 +86,6 @@ void Chassis::set(int power, int turn, int strafe) {
     float powere = power_mult * sgn(power) * 12000 * pow(power / 127.0, 2); // exponential speed function
     float turne = power_mult * sgn(turn) * 12000 * pow(turn / 127.0, 2);
 
-
-
     int left = (int)powere + (int)turne;
     int right = (int)powere - (int)turne;
 
@@ -103,7 +97,6 @@ void Chassis::set(int power, int turn, int strafe) {
     peripherals->righttwo_mtr.move_voltage(right);
     if (strafe > -9999)
         peripherals->strafe_mtr.move(strafe);
-
 }
 
 // Currently set to only move strafe, as forward/backward align is unreliable / not necessary
