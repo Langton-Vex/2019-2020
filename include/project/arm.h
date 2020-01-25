@@ -18,6 +18,7 @@ public:
     double scale(double x, double min, double max, double a, double b);
     void waitUntilSettled();
     void flipDisable(bool disable);
+    void tune();
 
     unsigned int current_major_position;
     unsigned int current_minor_position;

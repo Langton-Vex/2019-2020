@@ -40,6 +40,23 @@ void close_claw() {
         pros::delay(10);
 }
 
+void position_intake_to_point(okapi::QLength x, okapi::QLength y){
+    double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
+    cc->driveToPoint({x - (cos(angle_rad) * INTAKE_FROM_CENTER), x - (sin(angle_rad) * INTAKE_FROM_CENTER)});
+}
+
+void position_intake_to_point_async(okapi::QLength x, okapi::QLength y){
+    double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
+    cc->driveToPointAsync({x - (cos(angle_rad) * INTAKE_FROM_CENTER), x - (sin(angle_rad) * INTAKE_FROM_CENTER)});
+}
+
+
+void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y){
+    double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
+    cc->driveVector({x - (cos(angle_rad) * INTAKE_FROM_CENTER), x - (sin(angle_rad) * INTAKE_FROM_CENTER)});
+}
+
+
 void vision_test() {
     fprintf(stderr, "waiting for yeet");
 
@@ -103,7 +120,7 @@ void simpler_four_stack() {
     cc->driveStraight(-1.5_ft);
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
     auto large_side = (side > 0) ? 11.5_ft - (sin(angle_rad) * INTAKE_FROM_CENTER) : 58.6_in - (sin(angle_rad) * INTAKE_FROM_CENTER);
-    cc->driveToPoint({ large_side, 3.5_in }); // NOTE: 3.5 inches here is pretty risky, so this might need changing
+    cc->driveToPoint({ large_side, 3.5_in }); // NOTE: 3.5 inches here is pretty risky, so this might need changing to 8 inches
     //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     arm->flipDisable(false);
@@ -119,7 +136,7 @@ void simpler_four_stack() {
     cc->driveStraight(-2_in);
     arm->set(0);
 }
-
+/*
 void new_four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -162,7 +179,7 @@ void new_four_stack() {
     arm->set(0);
 
     // If arm control works?
-    /*
+
     arm->set_height(0_in);
     arm->waitUntilSettled();
     intake->moveVoltage(-12000);
@@ -170,7 +187,7 @@ void new_four_stack() {
     arm->set_height(1_in);
     intake->moveVoltage(0);
     cc->driveStraight(-2_in);
-    */
+
 }
 
 void four_floor() {
@@ -264,6 +281,65 @@ void bob_auton() {
     arm->set_height(1_in);
     cc->driveStraight(-4_in);
     arm->waitUntilSettled();
+}
+*/
+
+void skill_auton(){
+  int side = ConfigManager::get()->selected_team;
+  std::shared_ptr<Arm> arm = Arm::get();
+
+  close_claw();
+  arm->set_height(26_in);
+  position_intake_to_point_async(77_in, 25.4_in);
+  arn->waitUntilSettled();
+  position_intake_to_point(70.3_in, 23.2_in);
+  open_claw();
+
+  position_intake_to_point_diag({97.1_in, 49.9_in});
+  arm->set_height(0.5_in);
+  cc->setHeading(0_deg);
+  arm->waitUntilSettled();
+  close_claw();
+  arm->set_height(2_in);
+
+  position_intake_to_point({ 11.5_ft , 8_in });
+  open_claw();
+  arm->set_height(3_in);
+
+  position_intake_to_point_diag({112.3_in, 70.3_in});
+  arm->set_height(0_in);
+  cc->lookToPoint({105.7_in, 70.3_in});
+  arm->waitUntilSettled();
+  close_claw();
+
+  arm->set_height(18.7_in);
+  arm->waitUntilSettled();
+  position_intake_to_point({105.7_in, 70.3_in});
+  open_claw();
+
+  cc->strafe(1.25_ft);
+  arm->set_height(0.5_in);
+  position_intake_to_point_diag(97.1_in, 90.7_in);
+  arm->waitUntilSettled();
+  close_claw();
+  arm->set_height(3_in);
+
+  position_intake_to_point(11.5_ft , 10.5_ft );
+  arm->set_height(0_in);
+  arm->WaitUntilSettled();
+  open_claw();
+  arm->set_height(3_in);
+
+  position_intake_to_point_diag(77_in, 117.5_in);
+  arm->set_height(0_in);
+  arm->waitUntilSettled();
+  cc->lookToPoint({70.3_in, 117.5_in});
+  close_claw();
+  arm->set_height(26_in);
+  arm->waitUntilSettled();
+  position_intake_to_point(70.3_in, 117.5_in);
+  open_claw();
+
 }
 
 /* ----------------------------------------------------------------

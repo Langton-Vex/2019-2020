@@ -119,7 +119,7 @@ double Arm::scale(double x, double min, double max, double b, double a) {
 }
 
 // I don't know where to put this but it can sit here for now and move in the rewrite.
-void tune_arm() {
+void Arm::tune() {
     std::shared_ptr<okapi::Potentiometer> arm_pot = std::make_unique<okapi::Potentiometer>(pot_port);
     auto arm_motors = std::make_shared<okapi::MotorGroup>(okapi::MotorGroup({ -leftarm_port, -rightarm_port }));
     // Initializer lists are funky
@@ -129,8 +129,10 @@ void tune_arm() {
         0.001, 0.005, 0.000005, 0.00005, 0.00005, 0.0005,
         5, 4);
     auto tuning = ArmTuner.autotune();
+    fprintf(stderr, "\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);
+    pros::delay(100);
     for (int i = 0; i < 5; i++) {
-        printf("\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);
+        fprintf(stderr, "\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);
         pros::delay(2000);
     }
 }
