@@ -6,7 +6,7 @@ const auto max_height = 46 * okapi::inch;
 const int pot_min = 1623;
 const int pot_max = 150;
 const char pot_port = 'A';
-const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.0030, 0.0000, 0.00013 };
+const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.003273, 0.000048, 0.000225 };
 
 pros::ADIAnalogIn arm_pot(pot_port);
 
@@ -120,13 +120,15 @@ double Arm::scale(double x, double min, double max, double b, double a) {
 
 // I don't know where to put this but it can sit here for now and move in the rewrite.
 void Arm::tune() {
+    lift->flipDisable(true);
+    integrated_lift->flipDisable(true);
     std::shared_ptr<okapi::Potentiometer> arm_pot = std::make_unique<okapi::Potentiometer>(pot_port);
     auto arm_motors = std::make_shared<okapi::MotorGroup>(okapi::MotorGroup({ -leftarm_port, -rightarm_port }));
     // Initializer lists are funky
 
     auto ArmTuner = okapi::PIDTunerFactory::create(
-        arm_pot, arm_motors, 7 * okapi::second, 500,
-        0.001, 0.005, 0.000005, 0.00005, 0.00005, 0.0005,
+        arm_pot, arm_motors, 3 * okapi::second, 300,
+        0.001, 0.004, 0.000005, 0.00005, 0.00005, 0.0003,
         5, 4);
     auto tuning = ArmTuner.autotune();
     fprintf(stderr, "\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);

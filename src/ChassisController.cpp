@@ -172,8 +172,7 @@ void ChassisControllerHDrive::driveToPoint(okapi::Point point, bool turnreversed
 void ChassisControllerHDrive::driveToPointAsync(okapi::Point point, bool turnreversed) {
     auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
         point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
-    if (angle >= 1_deg) 
-      turnAngle(angle);
+    turnAngle(angle);
     driveStraightAsync(length);
 };
 
@@ -364,7 +363,7 @@ std::string TuningToString(okapi::PIDTuner::Output tuning) {
 }
 
 void ChassisControllerHDrive::tune() {
-
+    stop_task();
     //std::shared_ptr<okapi::Motor> strafeShared = std::move(strafeMotor);
 
     okapi::Logger::setDefaultLogger(
@@ -387,8 +386,8 @@ void ChassisControllerHDrive::tune() {
         ct, ct, 8 * okapi::second, 1035,
         0.0005, 0.004, 0, 0, 0, 0.00005);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 7 * okapi::second, 3000,
-        0.001, 0.004, 0, 0, 0.000005, 0.00003,
+        ct, ct, 7 * okapi::second, 2000,
+        0.0035, 0.0045, 0, 0, 0.00002, 0.00005,
         5, 4); // Num iterations and num particles, default 5, 16
 
     /*
@@ -421,8 +420,10 @@ void ChassisControllerHDrive::tune() {
     tuningMode = TuningMode::TuneStrafe;
     okapi::PIDTuner::Output strafeTune = StrafeTuner->autotune();
     std::string strafeValue = TuningToString(strafeTune);
+    fprintf(stderr,"strafe value: %s\n", strafeValue.c_str());
+    pros::delay(100);
     while (true) {
-        printf("strafe value: %s\n", strafeValue.c_str());
+        fprintf(stderr,"strafe value: %s\n", strafeValue.c_str());
         pros::delay(2000);
     }
 
@@ -490,6 +491,7 @@ void ChassisControllerHDrive::controllerSet(double ivalue) {
     leftSide->moveVelocity(std::min((int)round(leftVelocity), maxVelocity));
     rightSide->moveVelocity(std::min((int)round(rightVelocity), maxVelocity));
     strafeMotor->moveVelocity(std::min((int)round(strafeVelocity), maxVelocity));
+    pros::delay(5);
 };
 
 void ChassisControllerHDrive::waitUntilSettled() {

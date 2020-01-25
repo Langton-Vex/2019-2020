@@ -26,9 +26,9 @@ void set_temperature(int i) {
     double claw_temp = (peripherals->intake_mtr.get_temperature());
 
     if (i == 2)
-        peripherals->master_controller.print(1, 0, "%d,%d,%d,%d", (int)peripherals->leftarm_mtr.get_temperature(), (int)peripherals->rightarm_mtr.get_temperature(), (int)chassis_temp, (int)claw_temp);
+        peripherals->master_controller.print(1, 0, "%d,%d,%d,%d, %d", (int)peripherals->leftarm_mtr.get_temperature(), (int)peripherals->rightarm_mtr.get_temperature(), (int)chassis_temp, (int)claw_temp, (int)peripherals->strafe_mtr.get_temperature());
     if (i == 1)
-        peripherals->master_controller.print(0, 0, "AL,AR,Ch,Cl");
+        peripherals->master_controller.print(0, 0, "AL,AR,Ch,Cl,st");
 
     /*
     lv_gauge_set_value(gui->chassis_temp_guage, 0, chassis_temp);

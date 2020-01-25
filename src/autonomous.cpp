@@ -14,7 +14,7 @@ extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
-const auto INTAKE_FROM_CENTER = 12.5_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
+const auto INTAKE_FROM_CENTER = 12.6_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
 
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
@@ -42,31 +42,35 @@ void close_claw() {
 
 void position_intake_to_point(okapi::QLength x, okapi::QLength y){
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->driveToPoint({x - (cos(angle_rad) * INTAKE_FROM_CENTER), x - (sin(angle_rad) * INTAKE_FROM_CENTER)});
+    cc->driveToPoint({x - (cos(angle_rad) * INTAKE_FROM_CENTER), y - (sin(angle_rad) * INTAKE_FROM_CENTER)});
 }
 
 void position_intake_to_point_async(okapi::QLength x, okapi::QLength y){
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->driveToPointAsync({x - (cos(angle_rad) * INTAKE_FROM_CENTER), x - (sin(angle_rad) * INTAKE_FROM_CENTER)});
+    cc->driveToPointAsync({x - (cos(angle_rad) * INTAKE_FROM_CENTER), y - (sin(angle_rad) * INTAKE_FROM_CENTER)});
 }
 
 
 void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y){
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->driveVector({x - (cos(angle_rad) * INTAKE_FROM_CENTER), x - (sin(angle_rad) * INTAKE_FROM_CENTER)});
+    cc->driveVector(x - (cos(angle_rad) * INTAKE_FROM_CENTER), y - (sin(angle_rad) * INTAKE_FROM_CENTER));
 }
 
 
 void vision_test() {
-    fprintf(stderr, "waiting for yeet");
+    cc->tune();
+    //std::shared_ptr<Arm> arm = Arm::get();
+    //arm->tune();
+    pros::delay(100);
+    //fprintf(stderr, "waiting for yeet");
 
     /*
     cc->driveToPoint({ 2_ft, 0_ft });
     cc->driveToPoint({ 0_ft, 0_ft });
     cc->lookToPoint({ 1_ft, 0_ft });
     */
-    cc->generatePath({ { 0_ft, 0_ft, 0_deg }, { 2_ft, 0_ft, 0_deg } }, "A");
-    cc->runPath("A", false, false);
+    //cc->generatePath({ { 0_ft, 0_ft, 0_deg }, { 2_ft, 0_ft, 0_deg } }, "A");
+    //cc->runPath("A", false, false);
     //return;
     /*
     cc->stop_task();
@@ -106,21 +110,21 @@ void simpler_four_stack() {
 
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(0.4_in);
+    arm->set_height(1.3_in);
 
     cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x)); // Needs strafe PID retuning!
 
     arm->waitUntilSettled();
 
     cc->setHeading(0_deg);
-    cc->driveStraight(1.2_in);
+    cc->driveStraight(1.7_in);
     intake->moveVoltage(12000);
     pros::delay(500);
     arm->set_height(7_in);
     cc->driveStraight(-1.5_ft);
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    auto large_side = (side > 0) ? 11.5_ft - (sin(angle_rad) * INTAKE_FROM_CENTER) : 58.6_in - (sin(angle_rad) * INTAKE_FROM_CENTER);
-    cc->driveToPoint({ large_side, 3.5_in }); // NOTE: 3.5 inches here is pretty risky, so this might need changing to 8 inches
+    auto large_side = (side > 0) ? 11.5_ft - (sin(angle_rad) * INTAKE_FROM_CENTER) : 70_in + (sin(angle_rad) * INTAKE_FROM_CENTER);
+    cc->driveToPoint({ large_side, 9_in }); // NOTE: 3.5 inches here is pretty risky, so this might need changing to 8 inches
     //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
     arm->flipDisable(false);
@@ -291,22 +295,22 @@ void skill_auton(){
   close_claw();
   arm->set_height(26_in);
   position_intake_to_point_async(77_in, 25.4_in);
-  arn->waitUntilSettled();
+  arm->waitUntilSettled();
   position_intake_to_point(70.3_in, 23.2_in);
   open_claw();
 
-  position_intake_to_point_diag({97.1_in, 49.9_in});
+  position_intake_to_point_diag(97.1_in, 49.9_in);
   arm->set_height(0.5_in);
   cc->setHeading(0_deg);
   arm->waitUntilSettled();
   close_claw();
   arm->set_height(2_in);
 
-  position_intake_to_point({ 11.5_ft , 8_in });
+  position_intake_to_point( 11.5_ft , 8_in );
   open_claw();
   arm->set_height(3_in);
 
-  position_intake_to_point_diag({112.3_in, 70.3_in});
+  position_intake_to_point_diag(112.3_in, 70.3_in);
   arm->set_height(0_in);
   cc->lookToPoint({105.7_in, 70.3_in});
   arm->waitUntilSettled();
@@ -314,7 +318,7 @@ void skill_auton(){
 
   arm->set_height(18.7_in);
   arm->waitUntilSettled();
-  position_intake_to_point({105.7_in, 70.3_in});
+  position_intake_to_point(105.7_in, 70.3_in);
   open_claw();
 
   cc->strafe(1.25_ft);
@@ -326,7 +330,7 @@ void skill_auton(){
 
   position_intake_to_point(11.5_ft , 10.5_ft );
   arm->set_height(0_in);
-  arm->WaitUntilSettled();
+  arm->waitUntilSettled();
   open_claw();
   arm->set_height(3_in);
 
@@ -350,7 +354,8 @@ void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.002, 0, 0.00003);
+    PIDTuning strafeTuning = PIDTuning(0.003819, 0, 0.000030);
+
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
         { left_port, lefttwo_port });
@@ -389,6 +394,7 @@ void init_autonomous() {
     configManager->register_auton("do nothing", do_nothing);
     configManager->register_auton("four stack", simpler_four_stack,
         okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
+        /*
     configManager->register_auton("strafey new four stack", new_four_stack,
         okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
 
@@ -396,9 +402,10 @@ void init_autonomous() {
         okapi::OdomState{ 26.4_in, 33.4_in - INTAKE_FROM_CENTER, 0_deg });
     configManager->register_auton("four floor", four_floor,
         okapi::OdomState{ 26.4_in, 33.4_in - INTAKE_FROM_CENTER, 0_deg });
+        */
 
     //configManager->register_auton("potentiomenter test", pot_lookup);
-    //configManager->register_auton("vision test", vision_test);
+    configManager->register_auton("vision test", vision_test);
 }
 
 void auton_cleanup() {

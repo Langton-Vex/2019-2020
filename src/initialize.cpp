@@ -25,7 +25,7 @@ extern const int8_t righttwo_port = 18;
 extern const int8_t intake_port = 3;
 extern const int8_t strafe_port = 16;
 extern const int8_t leftarm_port = 1;
-extern const int8_t rightarm_port = 2;
+extern const int8_t rightarm_port = 5;
 
 /* TODO: Yikes these definitions are getting messy, these need to be moved to
    one file at some point. */
@@ -41,6 +41,8 @@ std::unique_ptr<Peripherals_t> peripherals;
 //Chassis chassis(TURN_RADIUS,WHEEL_CIRCUMFERENCE);
 
 void init_autonomous(); // uh oh global space
+
+extern std::shared_ptr<ChassisControllerHDrive> cc;
 
 void initialize() {
     std::cerr << "Intializing" << std::endl;
@@ -60,6 +62,8 @@ void initialize() {
 
     pros::delay(100);
     GUI::get()->gui_build();
+    //cc->tune();
+    pros::delay(100);
 
     //pros::lcd::initialize();
     //pros::lcd::set_text(1, "This means things are working?");

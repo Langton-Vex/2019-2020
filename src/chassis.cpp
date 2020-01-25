@@ -89,8 +89,6 @@ void Chassis::set(int power, int turn, int strafe) {
     int left = (int)powere + (int)turne;
     int right = (int)powere - (int)turne;
 
-    printf("l: %d, r: %d\n", left, right);
-
     peripherals->left_mtr.move_voltage(left);
     peripherals->right_mtr.move_voltage(right);
     peripherals->lefttwo_mtr.move_voltage(left);
