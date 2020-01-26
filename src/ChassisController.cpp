@@ -420,10 +420,10 @@ void ChassisControllerHDrive::tune() {
     tuningMode = TuningMode::TuneStrafe;
     okapi::PIDTuner::Output strafeTune = StrafeTuner->autotune();
     std::string strafeValue = TuningToString(strafeTune);
-    fprintf(stderr,"strafe value: %s\n", strafeValue.c_str());
+    fprintf(stderr, "strafe value: %s\n", strafeValue.c_str());
     pros::delay(100);
     while (true) {
-        fprintf(stderr,"strafe value: %s\n", strafeValue.c_str());
+        fprintf(stderr, "strafe value: %s\n", strafeValue.c_str());
         pros::delay(2000);
     }
 

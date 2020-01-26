@@ -107,7 +107,7 @@ void Arm::set_height(okapi::QLength height) {
 }
 void Arm::waitUntilSettled() {
     lift->waitUntilSettled();
-    fprintf(stderr, "error: %f", lift->getError());
+    fprintf(stderr, "lift error: %f\n", lift->getError());
 };
 void Arm::flipDisable(bool disable) {
     lift->flipDisable(disable);
@@ -128,8 +128,8 @@ void Arm::tune() {
 
     auto ArmTuner = okapi::PIDTunerFactory::create(
         arm_pot, arm_motors, 3 * okapi::second, 300,
-        0.001, 0.004, 0.000005, 0.00005, 0.00005, 0.0003,
-        5, 4);
+        0.002, 0.004, 0.00003, 0.00006, 0.0001, 0.0004,
+        5, 8);
     auto tuning = ArmTuner.autotune();
     fprintf(stderr, "\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);
     pros::delay(100);
