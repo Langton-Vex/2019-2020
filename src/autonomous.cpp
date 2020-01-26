@@ -110,20 +110,22 @@ void simpler_four_stack() {
 
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(1.3_in);
+    arm->set_height(1.4_in);
 
     cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x)); // Needs strafe PID retuning!
 
     arm->waitUntilSettled();
+    //motor.cooldowm
+    //game.win
 
     cc->setHeading(0_deg);
     cc->driveStraight(1.7_in);
     intake->moveVoltage(12000);
     pros::delay(500);
-    arm->set_height(7_in);
+    arm->set_height(5_in);
     cc->driveStraight(-1.5_ft);
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    auto large_side = (side > 0) ? 11.5_ft - (sin(angle_rad) * INTAKE_FROM_CENTER) : 70_in + (sin(angle_rad) * INTAKE_FROM_CENTER);
+    auto large_side = (side > 0) ? 11.5_ft - (sin(angle_rad) * INTAKE_FROM_CENTER) : 68_in + (sin(angle_rad) * INTAKE_FROM_CENTER);
     cc->driveToPoint({ large_side, 9_in }); // NOTE: 3.5 inches here is pretty risky, so this might need changing to 8 inches
     //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
