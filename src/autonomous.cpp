@@ -40,14 +40,23 @@ void close_claw() {
         pros::delay(10);
 }
 
-void position_intake_to_point(okapi::QLength x, okapi::QLength y) {
+void position_intake_to_point_async(okapi::QLength x, okapi::QLength y) {
+    auto angle = okapi::OdomMath::computeAngleToPoint(
+        okapi::Point({ x, y }).inFT(okapi::StateMode::CARTESIAN), cc->odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+    cc->turnAngle(angle);
+
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->driveToPoint({ x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER) });
+    okapi::Point point{ x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER) };
+
+    auto length = okapi::OdomMath::computeDistanceToPoint(
+        point.inFT(okapi::StateMode::CARTESIAN), cc->odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+
+    cc->driveStraightAsync(length);
 }
 
-void position_intake_to_point_async(okapi::QLength x, okapi::QLength y) {
-    double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->driveToPointAsync({ x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER) });
+void position_intake_to_point(okapi::QLength x, okapi::QLength y) {
+    position_intake_to_point_async(x, y);
+    cc->waitUntilSettled();
 }
 
 void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
