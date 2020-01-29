@@ -387,8 +387,8 @@ void ChassisControllerHDrive::tune() {
         0.0005, 0.004, 0, 0, 0, 0.00005);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 7 * okapi::second, 2000,
-        0.0035, 0.0065, 0, 0, 0.00004, 0.00007,
-        5, 4); // Num iterations and num particles, default 5, 16
+        0.0035, 0.0065, 0, 0, 0.00004, 0.0001,
+        5, 8); // Num iterations and num particles, default 5, 16
 
     /*
     tuningMode = TuningMode::TuneStraight;
