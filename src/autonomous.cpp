@@ -14,7 +14,7 @@ extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
-const auto INTAKE_FROM_CENTER = 12.6_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
+const auto INTAKE_FROM_CENTER = 12.2_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
 
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
@@ -65,8 +65,10 @@ void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
 }
 
 void vision_test() {
+    std::shared_ptr<Arm> arm = Arm::get();
+    arm->set_height(1_in);
     cc->tune();
-    //std::shared_ptr<Arm> arm = Arm::get();
+
     //arm->tune();
     pros::delay(100);
     //fprintf(stderr, "waiting for yeet");
@@ -98,8 +100,8 @@ void vision_test() {
 
 // Starts pointing towards small goal zone
 void near_small() {
-    ccont->moveDistance(12 * inch);
-    ccont->moveDistance(-18_in);
+    cc->driveStraight(-12_in);
+    cc->driveStraight(18_in);
 }
 
 void do_nothing() {
@@ -124,14 +126,14 @@ void simpler_four_stack() {
     arm->waitUntilSettled();
 
     cc->setHeading(0_deg);
-    cc->driveStraight(1.4_in); // Actually goes to 49.6, for a tad bit of tolerance
+    cc->driveStraight(1.6_in); // Actually goes to 49.6, for a tad bit of tolerance
     intake->moveVoltage(12000);
     pros::delay(500);
     //close_claw();
     arm->set_height(4_in);
     cc->driveStraight(-1.5_ft);
 
-    auto large_side_x = (side > 0) ? 11.5_ft : 56.2_in;
+    auto large_side_x = (side > 0) ? 11.4_ft : 56.3_in;
     // ok so this is jank but the zones are mirrored weirdly in this game and I don't want to write two routines so here we go
     position_intake_to_point(large_side_x, 9_in);
 
@@ -364,7 +366,7 @@ void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.003819, 0, 0.000030);
+    PIDTuning strafeTuning = PIDTuning(0.004500, 0, 0.000055);
 
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
@@ -416,6 +418,8 @@ void init_autonomous() {
 
     //configManager->register_auton("potentiomenter test", pot_lookup);
     configManager->register_auton("vision test", vision_test);
+    configManager->register_auton("skills", skill_auton,
+        okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
 }
 
 void auton_cleanup() {
