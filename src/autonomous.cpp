@@ -61,7 +61,7 @@ void position_intake_to_point(okapi::QLength x, okapi::QLength y) {
 
 void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->driveVector(x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER));
+    cc->diagToPoint({x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER)});
 }
 
 void vision_test() {
@@ -366,7 +366,7 @@ void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.005046, 0,0.000060);
+    PIDTuning strafeTuning = PIDTuning(0.005046, 0,0.000080);
 
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
