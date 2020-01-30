@@ -66,8 +66,9 @@ void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
 
 void vision_test() {
     std::shared_ptr<Arm> arm = Arm::get();
-    arm->set_height(1_in);
-    cc->tune();
+    arm->set_height(3_in);
+    cc->strafe(12_in);
+    //cc->tune();
 
     //arm->tune();
     pros::delay(100);
@@ -366,7 +367,7 @@ void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.005046, 0,0.000080);
+    PIDTuning strafeTuning = PIDTuning(0.0025, 0.0000100,0.000120);
 
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(
