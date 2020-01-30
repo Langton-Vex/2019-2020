@@ -128,7 +128,7 @@ void Arm::tune() {
 
     auto ArmTuner = okapi::PIDTunerFactory::create(
         arm_pot, arm_motors, 3 * okapi::second, 300,
-        0.0005, 0.002, 0.00003, 0.00006, 0.00015, 0.0005,
+        0.001, 0.002, 0.00003, 0.00006, 0.00025, 0.0005,
         5, 8);
     auto tuning = ArmTuner.autotune();
     fprintf(stderr, "\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);

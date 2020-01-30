@@ -218,7 +218,10 @@ void ChassisControllerHDrive::driveVectorAsync(okapi::QLength straight, okapi::Q
 
 void ChassisControllerHDrive::diagToPointAsync(okapi::Point point) {
     okapi::OdomState state = odom->getState(okapi::StateMode::CARTESIAN);
-    driveVectorAsync(point.y - state.y, point.x - state.x);
+    double angle_rad = state.theta.convert(okapi::radian);
+    auto strafeDistance = (cos(angle_rad) * (point.x - state.x)) + (sin(angle_rad) * (point.y - state.y));
+    auto forwardDistance = (cos(angle_rad) * (point.y - state.y)) + (sin(angle_rad) * (point.x - state.x));
+    driveVectorAsync(forwardDistance, strafeDistance);
 };
 void ChassisControllerHDrive::diagToPoint(okapi::Point point) {
     diagToPointAsync(point);

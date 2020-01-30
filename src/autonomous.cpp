@@ -66,11 +66,11 @@ void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
 
 void vision_test() {
     std::shared_ptr<Arm> arm = Arm::get();
-    arm->set_height(3_in);
-    cc->strafe(12_in);
+    //arm->set_height(3_in);
+    //cc->strafe(12_in);
     //cc->tune();
 
-    //arm->tune();
+    arm->tune();
     pros::delay(100);
     //fprintf(stderr, "waiting for yeet");
 
