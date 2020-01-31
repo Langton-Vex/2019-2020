@@ -64,6 +64,12 @@ void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
     cc->diagToPoint({x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER)});
 }
 
+void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y, okapi::QAngle angle) {
+    double angle_rad = angle.convert(okapi::radian);
+    cc->diagToPoint({x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER)});
+}
+
+
 void vision_test() {
     std::shared_ptr<Arm> arm = Arm::get();
     //arm->set_height(3_in);
@@ -313,7 +319,7 @@ void skill_auton() {
     position_intake_to_point(70.3_in, 23.2_in);
     open_claw();
 
-    position_intake_to_point_diag(97.1_in, 49.9_in);
+    position_intake_to_point_diag(97.1_in, 49.9_in, 0_deg);
     arm->set_height(0.5_in);
     cc->setHeading(0_deg);
     arm->waitUntilSettled();
@@ -324,13 +330,15 @@ void skill_auton() {
     open_claw();
     arm->set_height(3_in);
 
+
+    cc->setHeading(-90_deg);
     position_intake_to_point_diag(112.3_in, 70.3_in);
     arm->set_height(0_in);
-    cc->lookToPoint({ 105.7_in, 70.3_in });
+    // cc->lookToPoint({ 105.7_in, 70.3_in });
     arm->waitUntilSettled();
     close_claw();
 
-    arm->set_height(18.7_in);
+    arm->set_height(20_in);
     arm->waitUntilSettled();
     position_intake_to_point(105.7_in, 70.3_in);
     open_claw();
