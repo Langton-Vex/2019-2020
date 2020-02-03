@@ -29,15 +29,16 @@ extern pros::ADIAnalogIn arm_pot;
 
 void open_claw() {
     intake->moveVoltage(-12000);
-    while (intake->getActualVelocity() > 5)
-        pros::delay(10);
+    while (intake->getActualVelocity() > 1)
+        pros::delay(50);
     intake->moveVoltage(-1000); // -1volt
 }
 
 void close_claw() {
     intake->moveVoltage(12000);
-    while (intake->getActualVelocity() > 5)
-        pros::delay(10);
+    while (intake->getActualVelocity() > 1)
+        pros::delay(50);
+    pros::delay(50);
 }
 
 void position_intake_to_point_async(okapi::QLength x, okapi::QLength y) {
@@ -314,27 +315,27 @@ void skill_auton() {
 
     close_claw();
     arm->set_height(26_in);
-    position_intake_to_point_async(77_in, 25.4_in);
-    arm->waitUntilSettled();
     position_intake_to_point(70.3_in, 23.2_in);
+    arm->waitUntilSettled();
     open_claw();
 
-    position_intake_to_point_diag(97.1_in, 49.9_in, 0_deg);
+
+    cc->driveToPoint({97.1_in, 33.4_in});
     arm->set_height(0.5_in);
-    cc->setHeading(0_deg);
+    position_intake_to_point(97.1_in, 49.9_in);
     arm->waitUntilSettled();
     close_claw();
     arm->set_height(2_in);
 
     position_intake_to_point(11.5_ft, 8_in);
+    arm->set_height(1_in);
     open_claw();
     arm->set_height(3_in);
 
 
-    cc->setHeading(-90_deg);
-    position_intake_to_point_diag(112.3_in, 70.3_in);
+    cc->driveToPoint({125_in, 70.3_in});
     arm->set_height(0_in);
-    // cc->lookToPoint({ 105.7_in, 70.3_in });
+    position_intake_to_point(112.3_in, 70.3_in);
     arm->waitUntilSettled();
     close_claw();
 
@@ -343,23 +344,28 @@ void skill_auton() {
     position_intake_to_point(105.7_in, 70.3_in);
     open_claw();
 
-    cc->strafe(1.25_ft);
+
+    cc->driveStraight(-9_in);
     arm->set_height(0.5_in);
-    position_intake_to_point_diag(97.1_in, 90.7_in);
+    cc->setHeading(-90_deg);
+    cc->strafe(90.7_in - cc->odom->getState(okapi::StateMode::CARTESIAN).y);
+
+    position_intake_to_point(97.1_in, 90.7_in);
     arm->waitUntilSettled();
     close_claw();
-    arm->set_height(3_in);
+    arm->set_height(2_in);
 
     position_intake_to_point(11.5_ft, 10.5_ft);
-    arm->set_height(0_in);
+    arm->set_height(1_in);
     arm->waitUntilSettled();
     open_claw();
     arm->set_height(3_in);
 
-    position_intake_to_point_diag(77_in, 117.5_in);
-    arm->set_height(0_in);
+
+    cc->driveToPoint({89_in, 117.5_in});
+    arm->set_height(1_in);
+    position_intake_to_point(77_in, 117.5_in);
     arm->waitUntilSettled();
-    cc->lookToPoint({ 70.3_in, 117.5_in });
     close_claw();
     arm->set_height(26_in);
     arm->waitUntilSettled();
