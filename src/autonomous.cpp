@@ -14,7 +14,7 @@ extern int8_t left_port, right_port, lefttwo_port, righttwo_port,
 
 const auto WHEEL_DIAMETER = 4.3_in;
 const auto CHASSIS_WIDTH = 370_mm;
-const auto INTAKE_FROM_CENTER = 12.2_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
+const auto INTAKE_FROM_CENTER = 13_in; // NOTE: this is probably wrong, measure this when the arm is at rest!
 
 std::shared_ptr<okapi::ChassisController> ccont;
 std::shared_ptr<Motor> intake;
@@ -76,8 +76,8 @@ void vision_test() {
     //arm->set_height(3_in);
     //cc->strafe(12_in);
     //cc->tune();
-
-    arm->tune();
+    cc->driveVector(24_in, 24_in);
+    //arm->tune();
     pros::delay(100);
     //fprintf(stderr, "waiting for yeet");
 
@@ -127,7 +127,7 @@ void simpler_four_stack() {
 
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(1.4_in);
+    arm->set_height(2.2_in); // shuffled height lol was 1.4
 
     cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
 
@@ -139,17 +139,17 @@ void simpler_four_stack() {
     pros::delay(500);
     //close_claw();
     arm->set_height(4_in);
-    cc->driveStraight(-1.5_ft);
-
-    auto large_side_x = (side > 0) ? 11.4_ft : 56.3_in;
+    cc->driveStraight(-1.7_ft);
+    // 11.3_ft : 56.4_in;
+    auto large_side_x = (side > 0) ? 11.2_ft : 56.5_in;
     // ok so this is jank but the zones are mirrored weirdly in this game and I don't want to write two routines so here we go
-    position_intake_to_point(large_side_x, 9_in);
+    position_intake_to_point(large_side_x, 5_in);
 
     //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
-    arm->flipDisable(false);
-    arm->set_height(0_in);
-    arm->waitUntilSettled();
+    //arm->flipDisable(false);
+    //arm->set_height(0_in);
+    //arm->waitUntilSettled();
     arm->flipDisable(true);
     arm->set(-200);
     pros::delay(500);
