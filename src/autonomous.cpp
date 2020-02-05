@@ -38,7 +38,7 @@ void close_claw() {
     intake->moveVoltage(12000);
     while (intake->getActualVelocity() > 1)
         pros::delay(50);
-    pros::delay(50);
+    pros::delay(200);
 }
 
 void position_intake_to_point_async(okapi::QLength x, okapi::QLength y) {
@@ -313,6 +313,8 @@ void skill_auton() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
 
+
+    // Get first tower large blue
     close_claw();
     arm->set_height(26_in);
     position_intake_to_point(70.3_in, 23.2_in);
@@ -320,31 +322,34 @@ void skill_auton() {
     open_claw();
 
 
-    cc->driveToPoint({97.1_in, 33.4_in});
+    // Now head to four stack
+    cc->driveToPoint({97.1_in, 49.9_in - (INTAKE_FROM_CENTER + 2_in)});
     arm->set_height(0.5_in);
     position_intake_to_point(97.1_in, 49.9_in);
     arm->waitUntilSettled();
     close_claw();
     arm->set_height(2_in);
 
+    // now stack in large blue side
     position_intake_to_point(11.5_ft, 8_in);
     arm->set_height(1_in);
     open_claw();
     arm->set_height(3_in);
 
-
+    // Drive to small tower between large zones
     cc->driveToPoint({125_in, 70.3_in});
     arm->set_height(0_in);
     position_intake_to_point(112.3_in, 70.3_in);
     arm->waitUntilSettled();
     close_claw();
 
+    // Score cube
     arm->set_height(20_in);
     arm->waitUntilSettled();
     position_intake_to_point(105.7_in, 70.3_in);
     open_claw();
 
-
+    // get next 4 stack
     cc->driveStraight(-9_in);
     arm->set_height(0.5_in);
     cc->setHeading(-90_deg);
@@ -355,18 +360,20 @@ void skill_auton() {
     close_claw();
     arm->set_height(2_in);
 
+    // Score it
     position_intake_to_point(11.5_ft, 10.5_ft);
     arm->set_height(1_in);
     arm->waitUntilSettled();
     open_claw();
     arm->set_height(3_in);
 
-
+    // Get final tower
     cc->driveToPoint({89_in, 117.5_in});
     arm->set_height(1_in);
     position_intake_to_point(77_in, 117.5_in);
     arm->waitUntilSettled();
     close_claw();
+    
     arm->set_height(26_in);
     arm->waitUntilSettled();
     position_intake_to_point(70.3_in, 117.5_in);
