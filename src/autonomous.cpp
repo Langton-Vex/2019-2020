@@ -76,8 +76,8 @@ void vision_test() {
     //arm->set_height(3_in);
     //cc->strafe(12_in);
     //cc->tune();
-    cc->driveVector(24_in, 24_in);
-    //arm->tune();
+    //cc->driveVector(24_in, 24_in);
+    arm->tune();
     pros::delay(100);
     //fprintf(stderr, "waiting for yeet");
 
@@ -127,7 +127,7 @@ void simpler_four_stack() {
 
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(2.2_in); // shuffled height lol was 1.4
+    arm->set_height(1.4_in); // shuffled height lol was 1.4
 
     cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
 
@@ -141,7 +141,7 @@ void simpler_four_stack() {
     arm->set_height(4_in);
     cc->driveStraight(-1.7_ft);
     // 11.3_ft : 56.4_in;
-    auto large_side_x = (side > 0) ? 11.2_ft : 56.5_in;
+    auto large_side_x = (side > 0) ? 11.15_ft : 56.26_in;
     // ok so this is jank but the zones are mirrored weirdly in this game and I don't want to write two routines so here we go
     position_intake_to_point(large_side_x, 5_in);
 
@@ -373,7 +373,7 @@ void skill_auton() {
     position_intake_to_point(77_in, 117.5_in);
     arm->waitUntilSettled();
     close_claw();
-    
+
     arm->set_height(26_in);
     arm->waitUntilSettled();
     position_intake_to_point(70.3_in, 117.5_in);
