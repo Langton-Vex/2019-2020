@@ -24,7 +24,11 @@ void set_temperature(int i) {
 
     double chassis_temp = (peripherals->left_mtr.get_temperature() + peripherals->right_mtr.get_temperature() + peripherals->lefttwo_mtr.get_temperature() + peripherals->righttwo_mtr.get_temperature()) / 4;
     double claw_temp = (peripherals->intake_mtr.get_temperature());
+    bool holding = Chassis::get()->holdmode;
+    std::string holding_text = (holding) ? "true" : "false";
 
+    if (i == 3)
+        peripherals->master_controller.print(2, 0, "Hold: %s", holding_text);
     if (i == 2)
         peripherals->master_controller.print(1, 0, "%d,%d,%d,%d, %d", (int)peripherals->leftarm_mtr.get_temperature(), (int)peripherals->rightarm_mtr.get_temperature(), (int)chassis_temp, (int)claw_temp, (int)peripherals->strafe_mtr.get_temperature());
     if (i == 1)
@@ -44,7 +48,7 @@ void opcontrol() {
 
     peripherals->master_controller.print(-1, 0, ""); //NOTE: This may or may not work
 
-    int it = 11;
+    int it = 16;
     uint32_t time = pros::millis();
     while (true) {
         //macros_update(peripherals->master_controller);
@@ -55,8 +59,8 @@ void opcontrol() {
 
         it--;
         if (it == 0)
-            it = 11;
-        if (it <= 10 && it % 5 == 0) // Trying to delay over 50ms but not using tasks ...
+            it = 16;
+        if (it <= 15 && it % 5 == 0) // Trying to delay over 50ms but not using tasks ...
             set_temperature(it / 5);
 
         pros::Task::delay_until(&time, 10);

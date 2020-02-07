@@ -43,6 +43,7 @@ void Chassis::user_control() {
     int align_button = peripherals->master_controller.get_digital(DIGITAL_B);
     int strafe_left = peripherals->master_controller.get_digital(DIGITAL_R2);
     int strafe_right = peripherals->master_controller.get_digital(DIGITAL_R1);
+    int hold_button = peripherals->master_controller.get_digital_new_press(DIGITAL_UP);
 
     int strafe;
     if (strafe_left)
@@ -52,9 +53,30 @@ void Chassis::user_control() {
     else
         strafe = 0;
 
+    if (hold_button)
+        holdmode = !holdmode;
+
+    if (peripherals->left_mtr.get_temperature() >= 50 || peripherals->strafe_mtr.get_temperature() >= 50) {
+        holdmode = false;
+    }
+
     if (slowmode_button == 1)
         slowmode = !slowmode;
     //pros::lcd::print(5,"height per %f",arm.height_per);
+
+    if (holdmode) {
+        peripherals->left_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        peripherals->right_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        peripherals->lefttwo_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        peripherals->righttwo_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        peripherals->strafe_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    } else {
+        peripherals->left_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        peripherals->right_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        peripherals->lefttwo_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        peripherals->righttwo_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        peripherals->strafe_mtr.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    }
 
     if (align_button) {
         if (alignnextloop) {
@@ -89,12 +111,19 @@ void Chassis::set(int power, int turn, int strafe) {
     int left = (int)powere + (int)turne;
     int right = (int)powere - (int)turne;
 
-    peripherals->left_mtr.move_voltage(left);
-    peripherals->right_mtr.move_voltage(right);
-    peripherals->lefttwo_mtr.move_voltage(left);
-    peripherals->righttwo_mtr.move_voltage(right);
-    if (strafe > -9999)
+    if (abs(left) > 0 || abs(right) > 0 || abs(strafe) > 0) {
+        peripherals->left_mtr.move_voltage(left);
+        peripherals->right_mtr.move_voltage(right);
+        peripherals->lefttwo_mtr.move_voltage(left);
+        peripherals->righttwo_mtr.move_voltage(right);
         peripherals->strafe_mtr.move(strafe);
+    } else {
+        peripherals->left_mtr.move_velocity(0);
+        peripherals->right_mtr.move_velocity(0);
+        peripherals->lefttwo_mtr.move_velocity(0);
+        peripherals->righttwo_mtr.move_velocity(0);
+        peripherals->strafe_mtr.move_velocity(0);
+    }
 }
 
 // Currently set to only move strafe, as forward/backward align is unreliable / not necessary

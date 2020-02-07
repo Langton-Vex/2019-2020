@@ -8,8 +8,6 @@ const int pot_max = 150;
 const char pot_port = 'A';
 const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.001500, 0.000, 0.000181 };
 
-
-
 pros::ADIAnalogIn arm_pot(pot_port);
 
 using namespace okapi;

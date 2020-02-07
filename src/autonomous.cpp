@@ -62,14 +62,13 @@ void position_intake_to_point(okapi::QLength x, okapi::QLength y) {
 
 void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y) {
     double angle_rad = cc->odom->getState(okapi::StateMode::CARTESIAN).theta.convert(okapi::radian);
-    cc->diagToPoint({x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER)});
+    cc->diagToPoint({ x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER) });
 }
 
 void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y, okapi::QAngle angle) {
     double angle_rad = angle.convert(okapi::radian);
-    cc->diagToPoint({x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER)});
+    cc->diagToPoint({ x - (sin(angle_rad) * INTAKE_FROM_CENTER), y - (cos(angle_rad) * INTAKE_FROM_CENTER) });
 }
-
 
 void vision_test() {
     std::shared_ptr<Arm> arm = Arm::get();
@@ -313,7 +312,6 @@ void skill_auton() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
 
-
     // Get first tower large blue
     close_claw();
     arm->set_height(26_in);
@@ -321,9 +319,8 @@ void skill_auton() {
     arm->waitUntilSettled();
     open_claw();
 
-
     // Now head to four stack
-    cc->driveToPoint({97.1_in, 49.9_in - (INTAKE_FROM_CENTER + 2_in)});
+    cc->driveToPoint({ 97.1_in, 49.9_in - (INTAKE_FROM_CENTER + 2_in) });
     arm->set_height(0.5_in);
     position_intake_to_point(97.1_in, 49.9_in);
     arm->waitUntilSettled();
@@ -337,7 +334,7 @@ void skill_auton() {
     arm->set_height(3_in);
 
     // Drive to small tower between large zones
-    cc->driveToPoint({125_in, 70.3_in});
+    cc->driveToPoint({ 125_in, 70.3_in });
     arm->set_height(0_in);
     position_intake_to_point(112.3_in, 70.3_in);
     arm->waitUntilSettled();
@@ -368,7 +365,7 @@ void skill_auton() {
     arm->set_height(3_in);
 
     // Get final tower
-    cc->driveToPoint({89_in, 117.5_in});
+    cc->driveToPoint({ 89_in, 117.5_in });
     arm->set_height(1_in);
     position_intake_to_point(77_in, 117.5_in);
     arm->waitUntilSettled();
@@ -388,7 +385,7 @@ void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
     PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
-    PIDTuning strafeTuning = PIDTuning(0.0025, 0.0000100,0.000120);
+    PIDTuning strafeTuning = PIDTuning(0.0025, 0.0000100, 0.000120);
 
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(

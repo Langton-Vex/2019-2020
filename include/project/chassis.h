@@ -22,6 +22,7 @@ public:
     double turn_radius;
     double wheel_circumference;
     int motor_speed;
+    bool holdmode = false;
 
 protected:
     Chassis();
