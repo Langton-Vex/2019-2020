@@ -6,7 +6,7 @@ const auto max_height = 46 * okapi::inch;
 const int pot_min = 1623;
 const int pot_max = 150;
 const char pot_port = 'A';
-const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.001500, 0.000, 0.000181 };
+const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.001773, 0.000, 0.000036 };
 
 pros::ADIAnalogIn arm_pot(pot_port);
 
@@ -128,7 +128,7 @@ void Arm::tune() {
 
     auto ArmTuner = okapi::PIDTunerFactory::create(
         arm_pot, arm_motors, 3 * okapi::second, 300,
-        0.0006, 0.0015, 0.0000, 0.0000, 0.00005, 0.001,
+        0.001, 0.0025, 0.0000, 0.0000, 0.00001, 0.00005,
         5, 8);
     auto tuning = ArmTuner.autotune();
     fprintf(stderr, "\nKp: %f, Ki: %f, Kd: %f\n", tuning.kP, tuning.kI, tuning.kD);
