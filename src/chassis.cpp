@@ -32,9 +32,8 @@ Chassis::Chassis() {
     if (motor_gearset == MOTOR_GEARSET_36)
         motor_speed = 100;
     //else throw std::invalid_argument("Cannot get gearset of left mtr");
+    strafePID.setSampleTime(20*okapi::millisecond);
 }
-
-bool alignnextloop = true;
 
 void Chassis::user_control() {
     int power = peripherals->master_controller.get_analog(ANALOG_RIGHT_Y);
@@ -79,12 +78,9 @@ void Chassis::user_control() {
     }
 
     if (align_button) {
-        if (alignnextloop) {
-            this->set(power, 0, vision_align());
-        }
+        this->set(power, 0, vision_align());
     } else
         this->set(power, turn, strafe);
-    alignnextloop = !alignnextloop;
 }
 
 double Chassis::power_mult_calc() {
@@ -125,7 +121,8 @@ void Chassis::set(int power, int turn, int strafe) {
         peripherals->strafe_mtr.move_velocity(0);
     }
 }
-
+pros::vision_object_s_t last_obj;
+int last_return;
 // Currently set to only move strafe, as forward/backward align is unreliable / not necessary
 int Chassis::vision_align() {
 
@@ -133,12 +130,19 @@ int Chassis::vision_align() {
     //vision::signature SIG_1 (1, 607, 2287, 1446, 6913, 10321, 8618, 3.000, 0);
 
     pros::vision_object_s_t rtn = camera.get_by_size(0);
+
+    if (compare_vision_objects(last_obj, rtn)){
+      return last_return;
+    }
+    last_obj = rtn;
+
     if (camera.get_object_count() == 0)
         return -9999;
 
     if (rtn.width > 20) {
         vision_distance.store(190 - rtn.width);
         double strafeOut = strafePID.step(x_coord_filter.filter(rtn.x_middle_coord));
+        last_return = motor_speed * strafeOut;
         return motor_speed * strafeOut;
     }
     return 0;

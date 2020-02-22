@@ -4,6 +4,7 @@
 // User definitions
 
 float sgn(int x);
+bool compare_vision_objects(pros::vision_object const lhs, pros::vision_object const rhs);
 
 #include "project/peripherals_t.h"
 
