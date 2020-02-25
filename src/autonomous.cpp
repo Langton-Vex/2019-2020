@@ -118,11 +118,11 @@ void do_nothing() {
 
 void read_number() {
     while (true) {
-        int left = peripherals->leftenc.get();
-        int right = peripherals->rightenc.get();
-        int mid = peripherals->midenc.get();
+        int left = peripherals->leftenc->get();
+        int right = peripherals->rightenc->get();
+        int mid = peripherals->midenc->get();
 
-        printf("left: %d, right: %d %d, mid: %d\n\n", left, right, mid);
+        printf("left: %d, right: %d, mid: %d\n\n", left, right, mid);
     }
 };
 
