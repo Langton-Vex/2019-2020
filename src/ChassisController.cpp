@@ -183,6 +183,32 @@ void ChassisControllerHDrive::driveVector(okapi::QLength straight, okapi::QLengt
     waitUntilSettled();
 };
 
+void ChassisControllerHDrive::driveArc(okapi::Point point) {
+    driveArcAsync(point);
+    waitUntilSettled();
+};
+
+void ChassisControllerHDrive::driveArcAsync(okapi::Point point) {
+    pointTarget = point;
+    straightPID->flipDisable(false);
+    turnPID->flipDisable(false);
+
+    auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
+        point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+};
+
+void ChassisControllerHDrive::driveOmni(okapi::Point point, okapi::QAngle heading) {
+    driveOmniAsync(point, heading);
+    waitUntilSettled();
+};
+
+void ChassisControllerHDrive::driveOmniAsync(okapi::Point point, okapi::QAngle heading) {
+    pointTarget = point;
+    headingTarget = heading;
+    auto [length, angle] = okapi::OdomMath::computeDistanceAndAngleToPoint(
+        point.inFT(okapi::StateMode::CARTESIAN), odom->getState(okapi::StateMode::FRAME_TRANSFORMATION));
+};
+
 void ChassisControllerHDrive::lookToPoint(okapi::Point point, bool turnreversed) {
     lookToPointAsync(point, turnreversed);
     waitUntilSettled();
