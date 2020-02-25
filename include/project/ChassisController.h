@@ -40,6 +40,9 @@ public:
     double currentMaxVelocity = 0.0;
     double maxVoltage = 12.0;
 
+    okapi::Point pointTarget;
+    okapi::QAngle headingTarget;
+
     okapi::PathfinderLimits plimits{ 0.5, 0.75, 1 };
     std::string currentPath{ "" };
     int direction = 1;
@@ -100,6 +103,12 @@ public:
 
     void driveVector(okapi::QLength straight, okapi::QLength strafe);
     void driveVectorAsync(okapi::QLength straight, okapi::QLength strafe);
+
+    void driveArc(okapi::Point point);
+    void driveArcAsync(okapi::Point point);
+
+    void driveOmni(okapi::Point point, okapi::QAngle heading);
+    void driveOmniAsync(okapi::Point point, okapi::QAngle heading);
 
     void diagToPointAsync(okapi::Point point);
     void diagToPoint(okapi::Point point);
