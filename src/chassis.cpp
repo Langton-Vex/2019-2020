@@ -14,7 +14,7 @@ std::atomic<int> vision_distance;
 
 okapi::AverageFilter<5> x_coord_filter;
 pros::Vision camera(15, pros::E_VISION_ZERO_CENTER);
-auto strafePID = okapi::IterativeControllerFactory::posPID(0.0071, 0.000000, 0.00005);
+auto strafePID = okapi::IterativeControllerFactory::posPID(0.0071, 0.000000, 0.0001);
 /*
 okapi::EmaFilter x_coord_filter(1);
 okapi::DemaFilter x_coord_filter(1,1);
@@ -32,7 +32,7 @@ Chassis::Chassis() {
     if (motor_gearset == MOTOR_GEARSET_36)
         motor_speed = 100;
     //else throw std::invalid_argument("Cannot get gearset of left mtr");
-    strafePID.setSampleTime(20*okapi::millisecond);
+    strafePID.setSampleTime(20 * okapi::millisecond);
 }
 
 void Chassis::user_control() {
@@ -131,8 +131,8 @@ int Chassis::vision_align() {
 
     pros::vision_object_s_t rtn = camera.get_by_size(0);
 
-    if (compare_vision_objects(last_obj, rtn)){
-      return last_return;
+    if (compare_vision_objects(last_obj, rtn)) {
+        return last_return;
     }
     last_obj = rtn;
 

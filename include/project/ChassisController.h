@@ -21,7 +21,7 @@ public:
         okapi::MotorGroup rightSide, okapi::Motor strafe,
         okapi::AbstractMotor::GearsetRatioPair istraightGearset,
         okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
-        okapi::ChassisScales iscales);
+        okapi::ChassisScales iscales, okapi::ChassisScales itrackingscales);
     ~ChassisControllerHDrive();
     /* TODO: Make this controller use okapi's models
                            For cross robot compatability*/
@@ -71,7 +71,8 @@ public:
 
     std::unique_ptr<okapi::AbstractMotor::GearsetRatioPair> straightGearset;
     std::unique_ptr<okapi::AbstractMotor::GearsetRatioPair> strafeGearset;
-    std::unique_ptr<okapi::ChassisScales> scales;
+    std::unique_ptr<okapi::ChassisScales> chassisScales;
+    std::unique_ptr<okapi::ChassisScales> trackingScales;
 
     std::shared_ptr<okapi::AbstractMotor> leftSide;
     std::shared_ptr<okapi::AbstractMotor> rightSide;

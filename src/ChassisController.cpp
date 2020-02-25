@@ -38,7 +38,7 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     okapi::MotorGroup irightSide, okapi::Motor istrafe,
     okapi::AbstractMotor::GearsetRatioPair istraightGearset,
     okapi::AbstractMotor::GearsetRatioPair istrafeGearset,
-    okapi::ChassisScales iscales) {
+    okapi::ChassisScales iscales, okapi::ChassisScales itrackingscales) {
 
     pros::delay(100); // Just a good idea
 
@@ -63,8 +63,10 @@ ChassisControllerHDrive::ChassisControllerHDrive(
         istraightGearset);
     strafeGearset = std::make_unique<okapi::AbstractMotor::GearsetRatioPair>(
         istrafeGearset);
-    scales = std::make_unique<okapi::ChassisScales>(
+    chassisScales = std::make_unique<okapi::ChassisScales>(
         iscales);
+    trackingScales = std::make_unique<okapi::ChassisScales>(
+        itrackingscales);
 
     leftSide = std::make_unique<okapi::MotorGroup>(ileftSide);
     rightSide = std::make_unique<okapi::MotorGroup>(irightSide);
@@ -74,10 +76,10 @@ ChassisControllerHDrive::ChassisControllerHDrive(
     settledUtil = timeUtil->getSettledUtil();
 
     model = std::make_unique<okapi::HDriveModel>(leftSide, rightSide, strafeMotor,
-        leftSide->getEncoder(), rightSide->getEncoder(), strafeMotor->getEncoder(),
+        peripherals->leftenc, peripherals->rightenc, peripherals->midenc,
         maxVelocity, maxVoltage);
     odom = std::make_unique<okapi::ThreeEncoderOdometry>(okapi::TimeUtilFactory::createDefault(),
-        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), iscales);
+        std::static_pointer_cast<okapi::ReadOnlyChassisModel>(model), trackingScales);
 
     reset();
 
@@ -91,9 +93,9 @@ ChassisControllerHDrive::~ChassisControllerHDrive() {
 };
 
 void ChassisControllerHDrive::reset() {
-    leftSideStart = leftSide->getPosition();
-    rightSideStart = rightSide->getPosition();
-    strafeStart = strafeMotor->getPosition();
+    leftSideStart = peripherals->leftenc.get();
+    rightSideStart = peripherals->rightenc.get();
+    strafeStart = peripherals->leftenc.get();
     mode.clear();
 
     leftSide->moveVelocity(0);
@@ -122,7 +124,7 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
     straightPID->setTarget(
-        distance.convert(okapi::meter) * scales->straight * straightGearset->ratio);
+        distance.convert(okapi::meter) * chassisScales->straight * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
@@ -134,18 +136,18 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * chassisScales->turn * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * chassisScales->turn * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::changeTurn(okapi::QAngle angle) {
-    turnPID->setTarget(angle.convert(okapi::degree) * scales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * chassisScales->turn * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::strafe(okapi::QLength distance) {
@@ -161,7 +163,7 @@ void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
     mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
     strafePID->setTarget(
-        distance.convert(okapi::meter) * scales->middle * strafeGearset->ratio);
+        distance.convert(okapi::meter) * chassisScales->middle * strafeGearset->ratio);
 };
 
 void ChassisControllerHDrive::driveToPoint(okapi::Point point, bool turnreversed) {
@@ -255,7 +257,7 @@ void ChassisControllerHDrive::generatePath(std::initializer_list<okapi::Pathfind
 
     // Generate the trajectory
     pathfinder_generate(&candidate, trajectory.get());
-    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(), rightTrajectory.get(), scales->wheelTrack.convert(okapi::meter));
+    pathfinder_modify_tank(trajectory.get(), length, leftTrajectory.get(), rightTrajectory.get(), chassisScales->wheelTrack.convert(okapi::meter));
 
     // In case
     removePath(ipathId);
@@ -294,10 +296,10 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
     right_follower.segment = 0;
     right_follower.finished = 0;
     // TODO: This assumes everything is in degrees, please consider changing this!!
-    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, scales->straight, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig left_config = { (int)leftSide->getPosition(), 360, chassisScales->straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
-    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, scales->straight, // Position, Ticks per Rev, Wheel Circumference
+    EncoderConfig right_config = { (int)rightSide->getPosition(), 360, chassisScales->straight, // Position, Ticks per Rev, Wheel Circumference
         0.8, 0.0, 0.0, 1.0 / plimits.maxVel, 0.0 }; // Kp, Ki, Kd and Kv, Ka
 
     /* This is jank, should be in step, this entire project needs refactoring into
@@ -320,7 +322,7 @@ void ChassisControllerHDrive::runPath(const std::string& ipathId, bool reversed,
             heading = (360.0 - heading);
         }
 
-        turnPID->setTarget(heading * scales->turn * straightGearset->ratio);
+        turnPID->setTarget(heading * chassisScales->turn * straightGearset->ratio);
         double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
         double turnOut = turnPID->step(turnChange);
         double turnVelocity = (double)straightGearset->internalGearset * turnOut;
@@ -568,10 +570,15 @@ void ChassisControllerHDrive::step() {
     okapi::OdomState state = odom->getState();
     //fprintf(stderr, "odom: %f, %f, %f\n", state.x.convert(okapi::meter), state.y.convert(okapi::meter), state.theta.convert(okapi::degree));
 
-    double distance_forward = ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
-    double angleChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
-    double turnChange = ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
-    double strafeChange = strafeMotor->getPosition() - strafeStart;
+    double distance_forward = ((peripherals->leftenc.get() - leftSideStart) + (peripherals->rightenc.get() - rightSideStart)) / 2.0;
+    double angleChange = ((peripherals->leftenc.get() - leftSideStart) - (peripherals->rightenc.get() - rightSideStart));
+    double turnChange = ((peripherals->leftenc.get() - leftSideStart) - (peripherals->rightenc.get() - rightSideStart)) / 2.0;
+    double strafeChange = peripherals->midenc.get() - strafeStart;
+
+    distance_forward *= trackingScales->straight / chassisScales->straight;
+    angleChange *= trackingScales->turn / chassisScales->turn;
+    turnChange *= trackingScales->turn / chassisScales->turn;
+    strafeChange *= trackingScales->middle / chassisScales->middle;
 
     double leftVelocity = 0;
     double rightVelocity = 0;

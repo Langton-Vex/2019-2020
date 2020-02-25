@@ -116,6 +116,16 @@ void do_nothing() {
         pros::delay(10);
 };
 
+void read_number() {
+    while (true) {
+        int left = peripherals->leftenc.get();
+        int right = peripherals->rightenc.get();
+        int mid = peripherals->midenc.get();
+
+        printf("left: %d, right: %d %d, mid: %d\n\n", left, right, mid);
+    }
+};
+
 void simpler_four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
@@ -403,6 +413,11 @@ void create_cc() {
         okapi::ChassisScales(
             { { okapi::inch * 4.125, 15.1 * okapi::inch, // wheel diam, wheelbase diam
                   0 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+                okapi::imev5GreenTPR }),
+
+        okapi::ChassisScales( // Tracking scales
+            { { okapi::inch * 2.75, 8.1 * okapi::inch, // wheel diam, wheelbase diam
+                  2 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
                 okapi::imev5GreenTPR }));
 }
 

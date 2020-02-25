@@ -26,6 +26,9 @@ extern const int8_t intake_port = 6;
 extern const int8_t strafe_port = 16;
 extern const int8_t leftarm_port = 1;
 extern const int8_t rightarm_port = 5;
+extern const char leftenc_port = 'A';
+extern const char rightenc_port = 'C';
+extern const char midenc_port = 'E';
 
 /* TODO: Yikes these definitions are getting messy, these need to be moved to
    one file at some point. */
@@ -46,13 +49,13 @@ extern std::shared_ptr<ChassisControllerHDrive> cc;
 
 void initialize() {
     std::cerr << "Intializing" << std::endl;
-    pros::delay(100);
+    pros::delay(150);
 
     ConfigManager::get()->load_config();
 
     peripherals = std::make_unique<Peripherals_t>(left_port, right_port,
         lefttwo_port, righttwo_port, intake_port, strafe_port,
-        leftarm_port, rightarm_port);
+        leftarm_port, rightarm_port, leftenc_port, rightenc_port, midenc_port);
 
     Arm::get()->init();
 
