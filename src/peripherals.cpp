@@ -14,8 +14,9 @@ Peripherals_t::Peripherals_t(int left, int right, int lefttwo, int righttwo,
     leftarm_mtr(leftarm, MOTOR_GEARSET_36, true, MOTOR_ENCODER_DEGREES),
     rightarm_mtr(rightarm, MOTOR_GEARSET_36, false, MOTOR_ENCODER_DEGREES),
 
-    master_controller(pros::E_CONTROLLER_MASTER),
-
-    leftenc(leftenc_port, leftenc_port + 1),
-    rightenc(rightenc_port, rightenc_port + 1),
-    midenc(midenc_port, midenc_port + 1){};
+    master_controller(pros::E_CONTROLLER_MASTER) {
+    // Okapi generally wants pointers...
+    leftenc = std::make_shared<okapi::ADIEncoder>(leftenc_port, leftenc_port + 1);
+    rightenc = std::make_shared<okapi::ADIEncoder>(rightenc_port, rightenc_port + 1);
+    midenc = std::make_shared<okapi::ADIEncoder>(midenc_port, midenc_port + 1);
+};
