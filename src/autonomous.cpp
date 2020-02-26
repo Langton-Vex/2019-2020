@@ -72,11 +72,13 @@ void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y, okapi::QA
 
 void vision_test() {
     std::shared_ptr<Arm> arm = Arm::get();
-    //arm->set_height(3_in);
+    arm->set_height(3_in);
     //cc->strafe(12_in);
     //cc->tune();
     //cc->driveVector(24_in, 24_in);
-    arm->tune();
+    //arm->tune();
+    cc->driveStraight(24_in);
+    //cc->turnAngle(90_deg);
     pros::delay(100);
     //fprintf(stderr, "waiting for yeet");
 
@@ -123,6 +125,7 @@ void read_number() {
         int mid = peripherals->midenc->get();
 
         printf("left: %d, right: %d, mid: %d\n\n", left, right, mid);
+        pros::delay(500);
     }
 };
 
@@ -416,9 +419,9 @@ void create_cc() {
                 okapi::imev5GreenTPR }),
 
         okapi::ChassisScales( // Tracking scales
-            { { okapi::inch * 2.75, 8.1 * okapi::inch, // wheel diam, wheelbase diam
-                  2 * okapi::millimeter, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
-                okapi::imev5GreenTPR }));
+            { { okapi::inch * 2.75, 9.02916 * okapi::inch, // wheel diam, wheelbase diam
+                  1.88 * okapi::inch, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+                okapi::quadEncoderTPR }));
 }
 
 void init_autonomous() {
@@ -438,6 +441,7 @@ void init_autonomous() {
     auto configManager = ConfigManager::get();
     configManager->register_auton("near small", near_small);
     configManager->register_auton("do nothing", do_nothing);
+    configManager->register_auton("enc read", read_number);
     configManager->register_auton("four stack", simpler_four_stack,
         okapi::OdomState{ 97.1_in, 26.4_in - INTAKE_FROM_CENTER, 0_deg });
     /*

@@ -400,7 +400,7 @@ void ChassisControllerHDrive::tune() {
     //P,P, I, I, D, D
     auto StraightTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 4 * okapi::second, 3500,
-        0.0005, 0.002, 0, 0, 0, 0.0001);
+        0.0003, 0.0015, 0, 0, 0, 0.0001);
 
     auto AngleTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 4 * okapi::second, 0,
@@ -413,14 +413,14 @@ void ChassisControllerHDrive::tune() {
         0.0045, 0.0065, 0, 0, 0.00007, 0.00014,
         5, 8); // Num iterations and num particles, default 5, 16
 
-    /*
+
     tuningMode = TuningMode::TuneStraight;
     printf("straight tuning\n");
     okapi::PIDTuner::Output straightTune = StraightTuner->autotune();
     std::string straightValue = TuningToString(straightTune);
     printf("straight value: %s\n", straightValue.c_str());
 
-
+    /*
     printf("angle tuning\n");
     tuningMode = TuningMode::TuneAngle;
     okapi::PIDTuner::Output angleTune = AngleTuner->autotune();
@@ -437,7 +437,7 @@ void ChassisControllerHDrive::tune() {
         ct, ct, 8 * okapi::second, 1035,
         0.0005, 0.004, 0, 0, 0, 0.0001);
     TurnTuner->autotune();
-    */
+
 
     printf("strafe tuning\n");
     tuningMode = TuningMode::TuneStrafe;
@@ -448,7 +448,9 @@ void ChassisControllerHDrive::tune() {
     while (true) {
         fprintf(stderr, "strafe value: %s\n", strafeValue.c_str());
         pros::delay(2000);
+
     }
+    */
 
     pros::delay(10000);
     auto s = okapi::PIDTunerFactory::createPtr(
@@ -457,7 +459,7 @@ void ChassisControllerHDrive::tune() {
     okapi::PIDTuner::Output t = StrafeTuner->autotune();
 
     std::shared_ptr<GUI> gui = GUI::get();
-    gui->add_line(strafeValue);
+    //gui->add_line(strafeValue);
     /*
     gui->add_line(straightValue);
     gui->add_line(angleValue);
@@ -469,15 +471,25 @@ void ChassisControllerHDrive::tune() {
 }
 
 double ChassisControllerHDrive::controllerGet() {
+
+    double left = (peripherals->leftenc->get() - leftSideStart);
+    double right = (peripherals->rightenc->get() - rightSideStart);
+    double mid = (peripherals->leftenc->get() - leftSideStart);
+
+    double distance_forward = (left + right) / 2.0;
+    double angleChange = left - right;
+    double turnChange = (left - right) / 2.0;
+    double strafeChange = mid;
+
     switch (tuningMode) {
     case TuningMode::TuneStraight:
-        return ((leftSide->getPosition() - leftSideStart) + (rightSide->getPosition() - rightSideStart)) / 2.0;
+        return distance_forward;
     case TuningMode::TuneAngle:
-        return ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart));
+        return angleChange;
     case TuningMode::TuneTurn:
-        return ((leftSide->getPosition() - leftSideStart) - (rightSide->getPosition() - rightSideStart)) / 2.0;
+        return turnChange;
     case TuningMode::TuneStrafe:
-        return strafeMotor->getPosition() - strafeStart;
+        return strafeChange;
     default:
         return 0.0;
     }
@@ -599,11 +611,6 @@ void ChassisControllerHDrive::step() {
     double angleChange = left - right;
     double turnChange = (left - right) / 2.0;
     double strafeChange = mid;
-
-    distance_forward *= trackingScales->straight / chassisScales->straight;
-    angleChange *= (trackingScales->straight / chassisScales->straight) * (trackingScales->turn / chassisScales->turn);
-    turnChange *= (trackingScales->straight / chassisScales->straight) * (trackingScales->turn / chassisScales->turn);
-    strafeChange *= trackingScales->middle / chassisScales->middle;
 
     double leftVelocity = 0;
     double rightVelocity = 0;

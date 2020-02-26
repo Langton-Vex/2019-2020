@@ -26,8 +26,8 @@ extern const int8_t intake_port = 6;
 extern const int8_t strafe_port = 16;
 extern const int8_t leftarm_port = 1;
 extern const int8_t rightarm_port = 5;
-extern const char leftenc_port = 'A';
-extern const char rightenc_port = 'C';
+extern const char leftenc_port = 'C';
+extern const char rightenc_port = 'G';
 extern const char midenc_port = 'E';
 
 /* TODO: Yikes these definitions are getting messy, these need to be moved to
