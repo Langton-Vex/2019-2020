@@ -77,8 +77,8 @@ void vision_test() {
     //cc->tune();
     //cc->driveVector(24_in, 24_in);
     //arm->tune();
-    cc->driveStraight(24_in);
-    //cc->turnAngle(90_deg);
+    //cc->driveStraight(24_in);
+    cc->turnAngle(90_deg);
     pros::delay(100);
     //fprintf(stderr, "waiting for yeet");
 
@@ -395,10 +395,11 @@ void skill_auton() {
    ---------------------------------------------------------------- */
 
 void create_cc() {
-    PIDTuning straightTuning = PIDTuning(0.001890, 0.0, 0.000019);
+    PIDTuning straightTuning = PIDTuning(0.002000, 0.0, 0.000040);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
-    PIDTuning turnTuning = PIDTuning(0.001500, 0, 0.000053);
+    PIDTuning turnTuning = PIDTuning(0.004099, 0, 0.000144);
     PIDTuning strafeTuning = PIDTuning(0.0025, 0.0000100, 0.000120);
+
 
     PIDTuning hypotTuning = PIDTuning(0, 0, 0);
     okapi::MotorGroup leftSide(

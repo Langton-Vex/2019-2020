@@ -119,7 +119,7 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
     straightPID->setTarget(
-        distance.convert(okapi::meter) * trackingScales->straight * straightGearset->ratio);
+        distance.convert(okapi::meter) * trackingScales->straight);
 };
 
 void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
@@ -131,18 +131,18 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn );
 };
 
 void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn);
 };
 
 void ChassisControllerHDrive::changeTurn(okapi::QAngle angle) {
-    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn);
 };
 
 void ChassisControllerHDrive::strafe(okapi::QLength distance) {
@@ -399,40 +399,40 @@ void ChassisControllerHDrive::tune() {
     std::shared_ptr<ChassisControllerHDrive> ct(this);
     //P,P, I, I, D, D
     auto StraightTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 4 * okapi::second, 3500,
-        0.0003, 0.0015, 0, 0, 0, 0.0001);
+        ct, ct, 4 * okapi::second, 1500,
+        0.0005, 0.002, 0, 0, 0, 0.00015);
 
     auto AngleTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 4 * okapi::second, 0,
         0.0005, 0.001, 0, 0, 0, 0.0001);
     auto TurnTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 8 * okapi::second, 1035,
-        0.0005, 0.004, 0, 0, 0, 0.00005);
+        ct, ct, 8 * okapi::second, 535,
+        0.002, 0.0055, 0, 0, 0.00004, 0.00015);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 7 * okapi::second, 2000,
         0.0045, 0.0065, 0, 0, 0.00007, 0.00014,
         5, 8); // Num iterations and num particles, default 5, 16
 
-
+    /*
     tuningMode = TuningMode::TuneStraight;
     printf("straight tuning\n");
     okapi::PIDTuner::Output straightTune = StraightTuner->autotune();
     std::string straightValue = TuningToString(straightTune);
     printf("straight value: %s\n", straightValue.c_str());
 
-    /*
+
     printf("angle tuning\n");
     tuningMode = TuningMode::TuneAngle;
     okapi::PIDTuner::Output angleTune = AngleTuner->autotune();
     std::string angleValue = TuningToString(angleTune);
     printf("angle value: %s\n", angleValue.c_str());
-
+    */
     printf("turn tuning\n");
     tuningMode = TuningMode::TuneTurn;
     okapi::PIDTuner::Output turnTune = TurnTuner->autotune();
     std::string turnValue = TuningToString(turnTune);
     printf("turn value: %s\n", turnValue.c_str());
-
+    /*
     TurnTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 8 * okapi::second, 1035,
         0.0005, 0.004, 0, 0, 0, 0.0001);
@@ -452,7 +452,7 @@ void ChassisControllerHDrive::tune() {
     }
     */
 
-    pros::delay(10000);
+    pros::delay(20000);
     auto s = okapi::PIDTunerFactory::createPtr(
         ct, ct, 7 * okapi::second, 3000,
         0.002, 0.004, 0, 0, 0, 0.0001);

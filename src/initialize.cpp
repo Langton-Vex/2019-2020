@@ -112,11 +112,18 @@ void competition_initialize() {
     cc->odom->step();
     cc->odom->setState(state,
         okapi::StateMode::CARTESIAN);
-
+    int it = 0;
     while (pros::competition::is_disabled()) {
         GUI::get()->set_line(0, "Odom stepping");
+        it++;
         if (cc)
             cc->odom->step();
+
+        if (it >= 50){
+          it = 0;
+          auto state = cc->odom->getState(okapi::StateMode::CARTESIAN);
+          printf("odom: x: %f, y:%f, theta:%f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
+        }
         pros::delay(10);
         /* keep track of odom state while initialising
          this means that the robot can be pushed during initialising and keep
