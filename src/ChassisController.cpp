@@ -119,7 +119,7 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
     mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
     straightPID->setTarget(
-        distance.convert(okapi::meter) * chassisScales->straight * straightGearset->ratio);
+        distance.convert(okapi::meter) * trackingScales->straight * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
@@ -131,18 +131,18 @@ void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * chassisScales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::enableTurn(okapi::QAngle angle) {
     turnPID->flipDisable(false);
     mode.push_back(ControllerMode::turn);
 
-    turnPID->setTarget(angle.convert(okapi::degree) * chassisScales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::changeTurn(okapi::QAngle angle) {
-    turnPID->setTarget(angle.convert(okapi::degree) * chassisScales->turn * straightGearset->ratio);
+    turnPID->setTarget(angle.convert(okapi::degree) * trackingScales->turn * straightGearset->ratio);
 };
 
 void ChassisControllerHDrive::strafe(okapi::QLength distance) {
