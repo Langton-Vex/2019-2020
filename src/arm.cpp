@@ -6,7 +6,7 @@ const auto max_height = 46 * okapi::inch;
 const int pot_min = 1623;
 const int pot_max = 150;
 const char pot_port = 'A';
-const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.001773, 0.000, 0.000036 };
+const okapi::IterativePosPIDController::Gains pot_controller_gains = { 0.002164, 0.000, 0.000050 };
 
 pros::ADIAnalogIn arm_pot(pot_port);
 

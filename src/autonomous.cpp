@@ -73,7 +73,7 @@ void position_intake_to_point_diag(okapi::QLength x, okapi::QLength y, okapi::QA
 void vision_test() {
     std::shared_ptr<Arm> arm = Arm::get();
     arm->set_height(3_in);
-    //cc->strafe(12_in);
+    //cc->strafe(24_in);
     //cc->tune();
     //cc->driveVector(24_in, 24_in);
     //arm->tune();
@@ -109,8 +109,13 @@ void vision_test() {
 
 // Starts pointing towards small goal zone
 void near_small() {
-    cc->driveStraight(-12_in);
-    cc->driveStraight(18_in);
+    cc->stop_task();
+    auto chassis = Chassis::get();
+    chassis->set(200,0,0);
+    pros::delay(2000);
+    chassis->set(-200,0,0);
+    pros::delay(1000);
+    chassis->set(0,0,0);
 }
 
 void do_nothing() {
@@ -132,30 +137,44 @@ void read_number() {
 void simpler_four_stack() {
     int side = ConfigManager::get()->selected_team;
     std::shared_ptr<Arm> arm = Arm::get();
+    int startTime = pros::millis();
 
     // Get to cube
     arm->flipDisable(true);
-    auto cubeydelta = (48.2_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
+    auto cubeydelta = (47.5_in - INTAKE_FROM_CENTER) - cc->odom->getState(okapi::StateMode::CARTESIAN).y;
 
     cc->driveStraight(cubeydelta);
     arm->flipDisable(false);
-    arm->set_height(2_in); // shuffled height lol was 1.4
+    arm->set_height(2.7_in); // shuffled height lol was 1.4
 
-    cc->strafe((97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x));
+    cc->strafe(97.1_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
 
     arm->waitUntilSettled();
 
     cc->setHeading(0_deg);
-    cc->driveStraight(1.6_in); // Actually goes to 49.6, for a tad bit of tolerance
+    cc->driveStraight(1.7_in); // Actually goes to 49.6, for a tad bit of tolerance
     intake->moveVoltage(12000);
     pros::delay(500);
     //close_claw();
-    arm->set_height(4_in);
-    cc->driveStraight(-1.7_ft);
+
+    arm->set_height(6_in);
+    cc->driveStraight(-1.6_ft);
+
     // 11.3_ft : 56.4_in;
-    auto large_side_x = (side > 0) ? 11.2_ft : 56.26_in;
+    auto large_side_x = (side > 0) ? 11_ft : 62.2_in;
     // ok so this is jank but the zones are mirrored weirdly in this game and I don't want to write two routines so here we go
-    position_intake_to_point(large_side_x, 5_in);
+    position_intake_to_point_async(large_side_x, 1_in);
+
+    while ((pros::millis() - startTime) < 12000){
+      pros::delay(20);
+    }
+    if (cc->straightPID->isSettled()){
+      cc->waitUntilSettled();
+    }
+    else{
+      cc->disable_controllers();
+      cc->reset();
+    }
 
     //cc->lookToPoint({ large_side + (1_ft * side), cc->odom->getState(okapi::StateMode::CARTESIAN).y });
 
@@ -328,12 +347,17 @@ void skill_auton() {
     // Get first tower large blue
     close_claw();
     arm->set_height(26_in);
-    position_intake_to_point(70.3_in, 23.2_in);
+    position_intake_to_point_diag(68.3_in, 23.2_in);
     arm->waitUntilSettled();
     open_claw();
 
     // Now head to four stack
-    cc->driveToPoint({ 97.1_in, 49.9_in - (INTAKE_FROM_CENTER + 2_in) });
+    cc->strafe(85_in - cc->odom->getState(okapi::StateMode::CARTESIAN).x);
+    arm->set_height(3_in);
+    cc->diagToPoint({85_in, 23.2_in});
+    cc->diagToPoint({85_in, 47.5_in});
+    cc->diagToPoint({97.1_in, 47.5_in});
+    cc->driveStraight(1.4_in);
     arm->set_height(0.5_in);
     position_intake_to_point(97.1_in, 49.9_in);
     arm->waitUntilSettled();
@@ -397,7 +421,7 @@ void skill_auton() {
 void create_cc() {
     PIDTuning straightTuning = PIDTuning(0.002000, 0.0, 0.000040);
     PIDTuning angleTuning = PIDTuning(0.000764, 0, 0.000007);
-    PIDTuning turnTuning = PIDTuning(0.004099, 0, 0.000144);
+    PIDTuning turnTuning = PIDTuning(0.002, 0, 0.000025);
     PIDTuning strafeTuning = PIDTuning(0.0025, 0.0000100, 0.000120);
 
 
@@ -420,8 +444,8 @@ void create_cc() {
                 okapi::imev5GreenTPR }),
 
         okapi::ChassisScales( // Tracking scales
-            { { okapi::inch * 2.75, 9.02916 * okapi::inch, // wheel diam, wheelbase diam
-                  1.88 * okapi::inch, okapi::inch * 4.125 }, // middle wheel distance, middle wheel diam
+            { { okapi::inch * 2.777, 9.24 * okapi::inch, // wheel diam, wheelbase diam
+                  1.215 * okapi::inch, okapi::inch * 4.205 }, // middle wheel distance, middle wheel diam
                 okapi::quadEncoderTPR }));
 }
 

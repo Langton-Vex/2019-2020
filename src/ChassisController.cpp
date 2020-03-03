@@ -90,7 +90,7 @@ ChassisControllerHDrive::~ChassisControllerHDrive() {
 void ChassisControllerHDrive::reset() {
     leftSideStart = peripherals->leftenc->get();
     rightSideStart = peripherals->rightenc->get();
-    strafeStart = peripherals->leftenc->get();
+    strafeStart = peripherals->midenc->get();
     mode.clear();
 
     leftSide->moveVelocity(0);
@@ -125,6 +125,7 @@ void ChassisControllerHDrive::driveStraightAsync(okapi::QLength distance) {
 void ChassisControllerHDrive::turnAngle(okapi::QAngle angle) {
     turnAngleAsync(angle);
     waitUntilSettled();
+    printf("\nangle error: %f\n",turnPID->getError());
 };
 void ChassisControllerHDrive::turnAngleAsync(okapi::QAngle angle) {
     //disable_controllers();
@@ -157,8 +158,7 @@ void ChassisControllerHDrive::strafeAsync(okapi::QLength distance) {
     mode.push_back(ControllerMode::strafe);
     mode.push_back(ControllerMode::angle);
     anglePID->setTarget(0);
-    strafePID->setTarget(
-        distance.convert(okapi::meter) * chassisScales->middle * strafeGearset->ratio);
+    strafePID->setTarget(distance.convert(okapi::meter) * trackingScales->middle);
 };
 
 void ChassisControllerHDrive::driveToPoint(okapi::Point point, bool turnreversed) {
@@ -407,9 +407,9 @@ void ChassisControllerHDrive::tune() {
         0.0005, 0.001, 0, 0, 0, 0.0001);
     auto TurnTuner = okapi::PIDTunerFactory::createPtr(
         ct, ct, 8 * okapi::second, 535,
-        0.002, 0.0055, 0, 0, 0.00004, 0.00015);
+        0.002, 0.0065, 0, 0, 0.00004, 0.001);
     auto StrafeTuner = okapi::PIDTunerFactory::createPtr(
-        ct, ct, 7 * okapi::second, 2000,
+        ct, ct, 7 * okapi::second, 500,
         0.0045, 0.0065, 0, 0, 0.00007, 0.00014,
         5, 8); // Num iterations and num particles, default 5, 16
 
@@ -474,7 +474,7 @@ double ChassisControllerHDrive::controllerGet() {
 
     double left = (peripherals->leftenc->get() - leftSideStart);
     double right = (peripherals->rightenc->get() - rightSideStart);
-    double mid = (peripherals->leftenc->get() - leftSideStart);
+    double mid = (peripherals->midenc->get() - leftSideStart);
 
     double distance_forward = (left + right) / 2.0;
     double angleChange = left - right;
@@ -605,7 +605,7 @@ void ChassisControllerHDrive::step() {
 
     double left = (peripherals->leftenc->get() - leftSideStart);
     double right = (peripherals->rightenc->get() - rightSideStart);
-    double mid = (peripherals->leftenc->get() - leftSideStart);
+    double mid = (peripherals->midenc->get() - strafeStart);
 
     double distance_forward = (left + right) / 2.0;
     double angleChange = left - right;
@@ -642,13 +642,14 @@ void ChassisControllerHDrive::step() {
         double strafeOut = strafePID->step(strafeChange);
 
         strafeVelocity += (double)strafeGearset->internalGearset * strafeOut;
+
     }
 
     if (std::find(mode.begin(), mode.end(), ControllerMode::angle) != mode.end()) {
         double angleOut = anglePID->step(angleChange);
 
-        //leftVelocity += (double)straightGearset->internalGearset * angleOut;
-        //rightVelocity -= (double)straightGearset->internalGearset * angleOut;
+        leftVelocity += (double)straightGearset->internalGearset * angleOut;
+        rightVelocity -= (double)straightGearset->internalGearset * angleOut;
         // NOTE: Need to see if this works uncommented
     }
 
@@ -700,6 +701,7 @@ void ChassisControllerHDrive::step() {
     leftVelocity = std::copysign(std::min(std::abs(leftVelocity), currentMaxVelocity), leftVelocity);
     rightVelocity = std::copysign(std::min(std::abs(rightVelocity), currentMaxVelocity), rightVelocity);
     strafeVelocity = std::copysign(std::min(std::abs(strafeVelocity), currentMaxVelocity), strafeVelocity);
+
 
     leftSide->moveVelocity((int)leftVelocity);
     rightSide->moveVelocity((int)rightVelocity);
